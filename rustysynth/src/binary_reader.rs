@@ -73,3 +73,30 @@ pub(crate) fn read_fixed_length_string<R: io::Read>(reader: &mut R, length: i32)
         Err(error) => Err(Box::new(error)),
     }
 }
+
+pub(crate) fn discard_data<R: io::Read>(reader: &mut R, size: i32) -> Result<(), io::Error>
+{
+    let mut data: Vec<u8> = vec![0; size as usize];
+    reader.read_exact(&mut data)
+}
+
+pub(crate) fn read_wave_data<R: io::Read>(reader: &mut R, size: i32) -> Result<Vec<i16>, io::Error>
+{
+    let mut data: Vec<u8> = vec![0; size as usize];
+    match reader.read_exact(&mut data)
+    {
+        Ok(()) => (),
+        Err(error) => return Err(error),
+    }
+
+    let length: i32 = size / 2;
+    let mut samples: Vec<i16> = vec![0; length as usize];
+    for i in 0..length
+    {
+        let offset = 2 * i as usize;
+        let sample: [u8; 2] = [data[offset], data[offset + 1]];
+        samples[i as usize] = i16::from_le_bytes(sample);
+    }
+
+    Ok(samples)
+}

@@ -1,13 +1,17 @@
 use std::error;
 use std::io;
+use std::rc;
 
 use super::binary_reader;
 use super::soundfont_info::SoundFontInfo;
+use super::soundfont_sampledata::SoundFontSampleData;
 
 #[non_exhaustive]
 pub struct SoundFont
 {
     pub info: SoundFontInfo,
+    pub bits_per_sample: i32,
+    pub wave_data: rc::Rc<Vec<i16>>,
 }
 
 impl SoundFont
@@ -45,9 +49,18 @@ impl SoundFont
             Err(error) => return Err(error),
         };
 
+        let result = SoundFontSampleData::new(reader);
+        let wave_data = match result
+        {
+            Ok(value) => value,
+            Err(error) => return Err(error),
+        };
+
         Ok(SoundFont
         {
             info: info,
+            bits_per_sample: 16,
+            wave_data: wave_data.wave_data,
         })
     }
 }

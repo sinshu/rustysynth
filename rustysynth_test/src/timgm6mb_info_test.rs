@@ -25,4 +25,13 @@ fn soundfont_info()
     assert_eq!(sound_font.info.copyright.as_str(), "");
     assert_eq!(sound_font.info.comments.as_str(), "");
     assert_eq!(sound_font.info.tools.as_str(), "Awave Studio v8.5");
+
+    assert_eq!(sound_font.wave_data.len(), 2882168);
+
+    let mut sum: i32 = 0;
+    for value in sound_font.wave_data.iter()
+    {
+        sum += *value as i32;
+    }
+    assert_eq!(sum, 713099516)
 }

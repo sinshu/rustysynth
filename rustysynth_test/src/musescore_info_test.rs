@@ -25,4 +25,13 @@ fn soundfont_info()
     assert_eq!(sound_font.info.copyright.as_str(), "2012 by S. Christian Collins");
     assert_eq!(sound_font.info.comments.len(), 2207);
     assert_eq!(sound_font.info.tools.as_str(), ":SFEDT v1.10:SFEDT v1.36:");
+
+    assert_eq!(sound_font.wave_data.len(), 15513098);
+
+    let mut sum: i32 = 0;
+    for value in sound_font.wave_data.iter()
+    {
+        sum += *value as i32;
+    }
+    assert_eq!(sum, 101035585)
 }
