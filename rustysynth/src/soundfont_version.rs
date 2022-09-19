@@ -1,0 +1,33 @@
+use std::io;
+
+use super::binary_reader;
+
+pub struct SoundFontVersion
+{
+    pub major: i16,
+    pub minor: i16,
+}
+
+impl SoundFontVersion
+{
+    pub fn default() -> Self
+    {
+        SoundFontVersion
+        {
+            major: 0,
+            minor: 0,
+        }
+    }
+
+    pub fn new<R: io::Read>(reader: &mut R) -> Result<Self, io::Error>
+    {
+        let major = binary_reader::read_i16(reader)?;
+        let minor = binary_reader::read_i16(reader)?;
+
+        Ok(SoundFontVersion
+        {
+            major: major,
+            minor: minor,
+        })
+    }
+}

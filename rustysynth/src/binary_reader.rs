@@ -26,7 +26,8 @@ pub fn read_i32<R: io::Read>(reader: &mut R) -> Result<i32, io::Error>
 pub fn read_four_cc<R: io::Read>(reader: &mut R) -> Result<String, Box<dyn error::Error>>
 {
     let mut data: [u8; 4] = [0; 4];
-    match reader.read_exact(&mut data) {
+    match reader.read_exact(&mut data)
+    {
         Ok(()) => (),
         Err(error) => return Err(Box::new(error)),
     };
@@ -40,22 +41,25 @@ pub fn read_four_cc<R: io::Read>(reader: &mut R) -> Result<String, Box<dyn error
         }
     }
     
-    match str::from_utf8(&data) {
-        Ok(str) => Ok(str.to_string()),
+    match str::from_utf8(&data)
+    {
+        Ok(value) => Ok(value.to_string()),
         Err(error) => Err(Box::new(error)),
     }
 }
 
-pub fn read_fixed_length_string<R: io::Read>(reader: &mut R, length: usize) -> Result<String, Box<dyn error::Error>>
+pub fn read_fixed_length_string<R: io::Read>(reader: &mut R, length: i32) -> Result<String, Box<dyn error::Error>>
 {
-    let mut data: Vec<u8> = vec![0; length];
-    match reader.read_exact(&mut data) {
+    let mut data: Vec<u8> = vec![0; length as usize];
+    match reader.read_exact(&mut data)
+    {
         Ok(()) => (),
         Err(error) => return Err(Box::new(error)),
     }
 
-    match str::from_utf8(&data) {
-        Ok(str) => Ok(str.to_string()),
+    match str::from_utf8(&data)
+    {
+        Ok(value) => Ok(value.to_string()),
         Err(error) => Err(Box::new(error)),
     }
 }
