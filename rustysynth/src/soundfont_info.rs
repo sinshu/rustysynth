@@ -21,7 +21,7 @@ pub struct SoundFontInfo
 
 impl SoundFontInfo
 {
-    pub fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
+    pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
         let result = binary_reader::read_four_cc(reader);
         let chunk_id = match result

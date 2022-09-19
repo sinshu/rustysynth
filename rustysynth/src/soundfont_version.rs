@@ -10,7 +10,7 @@ pub struct SoundFontVersion
 
 impl SoundFontVersion
 {
-    pub fn default() -> Self
+    pub(crate) fn default() -> Self
     {
         SoundFontVersion
         {
@@ -19,7 +19,7 @@ impl SoundFontVersion
         }
     }
 
-    pub fn new<R: io::Read>(reader: &mut R) -> Result<Self, io::Error>
+    pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, io::Error>
     {
         let major = binary_reader::read_i16(reader)?;
         let minor = binary_reader::read_i16(reader)?;
