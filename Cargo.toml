@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "workspace",
+    "rustysynth"
+]

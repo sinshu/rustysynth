@@ -1,0 +1,64 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug executable 'workspace'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=workspace",
+                    "--package=workspace"
+                ],
+                "filter": {
+                    "name": "workspace",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'workspace'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=workspace",
+                    "--package=workspace"
+                ],
+                "filter": {
+                    "name": "workspace",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in library 'rustysynth'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
+                    "--package=rustysynth"
+                ],
+                "filter": {
+                    "name": "rustysynth",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
