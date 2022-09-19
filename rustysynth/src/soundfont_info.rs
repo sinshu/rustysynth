@@ -4,6 +4,7 @@ use std::io;
 use super::binary_reader;
 use super::soundfont_version::SoundFontVersion;
 
+#[non_exhaustive]
 pub struct SoundFontInfo
 {
     pub version: SoundFontVersion,
@@ -17,8 +18,6 @@ pub struct SoundFontInfo
     pub copyright: String,
     pub comments: String,
     pub tools: String,
-    
-    _private: (),
 }
 
 impl SoundFontInfo
@@ -267,8 +266,6 @@ impl SoundFontInfo
                 Some(value) => value,
                 None => String::new(),
             },
-
-            _private: (),
         })
     }
 }

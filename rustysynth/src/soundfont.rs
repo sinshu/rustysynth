@@ -4,11 +4,10 @@ use std::io;
 use super::binary_reader;
 use super::soundfont_info::SoundFontInfo;
 
+#[non_exhaustive]
 pub struct SoundFont
 {
     pub info: SoundFontInfo,
-    
-    _private: ()
 }
 
 impl SoundFont
@@ -49,8 +48,6 @@ impl SoundFont
         Ok(SoundFont
         {
             info: info,
-
-            _private: (),
         })
     }
 }

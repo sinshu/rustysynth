@@ -2,12 +2,11 @@ use std::io;
 
 use super::binary_reader;
 
+#[non_exhaustive]
 pub struct SoundFontVersion
 {
     pub major: i16,
     pub minor: i16,
-
-    _private: ()
 }
 
 impl SoundFontVersion
@@ -18,8 +17,6 @@ impl SoundFontVersion
         {
             major: 0,
             minor: 0,
-            
-            _private: (),
         }
     }
 
@@ -32,8 +29,6 @@ impl SoundFontVersion
         {
             major: major,
             minor: minor,
-
-            _private: (),
         })
     }
 }
