@@ -3,7 +3,6 @@ use std::io;
 
 use super::binary_reader;
 use super::soundfont_info::SoundFontInfo;
-use super::soundfont_version::SoundFontVersion;
 
 pub struct SoundFont
 {
@@ -22,10 +21,10 @@ impl SoundFont
         };
         if chunk_id != "RIFF"
         {
-            return Err("The RIFF chunk was not found.".into());
+            return Err(format!("The RIFF chunk was not found.").into());
         }
 
-        let size = binary_reader::read_i32(reader);
+        let _size = binary_reader::read_i32(reader);
 
         let result = binary_reader::read_four_cc(reader);
         let form_type = match result

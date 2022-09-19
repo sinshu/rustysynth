@@ -31,7 +31,7 @@ impl SoundFontInfo
         };
         if chunk_id != "LIST"
         {
-            return Err("The LIST chunk was not found.".into());
+            return Err(format!("The LIST chunk was not found.").into());
         }
 
         let result = binary_reader::read_i32(reader);

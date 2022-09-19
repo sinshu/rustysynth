@@ -11,4 +11,5 @@ fn main()
     let sf = rustysynth::SoundFont::new(&mut file).unwrap();
 
     println!("Bank name is \"{}\"", sf.info.bank_name);
+    println!("Bank name is \"{}\"", sf.info.target_sound_engine);
 }
