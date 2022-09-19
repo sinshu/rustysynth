@@ -17,6 +17,8 @@ pub struct SoundFontInfo
     pub copyright: String,
     pub comments: String,
     pub tools: String,
+    
+    _private: (),
 }
 
 impl SoundFontInfo
@@ -265,6 +267,8 @@ impl SoundFontInfo
                 Some(value) => value,
                 None => String::new(),
             },
+
+            _private: (),
         })
     }
 }

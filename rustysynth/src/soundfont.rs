@@ -7,6 +7,8 @@ use super::soundfont_info::SoundFontInfo;
 pub struct SoundFont
 {
     pub info: SoundFontInfo,
+    
+    _private: ()
 }
 
 impl SoundFont
@@ -47,6 +49,8 @@ impl SoundFont
         Ok(SoundFont
         {
             info: info,
+
+            _private: (),
         })
     }
 }
