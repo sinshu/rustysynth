@@ -13,7 +13,7 @@ pub struct SoundFontInfo
     pub rom_name: String,
     pub rom_version: SoundFontVersion,
     pub creation_date: String,
-    pub auther: String,
+    pub author: String,
     pub target_product: String,
     pub copyright: String,
     pub comments: String,
@@ -62,7 +62,7 @@ impl SoundFontInfo
         let mut rom_name: Option<String> = None;
         let mut rom_version: Option<SoundFontVersion> = None;
         let mut creation_date: Option<String> = None;
-        let mut auther: Option<String> = None;
+        let mut author: Option<String> = None;
         let mut target_product: Option<String> = None;
         let mut copyright: Option<String> = None;
         let mut comments: Option<String> = None;
@@ -149,7 +149,7 @@ impl SoundFontInfo
             if id == "IENG"
             {
                 let result = binary_reader::read_fixed_length_string(reader, size);
-                auther = match result
+                author = match result
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -237,7 +237,7 @@ impl SoundFontInfo
                 None => String::new(),
             },
 
-            auther: match auther
+            author: match author
             {
                 Some(value) => value,
                 None => String::new(),

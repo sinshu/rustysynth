@@ -2,5 +2,6 @@
 
 members = [
     "workspace",
-    "rustysynth"
+    "rustysynth",
+    "rustysynth_test",
 ]

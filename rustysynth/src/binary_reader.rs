@@ -57,7 +57,17 @@ pub(crate) fn read_fixed_length_string<R: io::Read>(reader: &mut R, length: i32)
         Err(error) => return Err(Box::new(error)),
     }
 
-    match str::from_utf8(&data)
+    let mut actual_length: i32 = 0;
+    for i in 0..length
+    {
+        if data[i as usize] == 0
+        {
+            break;
+        }
+        actual_length += 1;
+    }
+
+    match str::from_utf8(&data[0..actual_length as usize])
     {
         Ok(value) => Ok(value.to_string()),
         Err(error) => Err(Box::new(error)),
