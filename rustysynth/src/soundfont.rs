@@ -2,6 +2,8 @@ use std::error;
 use std::io;
 use std::rc;
 
+use crate::soundfont_parameters::SoundFontParameters;
+
 use super::binary_reader;
 use super::soundfont_info::SoundFontInfo;
 use super::soundfont_sampledata::SoundFontSampleData;
@@ -55,6 +57,8 @@ impl SoundFont
             Ok(value) => value,
             Err(error) => return Err(error),
         };
+
+        let result = SoundFontParameters::new(reader);
 
         Ok(SoundFont
         {

@@ -2,6 +2,20 @@ use std::error;
 use std::io;
 use std::str;
 
+pub(crate) fn read_i8<R: io::Read>(reader: &mut R) -> Result<i8, io::Error>
+{
+    let mut data: [u8; 1] = [0; 1];
+    reader.read_exact(&mut data)?;
+    Ok(i8::from_le_bytes(data))
+}
+
+pub(crate) fn read_u8<R: io::Read>(reader: &mut R) -> Result<u8, io::Error>
+{
+    let mut data: [u8; 1] = [0; 1];
+    reader.read_exact(&mut data)?;
+    Ok(u8::from_le_bytes(data))
+}
+
 pub(crate) fn read_i16<R: io::Read>(reader: &mut R) -> Result<i16, io::Error>
 {
     let mut data: [u8; 2] = [0; 2];

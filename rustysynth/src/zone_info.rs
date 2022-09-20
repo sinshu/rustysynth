@@ -59,7 +59,7 @@ pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<
         }
     }
 
-    for i in 0..count as usize
+    for i in 0..(count - 1) as usize
     {
         zones[i].generator_count = zones[i + 1].generator_index - zones[i].generator_index;
         zones[i].modulator_count = zones[i + 1].modulator_index - zones[i].modulator_index;

@@ -74,8 +74,7 @@ impl SoundFontSampleData
                     Err(error) => return Err(Box::new(error)),
                 };
             }
-
-            if id == "sm24"
+            else if id == "sm24"
             {
                 let result = binary_reader::discard_data(reader, size);
                 match result
@@ -83,6 +82,10 @@ impl SoundFontSampleData
                     Ok(()) => (),
                     Err(error) => return Err(Box::new(error)),
                 };
+            }
+            else
+            {
+                return Err(format!("The INFO list contains an unknown ID '{id}'.").into());
             }
 
             pos += size;

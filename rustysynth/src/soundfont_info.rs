@@ -95,8 +95,7 @@ impl SoundFontInfo
                     Err(error) => return Err(Box::new(error)),
                 };
             }
-
-            if id == "isng"
+            else if id == "isng"
             {
                 let result = binary_reader::read_fixed_length_string(reader, size);
                 target_sound_engine = match result
@@ -105,8 +104,7 @@ impl SoundFontInfo
                     Err(error) => return Err(error),
                 };
             }
-
-            if id == "INAM"
+            else if id == "INAM"
             {
                 let result = binary_reader::read_fixed_length_string(reader, size);
                 bank_name = match result
@@ -115,8 +113,7 @@ impl SoundFontInfo
                     Err(error) => return Err(error),
                 };
             }
-
-            if id == "irom"
+            else if id == "irom"
             {
                 let result = binary_reader::read_fixed_length_string(reader, size);
                 rom_name = match result
@@ -125,8 +122,7 @@ impl SoundFontInfo
                     Err(error) => return Err(error),
                 };
             }
-
-            if id == "iver"
+            else if id == "iver"
             {
                 let result = SoundFontVersion::new(reader);
                 rom_version = match result
@@ -135,8 +131,7 @@ impl SoundFontInfo
                     Err(error) => return Err(Box::new(error)),
                 };
             }
-
-            if id == "ICRD"
+            else if id == "ICRD"
             {
                 let result = binary_reader::read_fixed_length_string(reader, size);
                 creation_date = match result
@@ -145,8 +140,7 @@ impl SoundFontInfo
                     Err(error) => return Err(error),
                 };
             }
-
-            if id == "IENG"
+            else if id == "IENG"
             {
                 let result = binary_reader::read_fixed_length_string(reader, size);
                 author = match result
@@ -155,8 +149,7 @@ impl SoundFontInfo
                     Err(error) => return Err(error),
                 };
             }
-
-            if id == "IPRD"
+            else if id == "IPRD"
             {
                 let result = binary_reader::read_fixed_length_string(reader, size);
                 target_product = match result
@@ -165,8 +158,7 @@ impl SoundFontInfo
                     Err(error) => return Err(error),
                 };
             }
-
-            if id == "ICOP"
+            else if id == "ICOP"
             {
                 let result = binary_reader::read_fixed_length_string(reader, size);
                 copyright = match result
@@ -175,8 +167,7 @@ impl SoundFontInfo
                     Err(error) => return Err(error),
                 };
             }
-
-            if id == "ICMT"
+            else if id == "ICMT"
             {
                 let result = binary_reader::read_fixed_length_string(reader, size);
                 comments = match result
@@ -185,8 +176,7 @@ impl SoundFontInfo
                     Err(error) => return Err(error),
                 };
             }
-
-            if id == "ISFT"
+            else if id == "ISFT"
             {
                 let result = binary_reader::read_fixed_length_string(reader, size);
                 tools = match result
@@ -194,6 +184,10 @@ impl SoundFontInfo
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
                 };
+            }
+            else
+            {
+                return Err(format!("The INFO list contains an unknown ID '{id}'.").into());
             }
 
             pos += size;
