@@ -5,13 +5,13 @@ use super::binary_reader;
 
 pub(crate) struct Generator
 {
-    generator_type: u16,
-    value: u16,
+    pub(crate) generator_type: u16,
+    pub(crate) value: u16,
 }
 
 impl Generator
 {
-    pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
+    fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
         let result = binary_reader::read_u16(reader);
         let generator_type = match result
