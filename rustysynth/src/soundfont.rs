@@ -50,7 +50,7 @@ impl SoundFont
         };
 
         let result = SoundFontSampleData::new(reader);
-        let wave_data = match result
+        let sample_data = match result
         {
             Ok(value) => value,
             Err(error) => return Err(error),
@@ -60,7 +60,7 @@ impl SoundFont
         {
             info: info,
             bits_per_sample: 16,
-            wave_data: rc::Rc::new(wave_data.wave_data),
+            wave_data: rc::Rc::new(sample_data.wave_data),
         })
     }
 }
