@@ -60,7 +60,7 @@ impl SoundFont
         {
             info: info,
             bits_per_sample: 16,
-            wave_data: wave_data.wave_data,
+            wave_data: rc::Rc::new(wave_data.wave_data),
         })
     }
 }

@@ -1,13 +1,12 @@
 use std::error;
 use std::io;
-use std::rc::Rc;
 
 use super::binary_reader;
 
 pub struct SoundFontSampleData
 {
     pub bits_per_sample: i32,
-    pub wave_data: Rc<Vec<i16>>,
+    pub wave_data: Vec<i16>,
 }
 
 impl SoundFontSampleData
@@ -95,7 +94,7 @@ impl SoundFontSampleData
 
             wave_data: match wave_data
             {
-                Some(value) => Rc::new(value),
+                Some(value) => value,
                 None => return Err(format!("No valid sample data was found.").into()),
             },
         })
