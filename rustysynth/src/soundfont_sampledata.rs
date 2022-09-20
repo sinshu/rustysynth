@@ -1,7 +1,7 @@
 use std::error;
 use std::io;
 
-use super::binary_reader;
+use crate::binary_reader;
 
 pub struct SoundFontSampleData
 {

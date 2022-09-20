@@ -2,11 +2,10 @@ use std::error;
 use std::io;
 use std::rc;
 
+use crate::binary_reader;
+use crate::soundfont_info::SoundFontInfo;
+use crate::soundfont_sampledata::SoundFontSampleData;
 use crate::soundfont_parameters::SoundFontParameters;
-
-use super::binary_reader;
-use super::soundfont_info::SoundFontInfo;
-use super::soundfont_sampledata::SoundFontSampleData;
 
 #[non_exhaustive]
 pub struct SoundFont

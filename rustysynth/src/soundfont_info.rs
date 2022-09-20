@@ -193,73 +193,85 @@ impl SoundFontInfo
             pos += size;
         }
 
+        let version = match version
+        {
+            Some(value) => value,
+            None => SoundFontVersion::default(),
+        };
+
+        let target_sound_engine = match target_sound_engine
+        {
+            Some(value) => value,
+            None => String::new(),
+        };
+
+        let bank_name = match bank_name
+        {
+            Some(value) => value,
+            None => String::new(),
+        };
+
+        let rom_name = match rom_name
+        {
+            Some(value) => value,
+            None => String::new(),
+        };
+
+        let rom_version = match rom_version
+        {
+            Some(value) => value,
+            None => SoundFontVersion::default(),
+        };
+
+        let creation_date = match creation_date
+        {
+            Some(value) => value,
+            None => String::new(),
+        };
+
+        let author = match author
+        {
+            Some(value) => value,
+            None => String::new(),
+        };
+
+        let target_product = match target_product
+        {
+            Some(value) => value,
+            None => String::new(),
+        };
+
+        let copyright = match copyright
+        {
+            Some(value) => value,
+            None => String::new(),
+        };
+
+        let comments = match comments
+        {
+            Some(value) => value,
+            None => String::new(),
+        };
+
+        let tools = match tools
+        {
+            Some(value) => value,
+            None => String::new(),
+        };
+
         Ok(SoundFontInfo
         {
-            version: match version
-            {
-                Some(value) => value,
-                None => SoundFontVersion::default(),
-            },
-
-            target_sound_engine: match target_sound_engine
-            {
-                Some(value) => value,
-                None => String::new(),
-            },
-
-            bank_name: match bank_name
-            {
-                Some(value) => value,
-                None => String::new(),
-            },
-
-            rom_name: match rom_name
-            {
-                Some(value) => value,
-                None => String::new(),
-            },
-
-            rom_version: match rom_version
-            {
-                Some(value) => value,
-                None => SoundFontVersion::default(),
-            },
-
-            creation_date: match creation_date
-            {
-                Some(value) => value,
-                None => String::new(),
-            },
-
-            author: match author
-            {
-                Some(value) => value,
-                None => String::new(),
-            },
-
-            target_product: match target_product
-            {
-                Some(value) => value,
-                None => String::new(),
-            },
-
-            copyright: match copyright
-            {
-                Some(value) => value,
-                None => String::new(),
-            },
-
-            comments: match comments
-            {
-                Some(value) => value,
-                None => String::new(),
-            },
-
-            tools: match tools
-            {
-                Some(value) => value,
-                None => String::new(),
-            },
+            version: version,
+            target_sound_engine: target_sound_engine,
+            bank_name: bank_name,
+            rom_name: rom_name,
+            rom_version: rom_version,
+            creation_date: creation_date,
+            author: author,
+            target_product: target_product,
+            copyright: copyright,
+            comments: comments,
+            tools: tools,
         })
     }
 }

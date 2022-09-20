@@ -1,18 +1,17 @@
 use std::error;
 use std::io;
 
+use crate::binary_reader;
 use crate::generator;
 use crate::generator::Generator;
+use crate::zone_info;
+use crate::zone_info::ZoneInfo;
 use crate::preset_info;
 use crate::preset_info::PresetInfo;
 use crate::instrument_info;
 use crate::instrument_info::InstrumentInfo;
 use crate::sample_header;
 use crate::sample_header::SampleHeader;
-use crate::zone_info;
-use crate::zone_info::ZoneInfo;
-
-use super::binary_reader;
 
 pub(crate) struct SoundFontParameters
 {
@@ -169,6 +168,48 @@ impl SoundFontParameters
 
             pos += size;
         }
+
+        let preset_infos = match preset_infos
+        {
+            Some(value) => value,
+            None => return Err(format!("The PHDR sub-chunk was not found.").into()),
+        };
+
+        let preset_bag = match preset_bag
+        {
+            Some(value) => value,
+            None => return Err(format!("The PBAG sub-chunk was not found.").into()),
+        };
+
+        let preset_generators = match preset_generators
+        {
+            Some(value) => value,
+            None => return Err(format!("The PGEN sub-chunk was not found.").into()),
+        };
+
+        let instrument_infos = match instrument_infos
+        {
+            Some(value) => value,
+            None => return Err(format!("The INST sub-chunk was not found.").into()),
+        };
+
+        let instrument_bag = match instrument_bag
+        {
+            Some(value) => value,
+            None => return Err(format!("The IBAG sub-chunk was not found.").into()),
+        };
+
+        let instrument_generators = match instrument_generators
+        {
+            Some(value) => value,
+            None => return Err(format!("The IGEN sub-chunk was not found.").into()),
+        };
+
+        let sample_headers = match sample_headers
+        {
+            Some(value) => value,
+            None => return Err(format!("The SHDR sub-chunk was not found.").into()),
+        };
 
         println!("SOUNDFONT_PARAMS_DONE!!");
 
