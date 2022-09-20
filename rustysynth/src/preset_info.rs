@@ -19,50 +19,43 @@ impl PresetInfo
 {
     fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let result = binary_reader::read_fixed_length_string(reader, 20);
-        let name = match result
+        let name = match binary_reader::read_fixed_length_string(reader, 20)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
         };
 
-        let result = binary_reader::read_u16(reader);
-        let patch_number = match result
+        let patch_number = match binary_reader::read_u16(reader)
         {
             Ok(value) => value as i32,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_u16(reader);
-        let bank_number = match result
+        let bank_number = match binary_reader::read_u16(reader)
         {
             Ok(value) => value as i32,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_u16(reader);
-        let zone_start_index = match result
+        let zone_start_index = match binary_reader::read_u16(reader)
         {
             Ok(value) => value as i32,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_i32(reader);
-        let library = match result
+        let library = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_i32(reader);
-        let genre = match result
+        let genre = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_i32(reader);
-        let morphology = match result
+        let morphology = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
@@ -94,8 +87,7 @@ pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<
     let mut presets: Vec<PresetInfo> = Vec::new();
     for _i in 0..count
     {
-        let result = PresetInfo::new(reader);
-        match result
+        match PresetInfo::new(reader)
         {
             Ok(value) => presets.push(value),
             Err(error) => return Err(error),

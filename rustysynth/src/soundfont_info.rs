@@ -24,8 +24,7 @@ impl SoundFontInfo
 {
     pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let result = binary_reader::read_four_cc(reader);
-        let chunk_id = match result
+        let chunk_id = match binary_reader::read_four_cc(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
@@ -35,8 +34,7 @@ impl SoundFontInfo
             return Err(format!("The LIST chunk was not found.").into());
         }
 
-        let result = binary_reader::read_i32(reader);
-        let end = match result
+        let end = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
@@ -44,8 +42,7 @@ impl SoundFontInfo
 
         let mut pos: i32 = 0;
 
-        let result = binary_reader::read_four_cc(reader);
-        let list_type = match result
+        let list_type = match binary_reader::read_four_cc(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
@@ -70,16 +67,14 @@ impl SoundFontInfo
 
         while pos < end
         {
-            let result = binary_reader::read_four_cc(reader);
-            let id = match result
+            let id = match binary_reader::read_four_cc(reader)
             {
                 Ok(value) => value,
                 Err(error) => return Err(error),
             };
             pos += 4;
 
-            let result = binary_reader::read_i32(reader);
-            let size = match result
+            let size = match binary_reader::read_i32(reader)
             {
                 Ok(value) => value,
                 Err(error) => return Err(Box::new(error)),
@@ -88,8 +83,7 @@ impl SoundFontInfo
 
             if id == "ifil"
             {
-                let result = SoundFontVersion::new(reader);
-                version = match result
+                version = match SoundFontVersion::new(reader)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(Box::new(error)),
@@ -97,8 +91,7 @@ impl SoundFontInfo
             }
             else if id == "isng"
             {
-                let result = binary_reader::read_fixed_length_string(reader, size);
-                target_sound_engine = match result
+                target_sound_engine = match binary_reader::read_fixed_length_string(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -106,8 +99,7 @@ impl SoundFontInfo
             }
             else if id == "INAM"
             {
-                let result = binary_reader::read_fixed_length_string(reader, size);
-                bank_name = match result
+                bank_name = match binary_reader::read_fixed_length_string(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -115,8 +107,7 @@ impl SoundFontInfo
             }
             else if id == "irom"
             {
-                let result = binary_reader::read_fixed_length_string(reader, size);
-                rom_name = match result
+                rom_name = match binary_reader::read_fixed_length_string(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -124,8 +115,7 @@ impl SoundFontInfo
             }
             else if id == "iver"
             {
-                let result = SoundFontVersion::new(reader);
-                rom_version = match result
+                rom_version = match SoundFontVersion::new(reader)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(Box::new(error)),
@@ -133,8 +123,7 @@ impl SoundFontInfo
             }
             else if id == "ICRD"
             {
-                let result = binary_reader::read_fixed_length_string(reader, size);
-                creation_date = match result
+                creation_date = match binary_reader::read_fixed_length_string(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -142,8 +131,7 @@ impl SoundFontInfo
             }
             else if id == "IENG"
             {
-                let result = binary_reader::read_fixed_length_string(reader, size);
-                author = match result
+                author = match binary_reader::read_fixed_length_string(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -151,8 +139,7 @@ impl SoundFontInfo
             }
             else if id == "IPRD"
             {
-                let result = binary_reader::read_fixed_length_string(reader, size);
-                target_product = match result
+                target_product = match binary_reader::read_fixed_length_string(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -160,8 +147,7 @@ impl SoundFontInfo
             }
             else if id == "ICOP"
             {
-                let result = binary_reader::read_fixed_length_string(reader, size);
-                copyright = match result
+                copyright = match binary_reader::read_fixed_length_string(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -169,8 +155,7 @@ impl SoundFontInfo
             }
             else if id == "ICMT"
             {
-                let result = binary_reader::read_fixed_length_string(reader, size);
-                comments = match result
+                comments = match binary_reader::read_fixed_length_string(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -178,8 +163,7 @@ impl SoundFontInfo
             }
             else if id == "ISFT"
             {
-                let result = binary_reader::read_fixed_length_string(reader, size);
-                tools = match result
+                tools = match binary_reader::read_fixed_length_string(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),

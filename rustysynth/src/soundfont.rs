@@ -19,8 +19,7 @@ impl SoundFont
 {
     pub fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let result = binary_reader::read_four_cc(reader);
-        let chunk_id = match result
+        let chunk_id = match binary_reader::read_four_cc(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
@@ -32,8 +31,7 @@ impl SoundFont
 
         let _size = binary_reader::read_i32(reader);
 
-        let result = binary_reader::read_four_cc(reader);
-        let form_type = match result
+        let form_type = match binary_reader::read_four_cc(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
@@ -43,15 +41,13 @@ impl SoundFont
             return Err(format!("The type of the RIFF chunk must be 'sfbk', but was '{form_type}'.").into());
         }
 
-        let result = SoundFontInfo::new(reader);
-        let info = match result
+        let info = match SoundFontInfo::new(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
         };
 
-        let result = SoundFontSampleData::new(reader);
-        let sample_data = match result
+        let sample_data = match SoundFontSampleData::new(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(error),

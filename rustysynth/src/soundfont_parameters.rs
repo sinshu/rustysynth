@@ -22,8 +22,7 @@ impl SoundFontParameters
 {
     pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let result = binary_reader::read_four_cc(reader);
-        let chunk_id = match result
+        let chunk_id = match binary_reader::read_four_cc(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
@@ -33,8 +32,7 @@ impl SoundFontParameters
             return Err(format!("The LIST chunk was not found.").into());
         }
 
-        let result = binary_reader::read_i32(reader);
-        let end = match result
+        let end = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
@@ -42,8 +40,7 @@ impl SoundFontParameters
 
         let mut pos: i32 = 0;
 
-        let result = binary_reader::read_four_cc(reader);
-        let list_type = match result
+        let list_type = match binary_reader::read_four_cc(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
@@ -64,16 +61,14 @@ impl SoundFontParameters
 
         while pos < end
         {
-            let result = binary_reader::read_four_cc(reader);
-            let id = match result
+            let id = match binary_reader::read_four_cc(reader)
             {
                 Ok(value) => value,
                 Err(error) => return Err(error),
             };
             pos += 4;
 
-            let result = binary_reader::read_i32(reader);
-            let size = match result
+            let size = match binary_reader::read_i32(reader)
             {
                 Ok(value) => value,
                 Err(error) => return Err(Box::new(error)),
@@ -82,8 +77,7 @@ impl SoundFontParameters
 
             if id == "phdr"
             {
-                let result = preset_info::read_from_chunk(reader, size);
-                preset_infos = match result
+                preset_infos = match preset_info::read_from_chunk(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -91,8 +85,7 @@ impl SoundFontParameters
             }
             else if id == "pbag"
             {
-                let result = zone_info::read_from_chunk(reader, size);
-                preset_bag = match result
+                preset_bag = match zone_info::read_from_chunk(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -100,8 +93,7 @@ impl SoundFontParameters
             }
             else if id == "pmod"
             {
-                let result = binary_reader::discard_data(reader, size);
-                match result
+                match binary_reader::discard_data(reader, size)
                 {
                     Ok(()) => (),
                     Err(error) => return Err(Box::new(error)),
@@ -109,8 +101,7 @@ impl SoundFontParameters
             }
             else if id == "pgen"
             {
-                let result = generator::read_from_chunk(reader, size);
-                preset_generators = match result
+                preset_generators = match generator::read_from_chunk(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -118,8 +109,7 @@ impl SoundFontParameters
             }
             else if id == "inst"
             {
-                let result = instrument_info::read_from_chunk(reader, size);
-                instrument_infos = match result
+                instrument_infos = match instrument_info::read_from_chunk(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -127,8 +117,7 @@ impl SoundFontParameters
             }
             else if id == "ibag"
             {
-                let result = zone_info::read_from_chunk(reader, size);
-                instrument_bag = match result
+                instrument_bag = match zone_info::read_from_chunk(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -136,8 +125,7 @@ impl SoundFontParameters
             }
             else if id == "imod"
             {
-                let result = binary_reader::discard_data(reader, size);
-                match result
+                match binary_reader::discard_data(reader, size)
                 {
                     Ok(()) => (),
                     Err(error) => return Err(Box::new(error)),
@@ -145,8 +133,7 @@ impl SoundFontParameters
             }
             else if id == "igen"
             {
-                let result = generator::read_from_chunk(reader, size);
-                instrument_generators = match result
+                instrument_generators = match generator::read_from_chunk(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),
@@ -154,8 +141,7 @@ impl SoundFontParameters
             }
             else if id == "shdr"
             {
-                let result = sample_header::read_from_chunk(reader, size);
-                sample_headers = match result
+                sample_headers = match sample_header::read_from_chunk(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(error),

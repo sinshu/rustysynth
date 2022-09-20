@@ -13,8 +13,7 @@ impl SoundFontSampleData
 {
     pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let result = binary_reader::read_four_cc(reader);
-        let chunk_id = match result
+        let chunk_id = match binary_reader::read_four_cc(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
@@ -24,8 +23,7 @@ impl SoundFontSampleData
             return Err(format!("The LIST chunk was not found.").into());
         }
 
-        let result = binary_reader::read_i32(reader);
-        let end = match result
+        let end = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
@@ -33,8 +31,7 @@ impl SoundFontSampleData
 
         let mut pos: i32 = 0;
 
-        let result = binary_reader::read_four_cc(reader);
-        let list_type = match result
+        let list_type = match binary_reader::read_four_cc(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
@@ -49,8 +46,7 @@ impl SoundFontSampleData
 
         while pos < end
         {
-            let result = binary_reader::read_four_cc(reader);
-            let id = match result
+            let id = match binary_reader::read_four_cc(reader)
             {
                 Ok(value) => value,
                 Err(error) => return Err(error),
@@ -67,8 +63,7 @@ impl SoundFontSampleData
 
             if id == "smpl"
             {
-                let result = binary_reader::read_wave_data(reader, size);
-                wave_data = match result
+                wave_data = match binary_reader::read_wave_data(reader, size)
                 {
                     Ok(value) => Some(value),
                     Err(error) => return Err(Box::new(error)),
@@ -76,8 +71,7 @@ impl SoundFontSampleData
             }
             else if id == "sm24"
             {
-                let result = binary_reader::discard_data(reader, size);
-                match result
+                match binary_reader::discard_data(reader, size)
                 {
                     Ok(()) => (),
                     Err(error) => return Err(Box::new(error)),

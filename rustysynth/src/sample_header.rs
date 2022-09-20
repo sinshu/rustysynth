@@ -21,71 +21,61 @@ impl SampleHeader
 {
     fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let result = binary_reader::read_fixed_length_string(reader, 20);
-        let name = match result
+        let name = match binary_reader::read_fixed_length_string(reader, 20)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
         };
 
-        let result = binary_reader::read_i32(reader);
-        let start = match result
+        let start = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_i32(reader);
-        let end = match result
+        let end = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_i32(reader);
-        let start_loop = match result
+        let start_loop = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_i32(reader);
-        let end_loop = match result
+        let end_loop = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_i32(reader);
-        let sample_rate = match result
+        let sample_rate = match binary_reader::read_i32(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_u8(reader);
-        let original_pitch = match result
+        let original_pitch = match binary_reader::read_u8(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_i8(reader);
-        let pitch_correction = match result
+        let pitch_correction = match binary_reader::read_i8(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_u16(reader);
-        let link = match result
+        let link = match binary_reader::read_u16(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_u16(reader);
-        let sample_type = match result
+        let sample_type = match binary_reader::read_u16(reader)
         {
             Ok(value) => value,
             Err(error) => return Err(Box::new(error)),
@@ -119,8 +109,7 @@ pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<
     let mut headers: Vec<SampleHeader> = Vec::new();
     for _i in 0..count
     {
-        let result = SampleHeader::new(reader);
-        match result
+        match SampleHeader::new(reader)
         {
             Ok(value) => headers.push(value),
             Err(error) => return Err(error),
@@ -128,8 +117,7 @@ pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<
     }
 
     // The last one is the terminator.
-    let result = SampleHeader::new(reader);
-    match result
+    match SampleHeader::new(reader)
     {
         Ok(_value) => (),
         Err(error) => return Err(error),

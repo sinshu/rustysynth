@@ -14,15 +14,13 @@ impl InstrumentInfo
 {
     fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let result = binary_reader::read_fixed_length_string(reader, 20);
-        let name = match result
+        let name = match binary_reader::read_fixed_length_string(reader, 20)
         {
             Ok(value) => value,
             Err(error) => return Err(error),
         };
 
-        let result = binary_reader::read_u16(reader);
-        let zone_start_index = match result
+        let zone_start_index = match binary_reader::read_u16(reader)
         {
             Ok(value) => value as i32,
             Err(error) => return Err(Box::new(error)),
@@ -49,8 +47,7 @@ pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<
     let mut instruments: Vec<InstrumentInfo> = Vec::new();
     for _i in 0..count
     {
-        let result = InstrumentInfo::new(reader);
-        match result
+        match InstrumentInfo::new(reader)
         {
             Ok(value) => instruments.push(value),
             Err(error) => return Err(error),
