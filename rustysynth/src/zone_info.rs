@@ -15,15 +15,13 @@ impl ZoneInfo
 {
     fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let result = binary_reader::read_u16(reader);
-        let generator_index = match result
+        let generator_index = match binary_reader::read_u16(reader)
         {
             Ok(value) => value as i32,
             Err(error) => return Err(Box::new(error)),
         };
 
-        let result = binary_reader::read_u16(reader);
-        let modulator_index = match result
+        let modulator_index = match binary_reader::read_u16(reader)
         {
             Ok(value) => value as i32,
             Err(error) => return Err(Box::new(error)),
@@ -51,8 +49,7 @@ pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<
     let mut zones: Vec<ZoneInfo> = Vec::new();
     for _i in 0..count
     {
-        let result = ZoneInfo::new(reader);
-        match result
+        match ZoneInfo::new(reader)
         {
             Ok(value) => zones.push(value),
             Err(error) => return Err(error),

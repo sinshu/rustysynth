@@ -53,8 +53,7 @@ impl SoundFontSampleData
             };
             pos += 4;
 
-            let result = binary_reader::read_i32(reader);
-            let size = match result
+            let size = match binary_reader::read_i32(reader)
             {
                 Ok(value) => value,
                 Err(error) => return Err(Box::new(error)),
