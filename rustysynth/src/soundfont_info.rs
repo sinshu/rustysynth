@@ -24,29 +24,17 @@ impl SoundFontInfo
 {
     pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let chunk_id = match binary_reader::read_four_cc(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(error),
-        };
+        let chunk_id = binary_reader::read_four_cc(reader)?;
         if chunk_id != "LIST"
         {
             return Err(format!("The LIST chunk was not found.").into());
         }
 
-        let end = match binary_reader::read_i32(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(Box::new(error)),
-        };
+        let end = binary_reader::read_i32(reader)?;
 
         let mut pos: i32 = 0;
 
-        let list_type = match binary_reader::read_four_cc(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(error),
-        };
+        let list_type = binary_reader::read_four_cc(reader)?;
         if list_type != "INFO"
         {
             return Err(format!("The type of the LIST chunk must be 'INFO', but was '{list_type}'.").into());
@@ -67,107 +55,55 @@ impl SoundFontInfo
 
         while pos < end
         {
-            let id = match binary_reader::read_four_cc(reader)
-            {
-                Ok(value) => value,
-                Err(error) => return Err(error),
-            };
+            let id = binary_reader::read_four_cc(reader)?;
             pos += 4;
 
-            let size = match binary_reader::read_i32(reader)
-            {
-                Ok(value) => value,
-                Err(error) => return Err(Box::new(error)),
-            };
+            let size = binary_reader::read_i32(reader)?;
             pos += 4;
 
             if id == "ifil"
             {
-                version = match SoundFontVersion::new(reader)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(Box::new(error)),
-                };
+                version = Some(SoundFontVersion::new(reader)?);
             }
             else if id == "isng"
             {
-                target_sound_engine = match binary_reader::read_fixed_length_string(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                target_sound_engine = Some(binary_reader::read_fixed_length_string(reader, size)?);
             }
             else if id == "INAM"
             {
-                bank_name = match binary_reader::read_fixed_length_string(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                bank_name = Some(binary_reader::read_fixed_length_string(reader, size)?);
             }
             else if id == "irom"
             {
-                rom_name = match binary_reader::read_fixed_length_string(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                rom_name = Some(binary_reader::read_fixed_length_string(reader, size)?);
             }
             else if id == "iver"
             {
-                rom_version = match SoundFontVersion::new(reader)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(Box::new(error)),
-                };
+                rom_version = Some(SoundFontVersion::new(reader)?);
             }
             else if id == "ICRD"
             {
-                creation_date = match binary_reader::read_fixed_length_string(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                creation_date = Some(binary_reader::read_fixed_length_string(reader, size)?);
             }
             else if id == "IENG"
             {
-                author = match binary_reader::read_fixed_length_string(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                author = Some(binary_reader::read_fixed_length_string(reader, size)?);
             }
             else if id == "IPRD"
             {
-                target_product = match binary_reader::read_fixed_length_string(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                target_product = Some(binary_reader::read_fixed_length_string(reader, size)?);
             }
             else if id == "ICOP"
             {
-                copyright = match binary_reader::read_fixed_length_string(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                copyright = Some(binary_reader::read_fixed_length_string(reader, size)?);
             }
             else if id == "ICMT"
             {
-                comments = match binary_reader::read_fixed_length_string(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                comments = Some(binary_reader::read_fixed_length_string(reader, size)?);
             }
             else if id == "ISFT"
             {
-                tools = match binary_reader::read_fixed_length_string(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                tools = Some(binary_reader::read_fixed_length_string(reader, size)?);
             }
             else
             {

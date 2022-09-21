@@ -22,29 +22,17 @@ impl SoundFontParameters
 {
     pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let chunk_id = match binary_reader::read_four_cc(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(error),
-        };
+        let chunk_id = binary_reader::read_four_cc(reader)?;
         if chunk_id != "LIST"
         {
             return Err(format!("The LIST chunk was not found.").into());
         }
 
-        let end = match binary_reader::read_i32(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(Box::new(error)),
-        };
+        let end = binary_reader::read_i32(reader)?;
 
         let mut pos: i32 = 0;
 
-        let list_type = match binary_reader::read_four_cc(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(error),
-        };
+        let list_type = binary_reader::read_four_cc(reader)?;
         if list_type != "pdta"
         {
             return Err(format!("The type of the LIST chunk must be 'pdta', but was '{list_type}'.").into());
@@ -61,91 +49,47 @@ impl SoundFontParameters
 
         while pos < end
         {
-            let id = match binary_reader::read_four_cc(reader)
-            {
-                Ok(value) => value,
-                Err(error) => return Err(error),
-            };
+            let id = binary_reader::read_four_cc(reader)?;
             pos += 4;
 
-            let size = match binary_reader::read_i32(reader)
-            {
-                Ok(value) => value,
-                Err(error) => return Err(Box::new(error)),
-            };
+            let size = binary_reader::read_i32(reader)?;
             pos += 4;
 
             if id == "phdr"
             {
-                preset_infos = match preset_info::read_from_chunk(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                preset_infos = Some(preset_info::read_from_chunk(reader, size)?);
             }
             else if id == "pbag"
             {
-                preset_bag = match zone_info::read_from_chunk(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                preset_bag = Some(zone_info::read_from_chunk(reader, size)?);
             }
             else if id == "pmod"
             {
-                match binary_reader::discard_data(reader, size)
-                {
-                    Ok(()) => (),
-                    Err(error) => return Err(Box::new(error)),
-                };
+                binary_reader::discard_data(reader, size)?;
             }
             else if id == "pgen"
             {
-                preset_generators = match generator::read_from_chunk(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                preset_generators = Some(generator::read_from_chunk(reader, size)?);
             }
             else if id == "inst"
             {
-                instrument_infos = match instrument_info::read_from_chunk(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                instrument_infos = Some(instrument_info::read_from_chunk(reader, size)?);
             }
             else if id == "ibag"
             {
-                instrument_bag = match zone_info::read_from_chunk(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                instrument_bag = Some(zone_info::read_from_chunk(reader, size)?);
             }
             else if id == "imod"
             {
-                match binary_reader::discard_data(reader, size)
-                {
-                    Ok(()) => (),
-                    Err(error) => return Err(Box::new(error)),
-                };
+                binary_reader::discard_data(reader, size)?;
             }
             else if id == "igen"
             {
-                instrument_generators = match generator::read_from_chunk(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                instrument_generators = Some(generator::read_from_chunk(reader, size)?);
             }
             else if id == "shdr"
             {
-                sample_headers = match sample_header::read_from_chunk(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(error),
-                };
+                sample_headers = Some(sample_header::read_from_chunk(reader, size)?);
             }
             else
             {

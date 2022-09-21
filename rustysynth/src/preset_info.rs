@@ -19,47 +19,13 @@ impl PresetInfo
 {
     fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let name = match binary_reader::read_fixed_length_string(reader, 20)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(error),
-        };
-
-        let patch_number = match binary_reader::read_u16(reader)
-        {
-            Ok(value) => value as i32,
-            Err(error) => return Err(Box::new(error)),
-        };
-
-        let bank_number = match binary_reader::read_u16(reader)
-        {
-            Ok(value) => value as i32,
-            Err(error) => return Err(Box::new(error)),
-        };
-
-        let zone_start_index = match binary_reader::read_u16(reader)
-        {
-            Ok(value) => value as i32,
-            Err(error) => return Err(Box::new(error)),
-        };
-
-        let library = match binary_reader::read_i32(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(Box::new(error)),
-        };
-
-        let genre = match binary_reader::read_i32(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(Box::new(error)),
-        };
-
-        let morphology = match binary_reader::read_i32(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(Box::new(error)),
-        };
+        let name = binary_reader::read_fixed_length_string(reader, 20)?;
+        let patch_number = binary_reader::read_u16(reader)? as i32;
+        let bank_number = binary_reader::read_u16(reader)? as i32;
+        let zone_start_index = binary_reader::read_u16(reader)? as i32;
+        let library = binary_reader::read_i32(reader)?;
+        let genre = binary_reader::read_i32(reader)?;
+        let morphology = binary_reader::read_i32(reader)?;
 
         Ok(PresetInfo
         {
@@ -87,11 +53,7 @@ pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<
     let mut presets: Vec<PresetInfo> = Vec::new();
     for _i in 0..count
     {
-        match PresetInfo::new(reader)
-        {
-            Ok(value) => presets.push(value),
-            Err(error) => return Err(error),
-        }
+        presets.push(PresetInfo::new(reader)?);
     }
 
     for i in 0..(count - 1) as usize

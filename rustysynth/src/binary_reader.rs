@@ -40,11 +40,7 @@ pub(crate) fn read_i32<R: io::Read>(reader: &mut R) -> Result<i32, io::Error>
 pub(crate) fn read_four_cc<R: io::Read>(reader: &mut R) -> Result<String, Box<dyn error::Error>>
 {
     let mut data: [u8; 4] = [0; 4];
-    match reader.read_exact(&mut data)
-    {
-        Ok(()) => (),
-        Err(error) => return Err(Box::new(error)),
-    };
+    reader.read_exact(&mut data)?;
 
     for i in 0..4
     {
@@ -55,21 +51,13 @@ pub(crate) fn read_four_cc<R: io::Read>(reader: &mut R) -> Result<String, Box<dy
         }
     }
     
-    match str::from_utf8(&data)
-    {
-        Ok(value) => Ok(value.to_string()),
-        Err(error) => Err(Box::new(error)),
-    }
+    Ok(str::from_utf8(&data)?.to_string())
 }
 
 pub(crate) fn read_fixed_length_string<R: io::Read>(reader: &mut R, length: i32) -> Result<String, Box<dyn error::Error>>
 {
     let mut data: Vec<u8> = vec![0; length as usize];
-    match reader.read_exact(&mut data)
-    {
-        Ok(()) => (),
-        Err(error) => return Err(Box::new(error)),
-    }
+    reader.read_exact(&mut data)?;
 
     let mut actual_length: i32 = 0;
     for i in 0..length
@@ -81,11 +69,7 @@ pub(crate) fn read_fixed_length_string<R: io::Read>(reader: &mut R, length: i32)
         actual_length += 1;
     }
 
-    match str::from_utf8(&data[0..actual_length as usize])
-    {
-        Ok(value) => Ok(value.to_string()),
-        Err(error) => Err(Box::new(error)),
-    }
+    Ok(str::from_utf8(&data[0..actual_length as usize])?.to_string())
 }
 
 pub(crate) fn discard_data<R: io::Read>(reader: &mut R, size: i32) -> Result<(), io::Error>
@@ -100,11 +84,7 @@ pub(crate) fn read_wave_data<R: io::Read>(reader: &mut R, size: i32) -> Result<V
     // Is there a way to read binary data directly into Vec<i16>?
     
     let mut data: Vec<u8> = vec![0; size as usize];
-    match reader.read_exact(&mut data)
-    {
-        Ok(()) => (),
-        Err(error) => return Err(error),
-    }
+    reader.read_exact(&mut data)?;
 
     let length: i32 = size / 2;
     let mut samples: Vec<i16> = vec![0; length as usize];

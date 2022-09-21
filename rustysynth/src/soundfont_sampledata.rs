@@ -13,29 +13,17 @@ impl SoundFontSampleData
 {
     pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let chunk_id = match binary_reader::read_four_cc(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(error),
-        };
+        let chunk_id = binary_reader::read_four_cc(reader)?;
         if chunk_id != "LIST"
         {
             return Err(format!("The LIST chunk was not found.").into());
         }
 
-        let end = match binary_reader::read_i32(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(Box::new(error)),
-        };
+        let end = binary_reader::read_i32(reader)?;
 
         let mut pos: i32 = 0;
 
-        let list_type = match binary_reader::read_four_cc(reader)
-        {
-            Ok(value) => value,
-            Err(error) => return Err(error),
-        };
+        let list_type = binary_reader::read_four_cc(reader)?;
         if list_type != "sdta"
         {
             return Err(format!("The type of the LIST chunk must be 'sdta', but was '{list_type}'.").into());
@@ -46,35 +34,19 @@ impl SoundFontSampleData
 
         while pos < end
         {
-            let id = match binary_reader::read_four_cc(reader)
-            {
-                Ok(value) => value,
-                Err(error) => return Err(error),
-            };
+            let id = binary_reader::read_four_cc(reader)?;
             pos += 4;
 
-            let size = match binary_reader::read_i32(reader)
-            {
-                Ok(value) => value,
-                Err(error) => return Err(Box::new(error)),
-            };
+            let size = binary_reader::read_i32(reader)?;
             pos += 4;
 
             if id == "smpl"
             {
-                wave_data = match binary_reader::read_wave_data(reader, size)
-                {
-                    Ok(value) => Some(value),
-                    Err(error) => return Err(Box::new(error)),
-                };
+                wave_data = Some(binary_reader::read_wave_data(reader, size)?);
             }
             else if id == "sm24"
             {
-                match binary_reader::discard_data(reader, size)
-                {
-                    Ok(()) => (),
-                    Err(error) => return Err(Box::new(error)),
-                };
+                binary_reader::discard_data(reader, size)?;
             }
             else
             {
@@ -84,15 +56,16 @@ impl SoundFontSampleData
             pos += size;
         }
 
+        let wave_data = match wave_data
+        {
+            Some(value) => value,
+            None => return Err(format!("No valid sample data was found.").into()),
+        };
+
         Ok(SoundFontSampleData
         {
             bits_per_sample: 16,
-
-            wave_data: match wave_data
-            {
-                Some(value) => value,
-                None => return Err(format!("No valid sample data was found.").into()),
-            },
+            wave_data: wave_data,
         })
     }
 }
