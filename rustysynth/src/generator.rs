@@ -3,6 +3,7 @@ use std::io;
 
 use crate::binary_reader;
 
+#[derive(Clone, Copy)]
 pub(crate) struct Generator
 {
     pub(crate) generator_type: u16,
