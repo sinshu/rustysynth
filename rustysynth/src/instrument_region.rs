@@ -19,6 +19,10 @@ fn set_parameter(gs: &mut [i16; GeneratorType::COUNT], generator: &Generator)
 pub struct InstrumentRegion
 {
     gs: [i16; GeneratorType::COUNT],
+    sample_start: i32,
+    sample_end: i32,
+    sample_start_loop: i32,
+    sample_end_loop: i32,
 }
 
 impl InstrumentRegion
@@ -61,10 +65,15 @@ impl InstrumentRegion
         {
             return Err(format!("The instrument '{name}' contains an invalid sample ID '{id}'.").into());
         }
+        let sample = &samples[id];
 
         Ok(InstrumentRegion
         {
             gs: gs,
+            sample_start: sample.start,
+            sample_end: sample.end,
+            sample_start_loop: sample.start_loop,
+            sample_end_loop: sample.end_loop,
         })
     }
 
