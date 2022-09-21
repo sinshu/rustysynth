@@ -2,7 +2,7 @@ use std::error;
 use std::io;
 use std::rc;
 
-use crate::binary_reader;
+use crate::binary_reader::BinaryReader;
 use crate::soundfont_info::SoundFontInfo;
 use crate::soundfont_sampledata::SoundFontSampleData;
 use crate::soundfont_parameters::SoundFontParameters;
@@ -19,15 +19,15 @@ impl SoundFont
 {
     pub fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let chunk_id = binary_reader::read_four_cc(reader)?;
+        let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "RIFF"
         {
             return Err(format!("The RIFF chunk was not found.").into());
         }
 
-        let _size = binary_reader::read_i32(reader);
+        let _size = BinaryReader::read_i32(reader);
 
-        let form_type = binary_reader::read_four_cc(reader)?;
+        let form_type = BinaryReader::read_four_cc(reader)?;
         if form_type != "sfbk"
         {
             return Err(format!("The type of the RIFF chunk must be 'sfbk', but was '{form_type}'.").into());

@@ -1,7 +1,7 @@
 use std::error;
 use std::io;
 
-use crate::binary_reader;
+use crate::binary_reader::BinaryReader;
 
 pub(crate) struct PresetInfo
 {
@@ -19,13 +19,13 @@ impl PresetInfo
 {
     fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let name = binary_reader::read_fixed_length_string(reader, 20)?;
-        let patch_number = binary_reader::read_u16(reader)? as i32;
-        let bank_number = binary_reader::read_u16(reader)? as i32;
-        let zone_start_index = binary_reader::read_u16(reader)? as i32;
-        let library = binary_reader::read_i32(reader)?;
-        let genre = binary_reader::read_i32(reader)?;
-        let morphology = binary_reader::read_i32(reader)?;
+        let name = BinaryReader::read_fixed_length_string(reader, 20)?;
+        let patch_number = BinaryReader::read_u16(reader)? as i32;
+        let bank_number = BinaryReader::read_u16(reader)? as i32;
+        let zone_start_index = BinaryReader::read_u16(reader)? as i32;
+        let library = BinaryReader::read_i32(reader)?;
+        let genre = BinaryReader::read_i32(reader)?;
+        let morphology = BinaryReader::read_i32(reader)?;
 
         Ok(PresetInfo
         {
@@ -39,27 +39,27 @@ impl PresetInfo
             morphology: morphology,
         })
     }
-}
 
-pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<Vec<PresetInfo>, Box<dyn error::Error>>
-{
-    if size % 38 != 0
+    pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<Vec<PresetInfo>, Box<dyn error::Error>>
     {
-        return Err(format!("The preset list is invalid.").into());
+        if size % 38 != 0
+        {
+            return Err(format!("The preset list is invalid.").into());
+        }
+
+        let count = size / 38;
+
+        let mut presets: Vec<PresetInfo> = Vec::new();
+        for _i in 0..count
+        {
+            presets.push(PresetInfo::new(reader)?);
+        }
+
+        for i in 0..(count - 1) as usize
+        {
+            presets[i].zone_end_index = presets[i + 1].zone_start_index - 1;
+        }
+
+        Ok(presets)
     }
-
-    let count = size / 38;
-
-    let mut presets: Vec<PresetInfo> = Vec::new();
-    for _i in 0..count
-    {
-        presets.push(PresetInfo::new(reader)?);
-    }
-
-    for i in 0..(count - 1) as usize
-    {
-        presets[i].zone_end_index = presets[i + 1].zone_start_index - 1;
-    }
-
-    Ok(presets)
 }

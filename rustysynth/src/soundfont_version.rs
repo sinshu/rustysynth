@@ -1,6 +1,6 @@
 use std::io;
 
-use crate::binary_reader;
+use crate::binary_reader::BinaryReader;
 
 #[non_exhaustive]
 pub struct SoundFontVersion
@@ -22,8 +22,8 @@ impl SoundFontVersion
 
     pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, io::Error>
     {
-        let major = binary_reader::read_i16(reader)?;
-        let minor = binary_reader::read_i16(reader)?;
+        let major = BinaryReader::read_i16(reader)?;
+        let minor = BinaryReader::read_i16(reader)?;
 
         Ok(SoundFontVersion
         {

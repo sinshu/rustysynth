@@ -1,7 +1,7 @@
 use std::error;
 use std::io;
 
-use crate::binary_reader;
+use crate::binary_reader::BinaryReader;
 
 pub struct SoundFontSampleData
 {
@@ -13,17 +13,17 @@ impl SoundFontSampleData
 {
     pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let chunk_id = binary_reader::read_four_cc(reader)?;
+        let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "LIST"
         {
             return Err(format!("The LIST chunk was not found.").into());
         }
 
-        let end = binary_reader::read_i32(reader)?;
+        let end = BinaryReader::read_i32(reader)?;
 
         let mut pos: i32 = 0;
 
-        let list_type = binary_reader::read_four_cc(reader)?;
+        let list_type = BinaryReader::read_four_cc(reader)?;
         if list_type != "sdta"
         {
             return Err(format!("The type of the LIST chunk must be 'sdta', but was '{list_type}'.").into());
@@ -34,19 +34,19 @@ impl SoundFontSampleData
 
         while pos < end
         {
-            let id = binary_reader::read_four_cc(reader)?;
+            let id = BinaryReader::read_four_cc(reader)?;
             pos += 4;
 
-            let size = binary_reader::read_i32(reader)?;
+            let size = BinaryReader::read_i32(reader)?;
             pos += 4;
 
             if id == "smpl"
             {
-                wave_data = Some(binary_reader::read_wave_data(reader, size)?);
+                wave_data = Some(BinaryReader::read_wave_data(reader, size)?);
             }
             else if id == "sm24"
             {
-                binary_reader::discard_data(reader, size)?;
+                BinaryReader::discard_data(reader, size)?;
             }
             else
             {

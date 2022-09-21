@@ -1,7 +1,7 @@
 use std::error;
 use std::io;
 
-use super::binary_reader;
+use super::binary_reader::BinaryReader;
 use super::soundfont_version::SoundFontVersion;
 
 #[non_exhaustive]
@@ -24,17 +24,17 @@ impl SoundFontInfo
 {
     pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let chunk_id = binary_reader::read_four_cc(reader)?;
+        let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "LIST"
         {
             return Err(format!("The LIST chunk was not found.").into());
         }
 
-        let end = binary_reader::read_i32(reader)?;
+        let end = BinaryReader::read_i32(reader)?;
 
         let mut pos: i32 = 0;
 
-        let list_type = binary_reader::read_four_cc(reader)?;
+        let list_type = BinaryReader::read_four_cc(reader)?;
         if list_type != "INFO"
         {
             return Err(format!("The type of the LIST chunk must be 'INFO', but was '{list_type}'.").into());
@@ -55,10 +55,10 @@ impl SoundFontInfo
 
         while pos < end
         {
-            let id = binary_reader::read_four_cc(reader)?;
+            let id = BinaryReader::read_four_cc(reader)?;
             pos += 4;
 
-            let size = binary_reader::read_i32(reader)?;
+            let size = BinaryReader::read_i32(reader)?;
             pos += 4;
 
             if id == "ifil"
@@ -67,15 +67,15 @@ impl SoundFontInfo
             }
             else if id == "isng"
             {
-                target_sound_engine = Some(binary_reader::read_fixed_length_string(reader, size)?);
+                target_sound_engine = Some(BinaryReader::read_fixed_length_string(reader, size)?);
             }
             else if id == "INAM"
             {
-                bank_name = Some(binary_reader::read_fixed_length_string(reader, size)?);
+                bank_name = Some(BinaryReader::read_fixed_length_string(reader, size)?);
             }
             else if id == "irom"
             {
-                rom_name = Some(binary_reader::read_fixed_length_string(reader, size)?);
+                rom_name = Some(BinaryReader::read_fixed_length_string(reader, size)?);
             }
             else if id == "iver"
             {
@@ -83,27 +83,27 @@ impl SoundFontInfo
             }
             else if id == "ICRD"
             {
-                creation_date = Some(binary_reader::read_fixed_length_string(reader, size)?);
+                creation_date = Some(BinaryReader::read_fixed_length_string(reader, size)?);
             }
             else if id == "IENG"
             {
-                author = Some(binary_reader::read_fixed_length_string(reader, size)?);
+                author = Some(BinaryReader::read_fixed_length_string(reader, size)?);
             }
             else if id == "IPRD"
             {
-                target_product = Some(binary_reader::read_fixed_length_string(reader, size)?);
+                target_product = Some(BinaryReader::read_fixed_length_string(reader, size)?);
             }
             else if id == "ICOP"
             {
-                copyright = Some(binary_reader::read_fixed_length_string(reader, size)?);
+                copyright = Some(BinaryReader::read_fixed_length_string(reader, size)?);
             }
             else if id == "ICMT"
             {
-                comments = Some(binary_reader::read_fixed_length_string(reader, size)?);
+                comments = Some(BinaryReader::read_fixed_length_string(reader, size)?);
             }
             else if id == "ISFT"
             {
-                tools = Some(binary_reader::read_fixed_length_string(reader, size)?);
+                tools = Some(BinaryReader::read_fixed_length_string(reader, size)?);
             }
             else
             {

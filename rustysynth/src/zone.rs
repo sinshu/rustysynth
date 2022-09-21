@@ -32,23 +32,23 @@ impl Zone
             generators: segment,
         }
     }
-}
 
-pub(crate) fn create(infos: &Vec<ZoneInfo>, generators: &Vec<Generator>) -> Result<Vec<Zone>, Box<dyn error::Error>>
-{
-    if infos.len() <= 1
+    pub(crate) fn create(infos: &Vec<ZoneInfo>, generators: &Vec<Generator>) -> Result<Vec<Zone>, Box<dyn error::Error>>
     {
-        return Err(format!("No valid zone was found.").into());
+        if infos.len() <= 1
+        {
+            return Err(format!("No valid zone was found.").into());
+        }
+
+        // The last one is the terminator.
+        let count = infos.len() - 1;
+
+        let mut zones: Vec<Zone> = Vec::new();
+        for i in 0..count
+        {
+            zones.push(Zone::new(&infos[i], &generators));
+        }
+
+        Ok(zones)
     }
-
-    // The last one is the terminator.
-    let count = infos.len() - 1;
-
-    let mut zones: Vec<Zone> = Vec::new();
-    for i in 0..count
-    {
-        zones.push(Zone::new(&infos[i], &generators));
-    }
-
-    Ok(zones)
 }

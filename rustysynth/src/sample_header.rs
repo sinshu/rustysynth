@@ -1,7 +1,7 @@
 use std::error;
 use std::io;
 
-use crate::binary_reader;
+use crate::binary_reader::BinaryReader;
 
 pub struct SampleHeader
 {
@@ -21,16 +21,16 @@ impl SampleHeader
 {
     fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
     {
-        let name = binary_reader::read_fixed_length_string(reader, 20)?;
-        let start = binary_reader::read_i32(reader)?;
-        let end = binary_reader::read_i32(reader)?;
-        let start_loop = binary_reader::read_i32(reader)?;
-        let end_loop = binary_reader::read_i32(reader)?;
-        let sample_rate = binary_reader::read_i32(reader)?;
-        let original_pitch = binary_reader::read_u8(reader)?;
-        let pitch_correction = binary_reader::read_i8(reader)?;
-        let link = binary_reader::read_u16(reader)?;
-        let sample_type = binary_reader::read_u16(reader)?;
+        let name = BinaryReader::read_fixed_length_string(reader, 20)?;
+        let start = BinaryReader::read_i32(reader)?;
+        let end = BinaryReader::read_i32(reader)?;
+        let start_loop = BinaryReader::read_i32(reader)?;
+        let end_loop = BinaryReader::read_i32(reader)?;
+        let sample_rate = BinaryReader::read_i32(reader)?;
+        let original_pitch = BinaryReader::read_u8(reader)?;
+        let pitch_correction = BinaryReader::read_i8(reader)?;
+        let link = BinaryReader::read_u16(reader)?;
+        let sample_type = BinaryReader::read_u16(reader)?;
 
         Ok(SampleHeader
         {
@@ -46,25 +46,25 @@ impl SampleHeader
             sample_type: sample_type,
         })
     }
-}
 
-pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<Vec<SampleHeader>, Box<dyn error::Error>>
-{
-    if size % 46 != 0
+    pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<Vec<SampleHeader>, Box<dyn error::Error>>
     {
-        return Err(format!("The sample header list is invalid.").into());
+        if size % 46 != 0
+        {
+            return Err(format!("The sample header list is invalid.").into());
+        }
+
+        let count = size / 46 - 1;
+
+        let mut headers: Vec<SampleHeader> = Vec::new();
+        for _i in 0..count
+        {
+            headers.push(SampleHeader::new(reader)?);
+        }
+
+        // The last one is the terminator.
+        SampleHeader::new(reader)?;
+
+        Ok(headers)
     }
-
-    let count = size / 46 - 1;
-
-    let mut headers: Vec<SampleHeader> = Vec::new();
-    for _i in 0..count
-    {
-        headers.push(SampleHeader::new(reader)?);
-    }
-
-    // The last one is the terminator.
-    SampleHeader::new(reader)?;
-
-    Ok(headers)
 }

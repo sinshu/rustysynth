@@ -1,5 +1,5 @@
 #[allow(unused)]
-struct GeneratorType
+pub(crate) struct GeneratorType
 {
 }
 
@@ -67,4 +67,6 @@ impl GeneratorType
     pub(crate) const OVERRIDING_ROOT_KEY: u16 = 58;
     pub(crate) const UNUSED_5: u16 = 59;
     pub(crate) const UNUSED_END: u16 = 60;
+
+    pub(crate) const COUNT: usize = 61;
 }
