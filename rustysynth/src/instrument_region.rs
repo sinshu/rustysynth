@@ -177,7 +177,7 @@ impl InstrumentRegion
 
     pub fn get_initial_filter_q(&self) -> f32
     {
-        0.1f32 * self.gs[GeneratorType::INITIAL_FILTER_Q as usize] as f32
+        0.1_f32 * self.gs[GeneratorType::INITIAL_FILTER_Q as usize] as f32
     }
 
     pub fn get_modulation_lfo_to_filter_cutoff_frequency(&self) -> i32
@@ -192,22 +192,22 @@ impl InstrumentRegion
 
     pub fn get_modulation_lfo_to_volume(&self) -> f32
     {
-        0.1f32 * self.gs[GeneratorType::MODULATION_LFO_TO_VOLUME as usize] as f32
+        0.1_f32 * self.gs[GeneratorType::MODULATION_LFO_TO_VOLUME as usize] as f32
     }
 
     pub fn get_chorus_effects_send(&self) -> f32
     {
-        0.1f32 * self.gs[GeneratorType::CHORUS_EFFECTS_SEND as usize] as f32
+        0.1_f32 * self.gs[GeneratorType::CHORUS_EFFECTS_SEND as usize] as f32
     }
 
     pub fn get_reverb_effects_send(&self) -> f32
     {
-        0.1f32 * self.gs[GeneratorType::REVERB_EFFECTS_SEND as usize] as f32
+        0.1_f32 * self.gs[GeneratorType::REVERB_EFFECTS_SEND as usize] as f32
     }
 
     pub fn get_pan(&self) -> f32
     {
-        0.1f32 * self.gs[GeneratorType::PAN as usize] as f32
+        0.1_f32 * self.gs[GeneratorType::PAN as usize] as f32
     }
 
     pub fn get_delay_modulation_lfo(&self) -> f32
@@ -252,7 +252,7 @@ impl InstrumentRegion
 
     pub fn get_sustain_modulation_envelope(&self) -> f32
     {
-        0.1f32 * self.gs[GeneratorType::SUSTAIN_MODULATION_ENVELOPE as usize] as f32
+        0.1_f32 * self.gs[GeneratorType::SUSTAIN_MODULATION_ENVELOPE as usize] as f32
     }
 
     pub fn get_release_modulation_envelope(&self) -> f32
@@ -292,7 +292,7 @@ impl InstrumentRegion
 
     pub fn get_sustain_volume_envelope(&self) -> f32
     {
-        0.1f32 * self.gs[GeneratorType::SUSTAIN_VOLUME_ENVELOPE as usize] as f32
+        0.1_f32 * self.gs[GeneratorType::SUSTAIN_VOLUME_ENVELOPE as usize] as f32
     }
 
     pub fn get_release_volume_envelope(&self) -> f32
@@ -332,7 +332,7 @@ impl InstrumentRegion
 
     pub fn get_initial_attenuation(&self) -> f32
     {
-        0.1f32 * self.gs[GeneratorType::INITIAL_ATTENUATION as usize] as f32
+        0.1_f32 * self.gs[GeneratorType::INITIAL_ATTENUATION as usize] as f32
     }
 
     pub fn get_coarse_tune(&self) -> i32
