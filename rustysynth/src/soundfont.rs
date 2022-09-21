@@ -6,6 +6,9 @@ use crate::binary_reader::BinaryReader;
 use crate::soundfont_info::SoundFontInfo;
 use crate::soundfont_sampledata::SoundFontSampleData;
 use crate::soundfont_parameters::SoundFontParameters;
+use crate::sample_header::SampleHeader;
+use crate::preset::Preset;
+use crate::instrument::Instrument;
 
 #[non_exhaustive]
 pub struct SoundFont
@@ -13,6 +16,9 @@ pub struct SoundFont
     pub info: SoundFontInfo,
     pub bits_per_sample: i32,
     pub wave_data: rc::Rc<Vec<i16>>,
+    pub sample_headers: Vec<SampleHeader>,
+    pub presets: Vec<Preset>,
+    pub instruments: Vec<Instrument>,
 }
 
 impl SoundFont
@@ -35,14 +41,16 @@ impl SoundFont
 
         let info = SoundFontInfo::new(reader)?;
         let sample_data = SoundFontSampleData::new(reader)?;
-
-        let result = SoundFontParameters::new(reader);
+        let parameters = SoundFontParameters::new(reader)?;
 
         Ok(SoundFont
         {
             info: info,
             bits_per_sample: 16,
             wave_data: rc::Rc::new(sample_data.wave_data),
+            sample_headers: parameters.sample_headers,
+            presets: parameters.presets,
+            instruments: parameters.instruments,
         })
     }
 }

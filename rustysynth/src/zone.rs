@@ -10,7 +10,7 @@ pub(crate) struct Zone
 
 impl Zone
 {
-    fn empty() -> Self
+    pub(crate) fn empty() -> Self
     {
         Zone
         {

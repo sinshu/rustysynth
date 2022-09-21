@@ -3,14 +3,19 @@ use std::io;
 
 use crate::binary_reader::BinaryReader;
 use crate::generator::Generator;
+use crate::preset::Preset;
+use crate::zone::Zone;
 use crate::zone_info::ZoneInfo;
 use crate::preset_info::PresetInfo;
+use crate::instrument::Instrument;
 use crate::instrument_info::InstrumentInfo;
 use crate::sample_header::SampleHeader;
 
 pub(crate) struct SoundFontParameters
 {
-    test: i32,
+    pub(crate) sample_headers: Vec<SampleHeader>,
+    pub(crate) presets: Vec<Preset>,
+    pub(crate) instruments: Vec<Instrument>,
 }
 
 impl SoundFontParameters
@@ -136,8 +141,17 @@ impl SoundFontParameters
             None => return Err(format!("The SHDR sub-chunk was not found.").into()),
         };
 
-        println!("SOUNDFONT_PARAMS_DONE!!");
+        let instrument_zones = Zone::create(&instrument_bag, &instrument_generators)?;
+        let instruments = Instrument::create(&instrument_infos, &instrument_zones, &sample_headers)?;
 
-        Ok(SoundFontParameters { test: 3 })
+        let preset_zones = Zone::create(&preset_bag, &preset_generators)?;
+        let presets = Preset::create(&preset_infos, &preset_zones, &instruments)?;
+
+        Ok(SoundFontParameters
+        {
+            sample_headers: sample_headers,
+            presets: presets,
+            instruments: instruments,
+        })
     }
 }
