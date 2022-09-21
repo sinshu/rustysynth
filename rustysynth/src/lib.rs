@@ -5,6 +5,7 @@ mod soundfont_version;
 mod soundfont_info;
 mod soundfont_sampledata;
 mod soundfont_parameters;
+mod soundfont_math;
 
 mod generator;
 mod generator_type;
@@ -17,6 +18,7 @@ mod instrument;
 mod instrument_info;
 mod instrument_region;
 mod sample_header;
+mod loop_mode;
 
 pub use self::soundfont::SoundFont;
 pub use self::soundfont_info::SoundFontInfo;
