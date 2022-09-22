@@ -1,5 +1,6 @@
 use std::error;
 use std::io;
+use std::slice;
 use std::str;
 
 #[allow(unused)]
@@ -88,20 +89,12 @@ impl BinaryReader
 
     pub(crate) fn read_wave_data<R: io::Read>(reader: &mut R, size: i32) -> Result<Vec<i16>, io::Error>
     {
-        // The following code is not memory efficient.
-        // Is there a way to read binary data directly into Vec<i16>?
-        
-        let mut data: Vec<u8> = vec![0; size as usize];
-        reader.read_exact(&mut data)?;
+        let length = size as usize / 2;
+        let mut samples: Vec<i16> = vec![0; length];
 
-        let length: i32 = size / 2;
-        let mut samples: Vec<i16> = vec![0; length as usize];
-        for i in 0..length
-        {
-            let offset = 2 * i as usize;
-            let sample: [u8; 2] = [data[offset], data[offset + 1]];
-            samples[i as usize] = i16::from_le_bytes(sample);
-        }
+        let ptr = samples.as_mut_ptr() as *mut u8;
+        let data = unsafe { slice::from_raw_parts_mut(ptr, size as usize) };
+        reader.read_exact(data)?;
 
         Ok(samples)
     }
