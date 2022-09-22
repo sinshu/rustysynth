@@ -131,4 +131,14 @@ impl VolumeEnvelope
             panic!("Invalid envelope stage.");
         }
     }
+
+    pub(crate) fn get_value(&self) -> f32
+    {
+        self.value
+    }
+
+    pub(crate) fn get_priority(&self) -> f32
+    {
+        self.priority
+    }
 }
