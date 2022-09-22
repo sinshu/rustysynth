@@ -1,5 +1,5 @@
+#![allow(dead_code)]
 #![allow(unused_imports)]
-use std::cmp;
 
 use rustysynth;
 
