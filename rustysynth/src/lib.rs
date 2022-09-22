@@ -24,6 +24,7 @@ mod synthesizer_settings;
 mod volume_envelope;
 mod modulation_envelope;
 mod envelope_stage;
+mod lfo;
 
 pub use self::soundfont::SoundFont;
 pub use self::soundfont_info::SoundFontInfo;
