@@ -3,6 +3,7 @@ use std::io;
 
 use crate::binary_reader::BinaryReader;
 
+#[non_exhaustive]
 pub(crate) struct InstrumentInfo
 {
     pub(crate) name: String,

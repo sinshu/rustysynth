@@ -11,6 +11,7 @@ use crate::instrument::Instrument;
 use crate::instrument_info::InstrumentInfo;
 use crate::sample_header::SampleHeader;
 
+#[non_exhaustive]
 pub(crate) struct SoundFontParameters
 {
     pub(crate) sample_headers: Vec<SampleHeader>,

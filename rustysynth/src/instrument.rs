@@ -5,6 +5,7 @@ use crate::instrument_info::InstrumentInfo;
 use crate::instrument_region::InstrumentRegion;
 use crate::sample_header::SampleHeader;
 
+#[non_exhaustive]
 pub struct Instrument
 {
     pub name: String,

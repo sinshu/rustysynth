@@ -3,6 +3,7 @@ use std::io;
 use std::str;
 
 #[allow(unused)]
+#[non_exhaustive]
 pub(crate) struct BinaryReader
 {
 }

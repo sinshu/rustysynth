@@ -5,6 +5,7 @@ use crate::preset_info::PresetInfo;
 use crate::preset_region::PresetRegion;
 use crate::instrument::Instrument;
 
+#[non_exhaustive]
 pub struct Preset
 {
     pub name: String,

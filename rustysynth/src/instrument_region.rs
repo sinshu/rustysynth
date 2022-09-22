@@ -18,6 +18,7 @@ fn set_parameter(gs: &mut [i16; GeneratorType::COUNT], generator: &Generator)
     }
 }
 
+#[non_exhaustive]
 pub struct InstrumentRegion
 {
     gs: [i16; GeneratorType::COUNT],

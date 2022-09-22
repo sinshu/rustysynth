@@ -3,6 +3,7 @@ use std::io;
 
 use crate::binary_reader::BinaryReader;
 
+#[non_exhaustive]
 pub struct SoundFontSampleData
 {
     pub bits_per_sample: i32,
