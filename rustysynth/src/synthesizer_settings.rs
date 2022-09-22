@@ -1,4 +1,4 @@
-use std::error;
+use std::error::Error;
 
 #[non_exhaustive]
 pub struct SynthesizerSettings
@@ -26,7 +26,7 @@ impl SynthesizerSettings
         }
     }
 
-    pub(crate) fn validate(&self) -> Result<(), Box<dyn error::Error>>
+    pub(crate) fn validate(&self) -> Result<(), Box<dyn Error>>
     {
         SynthesizerSettings::check_sample_rate(self.sample_rate)?;
         SynthesizerSettings::check_block_size(self.block_size)?;
@@ -35,7 +35,7 @@ impl SynthesizerSettings
         Ok(())
     }
 
-    fn check_sample_rate(value: i32) -> Result<(), Box<dyn error::Error>>
+    fn check_sample_rate(value: i32) -> Result<(), Box<dyn Error>>
     {
         if !(16000 <= value && value <= 192000)
         {
@@ -45,7 +45,7 @@ impl SynthesizerSettings
         Ok(())
     }
 
-    fn check_block_size(value: i32) -> Result<(), Box<dyn error::Error>>
+    fn check_block_size(value: i32) -> Result<(), Box<dyn Error>>
     {
         if !(8 <= value && value <= 1024)
         {
@@ -55,7 +55,7 @@ impl SynthesizerSettings
         Ok(())
     }
 
-    fn check_maximum_polyphony(value: i32) -> Result<(), Box<dyn error::Error>>
+    fn check_maximum_polyphony(value: i32) -> Result<(), Box<dyn Error>>
     {
         if !(8 <= value && value <= 256)
         {

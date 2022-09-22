@@ -1,5 +1,5 @@
-use std::error;
-use std::io;
+use std::error::Error;
+use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
 
@@ -13,7 +13,7 @@ pub(crate) struct InstrumentInfo
 
 impl InstrumentInfo
 {
-    fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
+    fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>>
     {
         let name = BinaryReader::read_fixed_length_string(reader, 20)?;
         let zone_start_index = BinaryReader::read_u16(reader)? as i32;
@@ -26,7 +26,7 @@ impl InstrumentInfo
         })
     }
 
-    pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<Vec<InstrumentInfo>, Box<dyn error::Error>>
+    pub(crate) fn read_from_chunk<R: Read>(reader: &mut R, size: i32) -> Result<Vec<InstrumentInfo>, Box<dyn Error>>
     {
         if size % 22 != 0
         {

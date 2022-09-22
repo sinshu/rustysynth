@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
-use rustysynth;
+use rustysynth::InstrumentRegion;
 
 fn are_equal(x: f64, y: f64) -> bool
 {
@@ -17,7 +17,7 @@ fn are_equal(x: f64, y: f64) -> bool
     delta < limit
 }
 
-pub fn check(region: &rustysynth::InstrumentRegion, values: &[f64; 50])
+pub fn check(region: &InstrumentRegion, values: &[f64; 50])
 {
     assert!(are_equal(region.get_sample_start() as f64, values[0]));
     assert!(are_equal(region.get_sample_end() as f64, values[1]));

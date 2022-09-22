@@ -1,4 +1,4 @@
-use std::error;
+use std::error::Error;
 
 use crate::generator::Generator;
 use crate::zone_info::ZoneInfo;
@@ -34,7 +34,7 @@ impl Zone
         }
     }
 
-    pub(crate) fn create(infos: &Vec<ZoneInfo>, generators: &Vec<Generator>) -> Result<Vec<Zone>, Box<dyn error::Error>>
+    pub(crate) fn create(infos: &Vec<ZoneInfo>, generators: &Vec<Generator>) -> Result<Vec<Zone>, Box<dyn Error>>
     {
         if infos.len() <= 1
         {

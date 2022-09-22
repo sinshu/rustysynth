@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
-use rustysynth;
+use rustysynth::SampleHeader;
 
-pub fn check(sample: &rustysynth::SampleHeader, values: &[i32; 7])
+pub fn check(sample: &SampleHeader, values: &[i32; 7])
 {
     assert_eq!(sample.start as i32, values[0]);
     assert_eq!(sample.end as i32, values[1]);

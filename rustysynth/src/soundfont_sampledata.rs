@@ -1,5 +1,5 @@
-use std::error;
-use std::io;
+use std::error::Error;
+use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
 
@@ -12,7 +12,7 @@ pub struct SoundFontSampleData
 
 impl SoundFontSampleData
 {
-    pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
+    pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>>
     {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "LIST"

@@ -1,6 +1,6 @@
-use std::error;
-use std::io;
-use std::rc;
+use std::error::Error;
+use std::io::Read;
+use std::rc::Rc;
 
 use crate::binary_reader::BinaryReader;
 use crate::soundfont_info::SoundFontInfo;
@@ -15,7 +15,7 @@ pub struct SoundFont
 {
     pub info: SoundFontInfo,
     pub bits_per_sample: i32,
-    pub wave_data: rc::Rc<Vec<i16>>,
+    pub wave_data: Rc<Vec<i16>>,
     pub sample_headers: Vec<SampleHeader>,
     pub presets: Vec<Preset>,
     pub instruments: Vec<Instrument>,
@@ -23,7 +23,7 @@ pub struct SoundFont
 
 impl SoundFont
 {
-    pub fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
+    pub fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>>
     {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "RIFF"
@@ -47,7 +47,7 @@ impl SoundFont
         {
             info: info,
             bits_per_sample: 16,
-            wave_data: rc::Rc::new(sample_data.wave_data),
+            wave_data: Rc::new(sample_data.wave_data),
             sample_headers: parameters.sample_headers,
             presets: parameters.presets,
             instruments: parameters.instruments,

@@ -1,18 +1,19 @@
 #![allow(unused_imports)]
 
-use std::fs;
-use std::path;
+use std::fs::File;
+use std::path::PathBuf;
+use rustysynth::SoundFont;
 
 #[test]
 fn soundfont_info()
 {
-    let mut path = path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
     path.push("TimGM6mb.sf2");
 
-    let mut file = fs::File::open(&path).unwrap();
+    let mut file = File::open(&path).unwrap();
 
-    let sound_font = rustysynth::SoundFont::new(&mut file).unwrap();
+    let sound_font = SoundFont::new(&mut file).unwrap();
 
     assert_eq!(sound_font.info.version.major, 2);
     assert_eq!(sound_font.info.version.minor, 1);

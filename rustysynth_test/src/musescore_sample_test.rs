@@ -1,18 +1,19 @@
 #![allow(unused_imports)]
 
-use std::fs;
-use std::path;
+use std::fs::File;
+use std::path::PathBuf;
+use rustysynth::SoundFont;
 
 use crate::sample_util;
 
 #[test]
 fn samples()
 {
-    let mut path = path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
     path.push("GeneralUser GS MuseScore v1.442.sf2");
-    let mut file = fs::File::open(&path).unwrap();
-    let sf = rustysynth::SoundFont::new(&mut file).unwrap();
+    let mut file = File::open(&path).unwrap();
+    let sf = SoundFont::new(&mut file).unwrap();
 
     // GUTest-version144
     let values: [i32; 7] = [0, 28607, 8, 28599, 8000, 60, 0];

@@ -1,4 +1,4 @@
-use std::error;
+use std::error::Error;
 
 use crate::zone::Zone;
 use crate::preset_info::PresetInfo;
@@ -19,7 +19,7 @@ pub struct Preset
 
 impl Preset
 {
-    fn new(info: &PresetInfo, zones: &Vec<Zone>, instruments: &Vec<Instrument>) -> Result<Self, Box<dyn error::Error>>
+    fn new(info: &PresetInfo, zones: &Vec<Zone>, instruments: &Vec<Instrument>) -> Result<Self, Box<dyn Error>>
     {
         let name = info.name.clone();
 
@@ -46,7 +46,7 @@ impl Preset
         })
     }
 
-    pub(crate) fn create(infos: &Vec<PresetInfo>, zones: &Vec<Zone>, instruments: &Vec<Instrument>) -> Result<Vec<Preset>, Box<dyn error::Error>>
+    pub(crate) fn create(infos: &Vec<PresetInfo>, zones: &Vec<Zone>, instruments: &Vec<Instrument>) -> Result<Vec<Preset>, Box<dyn Error>>
     {
         if infos.len() <= 1
         {

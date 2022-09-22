@@ -1,4 +1,4 @@
-use std::error;
+use std::error::Error;
 
 use crate::zone::Zone;
 use crate::instrument_info::InstrumentInfo;
@@ -14,7 +14,7 @@ pub struct Instrument
 
 impl Instrument
 {
-    fn new(info: &InstrumentInfo, zones: &Vec<Zone>, samples: &Vec<SampleHeader>) -> Result<Self, Box<dyn error::Error>>
+    fn new(info: &InstrumentInfo, zones: &Vec<Zone>, samples: &Vec<SampleHeader>) -> Result<Self, Box<dyn Error>>
     {
         let name = info.name.clone();
 
@@ -36,7 +36,7 @@ impl Instrument
         })
     }
 
-    pub(crate) fn create(infos: &Vec<InstrumentInfo>, zones: &Vec<Zone>, samples: &Vec<SampleHeader>) -> Result<Vec<Instrument>, Box<dyn error::Error>>
+    pub(crate) fn create(infos: &Vec<InstrumentInfo>, zones: &Vec<Zone>, samples: &Vec<SampleHeader>) -> Result<Vec<Instrument>, Box<dyn Error>>
     {
         if infos.len() <= 1
         {

@@ -1,5 +1,5 @@
-use std::error;
-use std::rc;
+use std::error::Error;
+use std::rc::Rc;
 
 use crate::SoundFont;
 use crate::SynthesizerSettings;
@@ -7,12 +7,12 @@ use crate::SynthesizerSettings;
 #[non_exhaustive]
 pub struct Synthesizer
 {
-    pub sound_font: rc::Rc<SoundFont>,
+    pub sound_font: Rc<SoundFont>,
 }
 
 impl Synthesizer
 {
-    pub fn new(sound_font: rc::Rc<SoundFont>, settings: SynthesizerSettings) -> Result<Self, Box<dyn error::Error>>
+    pub fn new(sound_font: Rc<SoundFont>, settings: SynthesizerSettings) -> Result<Self, Box<dyn Error>>
     {
         settings.validate()?;
 

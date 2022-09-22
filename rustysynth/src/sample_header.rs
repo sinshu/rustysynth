@@ -1,5 +1,5 @@
-use std::error;
-use std::io;
+use std::error::Error;
+use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
 
@@ -20,7 +20,7 @@ pub struct SampleHeader
 
 impl SampleHeader
 {
-    fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
+    fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>>
     {
         let name = BinaryReader::read_fixed_length_string(reader, 20)?;
         let start = BinaryReader::read_i32(reader)?;
@@ -48,7 +48,7 @@ impl SampleHeader
         })
     }
 
-    pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<Vec<SampleHeader>, Box<dyn error::Error>>
+    pub(crate) fn read_from_chunk<R: Read>(reader: &mut R, size: i32) -> Result<Vec<SampleHeader>, Box<dyn Error>>
     {
         if size % 46 != 0
         {

@@ -1,4 +1,4 @@
-use std::error;
+use std::error::Error;
 
 use crate::soundfont_math::SoundFontMath;
 use crate::generator::Generator;
@@ -32,7 +32,7 @@ pub struct InstrumentRegion
 
 impl InstrumentRegion
 {
-    fn new(name: &String, global: &Zone, local: &Zone, samples: &Vec<SampleHeader>) -> Result<Self, Box<dyn error::Error>>
+    fn new(name: &String, global: &Zone, local: &Zone, samples: &Vec<SampleHeader>) -> Result<Self, Box<dyn Error>>
     {
         let mut gs: [i16; GeneratorType::COUNT] = [0; GeneratorType::COUNT];
         gs[GeneratorType::INITIAL_FILTER_CUTOFF_FREQUENCY as usize] = 13500;
@@ -84,7 +84,7 @@ impl InstrumentRegion
         })
     }
 
-    pub(crate) fn create(name: &String, zones: &[Zone], samples: &Vec<SampleHeader>) -> Result<Vec<InstrumentRegion>, Box<dyn error::Error>>
+    pub(crate) fn create(name: &String, zones: &[Zone], samples: &Vec<SampleHeader>) -> Result<Vec<InstrumentRegion>, Box<dyn Error>>
     {
         // Is the first one the global zone?
         if zones[0].generators.len() == 0 || zones[0].generators.last().unwrap().generator_type != GeneratorType::SAMPLE_ID

@@ -1,18 +1,19 @@
 #![allow(unused_imports)]
 
-use std::fs;
-use std::path;
+use std::fs::File;
+use std::path::PathBuf;
+use rustysynth::SoundFont;
 
 use crate::preset_util;
 
 #[test]
 fn regions()
 {
-    let mut path = path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
     path.push("TimGM6mb.sf2");
-    let mut file = fs::File::open(&path).unwrap();
-    let sf = rustysynth::SoundFont::new(&mut file).unwrap();
+    let mut file = File::open(&path).unwrap();
+    let sf = SoundFont::new(&mut file).unwrap();
 
     // ============================================================
     //  Flute TB

@@ -1,18 +1,19 @@
 #![allow(unused_imports)]
 
-use std::fs;
-use std::path;
+use std::fs::File;
+use std::path::PathBuf;
+use rustysynth::SoundFont;
 
 use crate::sample_util;
 
 #[test]
 fn samples()
 {
-    let mut path = path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
     path.push("TimGM6mb.sf2");
-    let mut file = fs::File::open(&path).unwrap();
-    let sf = rustysynth::SoundFont::new(&mut file).unwrap();
+    let mut file = File::open(&path).unwrap();
+    let sf = SoundFont::new(&mut file).unwrap();
 
     // FluteG6
     let values: [i32; 7] = [0, 9320, 3924, 7954, 22500, 79, 43];

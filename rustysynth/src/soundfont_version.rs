@@ -1,4 +1,5 @@
 use std::io;
+use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
 
@@ -20,7 +21,7 @@ impl SoundFontVersion
         }
     }
 
-    pub(crate) fn new<R: io::Read>(reader: &mut R) -> Result<Self, io::Error>
+    pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, io::Error>
     {
         let major = BinaryReader::read_i16(reader)?;
         let minor = BinaryReader::read_i16(reader)?;

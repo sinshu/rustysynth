@@ -1,5 +1,5 @@
-use std::error;
-use std::io;
+use std::error::Error;
+use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
 
@@ -13,7 +13,7 @@ pub(crate) struct Generator
 
 impl Generator
 {
-    fn new<R: io::Read>(reader: &mut R) -> Result<Self, Box<dyn error::Error>>
+    fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>>
     {
         let generator_type = BinaryReader::read_u16(reader)?;
         let value = BinaryReader::read_u16(reader)?;
@@ -25,7 +25,7 @@ impl Generator
         })
     }
 
-    pub(crate) fn read_from_chunk<R: io::Read>(reader: &mut R, size: i32) -> Result<Vec<Generator>, Box<dyn error::Error>>
+    pub(crate) fn read_from_chunk<R: Read>(reader: &mut R, size: i32) -> Result<Vec<Generator>, Box<dyn Error>>
     {
         if size % 4 != 0
         {

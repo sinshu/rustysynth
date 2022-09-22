@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
-use rustysynth;
+use rustysynth::PresetRegion;
 
 fn are_equal(x: f64, y: f64) -> bool
 {
@@ -17,7 +17,7 @@ fn are_equal(x: f64, y: f64) -> bool
     delta < limit
 }
 
-pub fn check(region: &rustysynth::PresetRegion, values: &[f64; 39])
+pub fn check(region: &PresetRegion, values: &[f64; 39])
 {
     assert!(are_equal(region.get_modulation_lfo_to_pitch() as f64, values[0]));
     assert!(are_equal(region.get_vibrato_lfo_to_pitch() as f64, values[1]));
