@@ -300,7 +300,7 @@ impl Voice
         }
     }
 
-    fn get_priority(&self) -> f32
+    pub(crate) fn get_priority(&self) -> f32
     {
         if self.note_gain < SoundFontMath::NON_AUDIBLE
         {
