@@ -6,7 +6,7 @@ use crate::voice::Voice;
 #[non_exhaustive]
 struct VoiceCollection
 {
-    pub(crate) voices: Vec<Box<Voice>>,
+    voices: Vec<Box<Voice>>,
     pub(crate) active_voice_count: i32,
 }
 
@@ -104,5 +104,10 @@ impl VoiceCollection
     pub(crate) fn clear(&mut self)
     {
         self.active_voice_count = 0;
+    }
+
+    pub(crate) fn get_active_voices(&self) -> &[Box<Voice>]
+    {
+        &self.voices[0..self.active_voice_count as usize]
     }
 }
