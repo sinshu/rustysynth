@@ -33,7 +33,7 @@ impl SampleHeader
         let link = BinaryReader::read_u16(reader)?;
         let sample_type = BinaryReader::read_u16(reader)?;
 
-        Ok(SampleHeader
+        Ok(Self
         {
             name: name,
             start: start,

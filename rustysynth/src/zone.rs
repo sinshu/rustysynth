@@ -13,7 +13,7 @@ impl Zone
 {
     pub(crate) fn empty() -> Self
     {
-        Zone
+        Self
         {
             generators: Vec::new(),
         }
@@ -28,7 +28,7 @@ impl Zone
             segment.push(generators[(info.generator_index + i) as usize]);
         }
 
-        Zone
+        Self
         {
             generators: segment,
         }

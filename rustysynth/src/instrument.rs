@@ -29,7 +29,7 @@ impl Instrument
         let zone_span = &zones[span_start..span_end];
         let regions = InstrumentRegion::create(&name, zone_span, &samples)?;
 
-        Ok(Instrument
+        Ok(Self
         {
             name: name,
             regions: regions,

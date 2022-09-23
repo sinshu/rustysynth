@@ -30,7 +30,7 @@ impl ModulationEnvelope
 {
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self
     {
-        ModulationEnvelope
+        Self
         {
             sample_rate: settings.sample_rate,
             attack_slope: 0_f64,

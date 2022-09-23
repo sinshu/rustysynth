@@ -18,7 +18,7 @@ impl InstrumentInfo
         let name = BinaryReader::read_fixed_length_string(reader, 20)?;
         let zone_start_index = BinaryReader::read_u16(reader)? as i32;
 
-        Ok(InstrumentInfo
+        Ok(Self
         {
             name: name,
             zone_start_index: zone_start_index,

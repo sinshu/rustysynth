@@ -43,7 +43,7 @@ impl SoundFont
         let sample_data = SoundFontSampleData::new(reader)?;
         let parameters = SoundFontParameters::new(reader)?;
 
-        Ok(SoundFont
+        Ok(Self
         {
             info: info,
             bits_per_sample: 16,

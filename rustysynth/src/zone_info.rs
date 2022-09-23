@@ -19,7 +19,7 @@ impl ZoneInfo
         let generator_index = BinaryReader::read_u16(reader)? as i32;
         let modulator_index = BinaryReader::read_u16(reader)? as i32;
 
-        Ok(ZoneInfo
+        Ok(Self
         {
             generator_index: generator_index,
             modulator_index: modulator_index,

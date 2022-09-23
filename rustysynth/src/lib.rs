@@ -21,6 +21,7 @@ mod loop_mode;
 
 mod synthesizer;
 mod synthesizer_settings;
+mod region_pair;
 mod oscillator;
 mod volume_envelope;
 mod modulation_envelope;

@@ -19,7 +19,7 @@ impl Lfo
 {
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self
     {
-        Lfo
+        Self
         {
             sample_rate: settings.sample_rate,
             block_size: settings.block_size,

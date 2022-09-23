@@ -20,7 +20,7 @@ fn set_parameter(gs: &mut [i16; GeneratorType::COUNT], generator: &Generator)
 #[non_exhaustive]
 pub struct PresetRegion
 {
-    gs: [i16; GeneratorType::COUNT],
+    pub(crate) gs: [i16; GeneratorType::COUNT],
 }
 
 impl PresetRegion
@@ -47,7 +47,7 @@ impl PresetRegion
             return Err(format!("The preset '{name}' contains an invalid instrument ID '{id}'.").into());
         }
 
-        Ok(PresetRegion
+        Ok(Self
         {
             gs: gs,
         })

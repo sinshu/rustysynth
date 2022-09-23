@@ -179,7 +179,7 @@ impl SoundFontInfo
             None => String::new(),
         };
 
-        Ok(SoundFontInfo
+        Ok(Self
         {
             version: version,
             target_sound_engine: target_sound_engine,

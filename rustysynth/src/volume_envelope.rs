@@ -30,7 +30,7 @@ impl VolumeEnvelope
 {
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self
     {
-        VolumeEnvelope
+        Self
         {
             sample_rate: settings.sample_rate,
             attack_slope: 0_f64,

@@ -63,7 +63,7 @@ impl SoundFontSampleData
             None => return Err(format!("No valid sample data was found.").into()),
         };
 
-        Ok(SoundFontSampleData
+        Ok(Self
         {
             bits_per_sample: 16,
             wave_data: wave_data,

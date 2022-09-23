@@ -16,7 +16,7 @@ impl Synthesizer
     {
         settings.validate()?;
 
-        Ok(Synthesizer
+        Ok(Self
         {
             sound_font: sound_font,
         })

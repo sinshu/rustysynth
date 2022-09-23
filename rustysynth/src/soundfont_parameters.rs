@@ -148,7 +148,7 @@ impl SoundFontParameters
         let preset_zones = Zone::create(&preset_bag, &preset_generators)?;
         let presets = Preset::create(&preset_infos, &preset_zones, &instruments)?;
 
-        Ok(SoundFontParameters
+        Ok(Self
         {
             sample_headers: sample_headers,
             presets: presets,

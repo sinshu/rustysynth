@@ -34,7 +34,7 @@ impl Preset
         let zone_span = &zones[span_start..span_end];
         let regions = PresetRegion::create(&name, zone_span, &instruments)?;
 
-        Ok(Preset
+        Ok(Self
         {
             name: name,
             patch_number: info.patch_number,

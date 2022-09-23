@@ -39,7 +39,7 @@ impl Oscillator
 
     fn new(settings: &SynthesizerSettings) -> Self
     {
-        Oscillator
+        Self
         {
             synthesizer_sample_rate: settings.sample_rate,
             data: None,

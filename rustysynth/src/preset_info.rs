@@ -28,7 +28,7 @@ impl PresetInfo
         let genre = BinaryReader::read_i32(reader)?;
         let morphology = BinaryReader::read_i32(reader)?;
 
-        Ok(PresetInfo
+        Ok(Self
         {
             name: name,
             patch_number: patch_number,

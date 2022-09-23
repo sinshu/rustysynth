@@ -17,7 +17,7 @@ impl SynthesizerSettings
 
     pub fn new(sample_rate: i32) -> Self
     {
-        SynthesizerSettings
+        Self
         {
             sample_rate: sample_rate,
             block_size: SynthesizerSettings::DEFAULT_BLOCK_SIZE,

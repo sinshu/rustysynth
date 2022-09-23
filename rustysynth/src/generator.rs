@@ -18,7 +18,7 @@ impl Generator
         let generator_type = BinaryReader::read_u16(reader)?;
         let value = BinaryReader::read_u16(reader)?;
 
-        Ok(Generator
+        Ok(Self
         {
             generator_type: generator_type,
             value: value,

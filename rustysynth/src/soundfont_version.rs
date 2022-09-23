@@ -14,7 +14,7 @@ impl SoundFontVersion
 {
     pub(crate) fn default() -> Self
     {
-        SoundFontVersion
+        Self
         {
             major: 0,
             minor: 0,
@@ -26,7 +26,7 @@ impl SoundFontVersion
         let major = BinaryReader::read_i16(reader)?;
         let minor = BinaryReader::read_i16(reader)?;
 
-        Ok(SoundFontVersion
+        Ok(Self
         {
             major: major,
             minor: minor,

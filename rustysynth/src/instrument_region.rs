@@ -21,13 +21,13 @@ fn set_parameter(gs: &mut [i16; GeneratorType::COUNT], generator: &Generator)
 #[non_exhaustive]
 pub struct InstrumentRegion
 {
-    gs: [i16; GeneratorType::COUNT],
-    sample_start: i32,
-    sample_end: i32,
-    sample_start_loop: i32,
-    sample_end_loop: i32,
-    sample_original_pitch: i32,
-    sample_pitch_correction: i32,
+    pub(crate) gs: [i16; GeneratorType::COUNT],
+    pub(crate) sample_start: i32,
+    pub(crate) sample_end: i32,
+    pub(crate) sample_start_loop: i32,
+    pub(crate) sample_end_loop: i32,
+    pub(crate) sample_original_pitch: i32,
+    pub(crate) sample_pitch_correction: i32,
 }
 
 impl InstrumentRegion
@@ -72,7 +72,7 @@ impl InstrumentRegion
         }
         let sample = &samples[id];
 
-        Ok(InstrumentRegion
+        Ok(Self
         {
             gs: gs,
             sample_start: sample.start,
