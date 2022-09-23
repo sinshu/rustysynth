@@ -1,3 +1,5 @@
+use std::f32::consts;
+
 #[allow(unused)]
 #[non_exhaustive]
 pub(crate) struct SoundFontMath
@@ -6,6 +8,7 @@ pub(crate) struct SoundFontMath
 
 impl SoundFontMath
 {
+    pub(crate) const HALF_PI: f32 = consts::PI / 2_f32;
     pub(crate) const NON_AUDIBLE: f32 = 1.0e-3_f32;
     pub(crate) const LOG_NON_AUDIBLE: f32 = -6.90775527898_f32;
 

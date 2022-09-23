@@ -24,6 +24,7 @@ mod synthesizer;
 mod synthesizer_settings;
 mod region_pair;
 mod region_ex;
+mod voice;
 mod oscillator;
 mod bi_quad_filter;
 mod volume_envelope;

@@ -15,7 +15,7 @@ pub(crate) struct RegionEx
 
 impl RegionEx
 {
-    pub(crate) fn start_oscillator(oscillator: &mut Oscillator, data: Rc<Vec<i16>>, region: &RegionPair)
+    pub(crate) fn start_oscillator(oscillator: &mut Oscillator, data: &Rc<Vec<i16>>, region: &RegionPair)
     {
         let sample_rate = region.instrument.sample_sample_rate;
         let loop_mode = region.get_sample_modes();

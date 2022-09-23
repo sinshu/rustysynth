@@ -70,6 +70,13 @@ impl VolumeEnvelope
         self.process(0);
     }
 
+    pub(crate) fn release(&mut self)
+    {
+        self.stage = EnvelopeStage::RELEASE;
+        self.release_start_time = self.processed_sample_count as f64 / self.sample_rate as f64;
+        self.release_level = self.value;
+    }
+
     pub(crate) fn process(&mut self, sample_count: i32) -> bool
     {
         self.processed_sample_count += sample_count;

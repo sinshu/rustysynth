@@ -82,4 +82,9 @@ impl Lfo
             }
         }
     }
+
+    pub(crate) fn get_value(&self) -> f32
+    {
+        self.value
+    }
 }

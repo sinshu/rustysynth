@@ -58,9 +58,9 @@ impl Oscillator
         }
     }
 
-    pub(crate) fn start(&mut self, data: Rc<Vec<i16>>, loop_mode: i32, sample_rate: i32, start: i32, end: i32, start_loop: i32, end_loop: i32, root_key: i32, coarse_tune: i32, fine_tune: i32, scale_tuning: i32)
+    pub(crate) fn start(&mut self, data: &Rc<Vec<i16>>, loop_mode: i32, sample_rate: i32, start: i32, end: i32, start_loop: i32, end_loop: i32, root_key: i32, coarse_tune: i32, fine_tune: i32, scale_tuning: i32)
     {
-        self.data = Some(data);
+        self.data = Some(Rc::clone(data));
         self.loop_mode = loop_mode;
         self.sample_sample_rate = sample_rate;
         self.start = start;
