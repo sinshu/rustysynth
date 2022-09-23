@@ -1,3 +1,4 @@
+mod array_math;
 mod binary_reader;
 
 mod soundfont;
