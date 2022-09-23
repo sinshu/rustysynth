@@ -31,6 +31,25 @@ impl Lfo
         }
     }
 
+    pub(crate) fn start(&mut self, delay: f32, frequency: f32)
+    {
+        if frequency > 1.0E-3_f32
+        {
+            self.active = true;
+
+            self.delay = delay as f64;
+            self.period = 1.0_f64 / frequency as f64;
+
+            self.processed_sample_count = 0;
+            self.value = 0_f32;
+        }
+        else
+        {
+            self.active = false;
+            self.value = 0_f32;
+        }
+    }
+
     pub(crate) fn process(&mut self)
     {
         if !self.active

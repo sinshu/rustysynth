@@ -26,6 +26,7 @@ pub struct InstrumentRegion
     pub(crate) sample_end: i32,
     pub(crate) sample_start_loop: i32,
     pub(crate) sample_end_loop: i32,
+    pub(crate) sample_sample_rate: i32,
     pub(crate) sample_original_pitch: i32,
     pub(crate) sample_pitch_correction: i32,
 }
@@ -79,6 +80,7 @@ impl InstrumentRegion
             sample_end: sample.end,
             sample_start_loop: sample.start_loop,
             sample_end_loop: sample.end_loop,
+            sample_sample_rate: sample.sample_rate,
             sample_original_pitch: sample.original_pitch as i32,
             sample_pitch_correction: sample.pitch_correction as i32,
         })

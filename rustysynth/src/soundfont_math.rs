@@ -52,6 +52,21 @@ impl SoundFontMath
         2_f32.powf((1_f32 / 1200_f32) * x)
     }
 
+    pub(crate) fn decibels_to_linear(x: f32) -> f32
+    {
+        10_f32.powf(0.05_f32 * x)
+    }
+
+    pub(crate) fn linear_to_decibels(x: f32) -> f32
+    {
+        20_f32 * x.log10()
+    }
+
+    pub(crate) fn key_number_to_multiplying_factor(cents: i32, key: i32) -> f32
+    {
+        SoundFontMath::timecents_to_seconds((cents * (60 - key)) as f32)
+    }
+
     pub(crate) fn exp_cutoff(x: f64) -> f64
     {
         if x < SoundFontMath::LOG_NON_AUDIBLE as f64
