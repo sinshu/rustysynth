@@ -12,7 +12,7 @@ pub(crate) struct RegionPair<'a>
 
 impl<'a> RegionPair<'a>
 {
-    fn new(preset: &'a PresetRegion, instrument: &'a InstrumentRegion) -> Self
+    pub(crate) fn new(preset: &'a PresetRegion, instrument: &'a InstrumentRegion) -> Self
     {
         Self
         {

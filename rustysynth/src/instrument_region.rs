@@ -118,6 +118,13 @@ impl InstrumentRegion
         }
     }
 
+    pub fn contains(&self, key: i32, velocity: i32) -> bool
+    {
+        let contains_key = self.get_key_range_start() <= key && key <= self.get_key_range_end();
+        let contains_velocity = self.get_velocity_range_start() <= velocity && velocity <= self.get_velocity_range_end();
+        return contains_key && contains_velocity;
+    }
+
     pub fn get_sample_start(&self) -> i32
     {
         self.sample_start + self.get_start_address_offset()

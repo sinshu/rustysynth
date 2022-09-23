@@ -21,6 +21,7 @@ fn set_parameter(gs: &mut [i16; GeneratorType::COUNT], generator: &Generator)
 pub struct PresetRegion
 {
     pub(crate) gs: [i16; GeneratorType::COUNT],
+    pub(crate) instrument: usize,
 }
 
 impl PresetRegion
@@ -50,6 +51,7 @@ impl PresetRegion
         Ok(Self
         {
             gs: gs,
+            instrument: id,
         })
     }
 
@@ -83,6 +85,13 @@ impl PresetRegion
 
             Ok(regions)
         }
+    }
+
+    pub fn contains(&self, key: i32, velocity: i32) -> bool
+    {
+        let contains_key = self.get_key_range_start() <= key && key <= self.get_key_range_end();
+        let contains_velocity = self.get_velocity_range_start() <= velocity && velocity <= self.get_velocity_range_end();
+        return contains_key && contains_velocity;
     }
 
     pub fn get_modulation_lfo_to_pitch(&self) -> i32

@@ -1,4 +1,5 @@
 use std::f32::consts;
+use std::rc::Rc;
 
 use crate::soundfont_math::SoundFontMath;
 use crate::synthesizer::Synthesizer;
@@ -124,7 +125,7 @@ impl Voice
         }
     }
 
-    pub(crate) fn start(&mut self, synthesizer: &Synthesizer, region: &RegionPair, channel: i32, key: i32, velocity: i32)
+    pub(crate) fn start(&mut self, data: &Rc<Vec<i16>>, region: &RegionPair, channel: i32, key: i32, velocity: i32)
     {
         self.exclusive_class = region.get_exclusive_class();
         self.channel = channel;
@@ -167,7 +168,7 @@ impl Voice
         RegionEx::start_modulation_envelope(&mut self.mod_env, region, key, velocity);
         RegionEx::start_vibrato(&mut self.vib_lfo, region, key, velocity);
         RegionEx::start_modulation(&mut self.mod_lfo, region, key, velocity);
-        RegionEx::start_oscillator(&mut self.oscillator, &synthesizer.sound_font.wave_data, region);
+        RegionEx::start_oscillator(&mut self.oscillator, data, region);
         self.filter.clear_buffer();
         self.filter.set_low_pass_filter(self.cutoff, self.resonance);
 
@@ -223,12 +224,12 @@ impl Voice
         {
             let cents = self.mod_lfo_to_cutoff as f32 * self.mod_lfo.get_value() + self.mod_env_to_cutoff as f32 * self.mod_env.get_value();
             let factor = SoundFontMath::cents_to_multiplying_factor(cents);
-            let newCutoff = factor * self.cutoff;
+            let new_cutoff = factor * self.cutoff;
 
             // The cutoff change is limited within x0.5 and x2 to reduce pop noise.
             let lower_limit = 0.5_f32 * self.smoothed_cutoff;
             let upper_limit = 2_f32 * self.smoothed_cutoff;
-            self.smoothed_cutoff = SoundFontMath::clamp(newCutoff, lower_limit, upper_limit);
+            self.smoothed_cutoff = SoundFontMath::clamp(new_cutoff, lower_limit, upper_limit);
 
             self.filter.set_low_pass_filter(self.smoothed_cutoff, self.resonance);
         }
