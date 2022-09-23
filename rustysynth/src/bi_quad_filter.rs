@@ -1,5 +1,4 @@
 use std::f32::consts;
-use std::rc::Rc;
 
 use crate::synthesizer_settings::SynthesizerSettings;
 
