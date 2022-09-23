@@ -1,8 +1,9 @@
+#![allow(dead_code)]
+
 use std::f32::consts;
 use std::rc::Rc;
 
 use crate::soundfont_math::SoundFontMath;
-use crate::synthesizer::Synthesizer;
 use crate::synthesizer_settings::SynthesizerSettings;
 use crate::region_pair::RegionPair;
 use crate::region_ex::RegionEx;
@@ -76,6 +77,7 @@ pub(crate) struct Voice
 
     voice_state: i32,
     pub(crate) voice_length: i32,
+    min_voice_length: i32,
 }
 
 impl Voice
@@ -122,6 +124,7 @@ impl Voice
             smoothed_cutoff: 0_f32,
             voice_state: 0,
             voice_length: 0,
+            min_voice_length: settings.sample_rate / 500,
         }
     }
 
@@ -191,16 +194,16 @@ impl Voice
         self.note_gain = 0_f32;
     }
 
-    pub(crate) fn process(&mut self, synthesizer: &Synthesizer) -> bool
+    pub(crate) fn process(&mut self, channels: &Vec<Channel>) -> bool
     {
         if self.note_gain < SoundFontMath::NON_AUDIBLE
         {
             return false;
         }
 
-        let channel_info = &synthesizer.channels[self.channel as usize];
+        let channel_info = &channels[self.channel as usize];
 
-        self.release_if_necessary(channel_info, synthesizer.minimum_voice_duration);
+        self.release_if_necessary(channel_info);
 
         if !self.vol_env.process(self.block_size)
         {
@@ -284,9 +287,9 @@ impl Voice
         return true;
     }
 
-    fn release_if_necessary(&mut self, channel_info: &Channel, minimum_voice_duration: i32)
+    fn release_if_necessary(&mut self, channel_info: &Channel)
     {
-        if self.voice_length < minimum_voice_duration
+        if self.voice_length < self.min_voice_length
         {
             return;
         }

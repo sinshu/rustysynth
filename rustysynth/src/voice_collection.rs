@@ -1,7 +1,9 @@
+#![allow(dead_code)]
+
 use crate::instrument_region::InstrumentRegion;
-use crate::synthesizer::Synthesizer;
 use crate::synthesizer_settings::SynthesizerSettings;
 use crate::voice::Voice;
+use crate::channel::Channel;
 
 #[non_exhaustive]
 pub(crate) struct VoiceCollection
@@ -65,7 +67,7 @@ impl VoiceCollection
                 lowest_priority = priority;
                 candidate = i;
             }
-            else if (priority == lowest_priority)
+            else if priority == lowest_priority
             {
                 // Same priority...
                 // The older one should be more suitable for reuse.
@@ -78,7 +80,7 @@ impl VoiceCollection
         return Some(self.voices[candidate].as_mut());
     }
 
-    pub(crate) fn process(&mut self, synthesizer: &Synthesizer)
+    pub(crate) fn process(&mut self, channels: &Vec<Channel>)
     {
         let mut i: usize = 0;
 
@@ -89,7 +91,7 @@ impl VoiceCollection
                 return;
             }
 
-            if self.voices[i].as_mut().process(synthesizer)
+            if self.voices[i].as_mut().process(channels)
             {
                 i += 1;
             }

@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::synthesizer_settings::SynthesizerSettings;
 
 #[non_exhaustive]

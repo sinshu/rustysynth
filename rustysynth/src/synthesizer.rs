@@ -1,10 +1,15 @@
+#![allow(dead_code)]
+
+use std::cmp;
 use std::collections::HashMap;
 use std::error::Error;
 use std::rc::Rc;
 
-use crate::SoundFont;
+use crate::array_math::ArrayMath;
+use crate::soundfont_math::SoundFontMath;
+use crate::soundfont::SoundFont;
 use crate::region_pair::RegionPair;
-use crate::SynthesizerSettings;
+use crate::synthesizer_settings::SynthesizerSettings;
 use crate::voice_collection::VoiceCollection;
 use crate::channel::Channel;
 
@@ -302,5 +307,78 @@ impl Synthesizer
         }
 
         self.block_read = self.block_size as usize;
+    }
+
+    pub fn render(&mut self, left: &mut[f32], right: &mut[f32])
+    {
+        if left.len() != right.len()
+        {
+            panic!("The output buffers for the left and right must be the same length.");
+        }
+
+        let left_length = left.len();
+
+        let mut wrote = 0;
+        while wrote < left_length
+        {
+            if self.block_read == self.block_size as usize
+            {
+                self.render_block();
+                self.block_read = 0;
+            }
+
+            let src_rem = self.block_size as usize - self.block_read;
+            let dst_rem = left_length - wrote;
+            let rem = cmp::min(src_rem, dst_rem);
+
+            for t in 0..rem
+            {
+                left[wrote + t] = self.block_left[self.block_read + t];
+                right[wrote + t] = self.block_right[self.block_read + t];
+            }
+
+            self.block_read += rem;
+            wrote += rem;
+        }
+    }
+
+    fn render_block(&mut self)
+    {
+        self.voices.process(&self.channels);
+
+        for t in 0..self.block_size as usize
+        {
+            self.block_left[t] = 0_f32;
+            self.block_right[t] = 0_f32;
+        }
+
+        for i in 0..self.voices.active_voice_count as usize
+        {
+            let voice = self.voices.voices[i].as_ref();
+            let previous_gain_left = self.master_volume * voice.previous_mix_gain_left;
+            let current_gain_left = self.master_volume * voice.current_mix_gain_left;
+            Synthesizer::write_block(previous_gain_left, current_gain_left, &voice.block[..], &mut self.block_left[..], self.inverse_block_size);
+            let previous_gain_right = self.master_volume * voice.previous_mix_gain_right;
+            let current_gain_right = self.master_volume * voice.current_mix_gain_right;
+            Synthesizer::write_block(previous_gain_right, current_gain_right, &voice.block[..], &mut self.block_right[..], self.inverse_block_size);
+        }
+    }
+
+    fn write_block(previous_gain: f32, current_gain: f32, source: &[f32], destination: &mut[f32], inverse_block_size: f32)
+    {
+        if SoundFontMath::max(previous_gain, current_gain) < SoundFontMath::NON_AUDIBLE
+        {
+            return;
+        }
+
+        if (current_gain - previous_gain).abs() < 1.0E-3_f32
+        {
+            ArrayMath::multiply_add(current_gain, source, destination);
+        }
+        else
+        {
+            let step = inverse_block_size * (current_gain - previous_gain);
+            ArrayMath::multiply_add_slope(previous_gain, step, source, destination);
+        }
     }
 }

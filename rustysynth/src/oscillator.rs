@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::rc::Rc;
 
 use crate::synthesizer_settings::SynthesizerSettings;

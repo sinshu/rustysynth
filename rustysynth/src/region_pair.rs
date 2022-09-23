@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::soundfont_math::SoundFontMath;
 use crate::generator_type::GeneratorType;
 use crate::preset_region::PresetRegion;

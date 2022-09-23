@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::error::Error;
 
 use crate::soundfont_math::SoundFontMath;

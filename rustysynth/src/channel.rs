@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 #[non_exhaustive]
 pub(crate) struct Channel
 {

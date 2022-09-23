@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::soundfont_math::SoundFontMath;
 use crate::synthesizer_settings::SynthesizerSettings;
 use crate::envelope_stage::EnvelopeStage;
@@ -95,7 +97,7 @@ impl ModulationEnvelope
                 _ => panic!("Invalid envelope stage."),
             };
 
-            if (current_time < end_time)
+            if current_time < end_time
             {
                 break;
             }
