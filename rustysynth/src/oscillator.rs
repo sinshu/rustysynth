@@ -37,7 +37,7 @@ impl Oscillator
     const FRAC_UNIT: i64 = 1_i64 << Oscillator::FRAC_BITS;
     const FP_TO_SAMPLE: f32 = 1_f32 / (32768 * Oscillator::FRAC_UNIT) as f32;
 
-    fn new(settings: &SynthesizerSettings) -> Self
+    pub(crate) fn new(settings: &SynthesizerSettings) -> Self
     {
         Self
         {

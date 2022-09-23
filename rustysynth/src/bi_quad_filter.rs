@@ -26,7 +26,7 @@ impl BiQuadFilter
 {
     const RESONANCE_PEAK_OFFSET: f32 = 1_f32 - 1_f32 / 1.41421356237_f32;
 
-    fn new(settings: &SynthesizerSettings) -> Self
+    pub(crate) fn new(settings: &SynthesizerSettings) -> Self
     {
         Self
         {
@@ -44,19 +44,19 @@ impl BiQuadFilter
         }
     }
 
-    fn clear_buffer(&mut self)
+    pub(crate) fn clear_buffer(&mut self)
     {
-        x1 = 0_f32;
-        x2 = 0_f32;
-        y1 = 0_f32;
-        y2 = 0_f32;
+        self.x1 = 0_f32;
+        self.x2 = 0_f32;
+        self.y1 = 0_f32;
+        self.y2 = 0_f32;
     }
 
-    fn set_low_pass_filter(&mut self, cutoff_frequency: f32, resonance: f32)
+    pub(crate) fn set_low_pass_filter(&mut self, cutoff_frequency: f32, resonance: f32)
     {
-        if cutoff_frequency < 0.499_f32 * self.sample_rate
+        if cutoff_frequency < 0.499_f32 * self.sample_rate as f32
         {
-            active = true;
+            self.active = true;
 
             // This equation gives the Q value which makes the desired resonance peak.
             // The error of the resultant peak height is less than 3%.
@@ -73,24 +73,24 @@ impl BiQuadFilter
             let a1 = -2_f32 * cosw;
             let a2 = 1_f32 - alpha;
 
-            SetCoefficients(a0, a1, a2, b0, b1, b2);
+            self.set_coefficients(a0, a1, a2, b0, b1, b2);
         }
         else
         {
-            active = false;
+            self.active = false;
         }
     }
 
-    fn process(&mut self, block: &[f32])
+    pub(crate) fn process(&mut self, block: &mut [f32])
     {
         let block_length = block.len();
 
-        if active
+        if self.active
         {
             for t in 0..block_length
             {
                 let input = block[t];
-                let output = a0 * input + a1 * x1 + a2 * x2 - a3 * y1 - a4 * y2;
+                let output = self.a0 * input + self.a1 * self.x1 + self.a2 * self.x2 - self.a3 * self.y1 - self.a4 * self.y2;
 
                 self.x2 = self.x1;
                 self.x1 = input;
@@ -102,8 +102,8 @@ impl BiQuadFilter
         }
         else
         {
-            self.x2 = block[block.Length - 2];
-            self.x1 = block[block.Length - 1];
+            self.x2 = block[block_length - 2];
+            self.x1 = block[block_length - 1];
             self.y2 = self.x2;
             self.y1 = self.x1;
         }

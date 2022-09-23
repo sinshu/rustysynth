@@ -23,10 +23,12 @@ mod synthesizer;
 mod synthesizer_settings;
 mod region_pair;
 mod oscillator;
+mod bi_quad_filter;
 mod volume_envelope;
 mod modulation_envelope;
 mod envelope_stage;
 mod lfo;
+mod channel;
 
 pub use self::soundfont::SoundFont;
 pub use self::soundfont_info::SoundFontInfo;
