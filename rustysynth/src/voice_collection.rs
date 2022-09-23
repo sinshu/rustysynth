@@ -4,7 +4,7 @@ use crate::synthesizer_settings::SynthesizerSettings;
 use crate::voice::Voice;
 
 #[non_exhaustive]
-struct VoiceCollection
+pub(crate) struct VoiceCollection
 {
     voices: Vec<Box<Voice>>,
     pub(crate) active_voice_count: i32,
