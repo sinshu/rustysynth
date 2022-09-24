@@ -10,11 +10,11 @@ use rustysynth::MidiFileSequencer;
 
 fn main()
 {
-    let sf2_path = Path::new("RLNDGM.SF2");
+    let sf2_path = Path::new("TimGM6mb.sf2");
     let mut sf2_reader = File::open(&sf2_path).unwrap();
     let sound_font = Rc::new(SoundFont::new(&mut sf2_reader).unwrap());
 
-    let mid_path = Path::new("town.mid");
+    let mid_path = Path::new("flourish.mid");
     let mut mid_reader = File::open(&mid_path).unwrap();
     let midi_file = Rc::new(MidiFile::new(&mut mid_reader).unwrap());
 
