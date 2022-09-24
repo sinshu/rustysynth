@@ -40,7 +40,7 @@ fn simple_chord()
     synthesizer.render(&mut left[..], &mut right[..]);
 
     // Write the waveform to the file.
-    write_pcm(&left[..], &right[..], "simple_chord.pcm")
+    write_pcm(&left[..], &right[..], "simple_chord.pcm");
 
 }
 
