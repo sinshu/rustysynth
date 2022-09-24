@@ -5,6 +5,7 @@ use std::rc::Rc;
 use rustysynth::SoundFont;
 use rustysynth::SynthesizerSettings;
 use rustysynth::Synthesizer;
+use rustysynth::MidiFile;
 
 fn main()
 {

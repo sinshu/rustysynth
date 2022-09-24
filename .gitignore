@@ -16,3 +16,4 @@ Cargo.lock
 # Audio related files
 *.sf2
 *.pcm
+*.mid

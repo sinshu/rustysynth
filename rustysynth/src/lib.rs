@@ -34,6 +34,8 @@ mod envelope_stage;
 mod lfo;
 mod channel;
 
+mod midifile;
+
 pub use self::soundfont::SoundFont;
 pub use self::soundfont_info::SoundFontInfo;
 pub use self::soundfont_version::SoundFontVersion;
@@ -44,3 +46,4 @@ pub use self::instrument::Instrument;
 pub use self::instrument_region::InstrumentRegion;
 pub use self::synthesizer::Synthesizer;
 pub use self::synthesizer_settings::SynthesizerSettings;
+pub use self::midifile::MidiFile;
