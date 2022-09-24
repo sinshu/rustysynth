@@ -83,8 +83,8 @@ impl Message
 #[non_exhaustive]
 pub struct MidiFile
 {
-    messages: Vec<Message>,
-    times: Vec<f64>,
+    pub(crate) messages: Vec<Message>,
+    pub(crate) times: Vec<f64>,
 }
 
 impl MidiFile
@@ -294,5 +294,10 @@ impl MidiFile
         }
 
         (merged_messages, merged_times)
+    }
+
+    pub fn get_length(&self) -> f64
+    {
+        *self.times.last().unwrap()
     }
 }

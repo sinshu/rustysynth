@@ -141,10 +141,10 @@ impl Oscillator
                 }
             }
 
-            let x1 = data[index];
-            let x2 = data[index + 1];
+            let x1 = data[index] as i64;
+            let x2 = data[index + 1] as i64;
             let a_fp = self.position_fp & (Oscillator::FRAC_UNIT - 1);
-            block[t] = Oscillator::FP_TO_SAMPLE * (((x1 as i64) << Oscillator::FRAC_BITS) + a_fp * (x2 - x1) as i64) as f32;
+            block[t] = Oscillator::FP_TO_SAMPLE * (((x1 as i64) << Oscillator::FRAC_BITS) + a_fp * (x2 - x1)) as f32;
 
             self.position_fp += pitch_ratio_fp;
         }
@@ -177,10 +177,10 @@ impl Oscillator
                 index2 -= loop_length as usize;
             }
 
-            let x1 = data[index1];
-            let x2 = data[index2];
+            let x1 = data[index1] as i64;
+            let x2 = data[index2] as i64;
             let a_fp = self.position_fp & (Oscillator::FRAC_UNIT - 1);
-            block[t] = Oscillator::FP_TO_SAMPLE * (((x1 as i64) << Oscillator::FRAC_BITS) + a_fp * (x2 - x1) as i64) as f32;
+            block[t] = Oscillator::FP_TO_SAMPLE * (((x1 as i64) << Oscillator::FRAC_BITS) + a_fp * (x2 - x1)) as f32;
 
             self.position_fp += pitch_ratio_fp;
         }

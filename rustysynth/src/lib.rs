@@ -35,6 +35,7 @@ mod lfo;
 mod channel;
 
 mod midifile;
+mod midifile_sequencer;
 
 pub use self::soundfont::SoundFont;
 pub use self::soundfont_info::SoundFontInfo;
@@ -47,3 +48,4 @@ pub use self::instrument_region::InstrumentRegion;
 pub use self::synthesizer::Synthesizer;
 pub use self::synthesizer_settings::SynthesizerSettings;
 pub use self::midifile::MidiFile;
+pub use self::midifile_sequencer::MidiFileSequencer;

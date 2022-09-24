@@ -6,31 +6,42 @@ use rustysynth::SoundFont;
 use rustysynth::SynthesizerSettings;
 use rustysynth::Synthesizer;
 use rustysynth::MidiFile;
+use rustysynth::MidiFileSequencer;
 
 fn main()
 {
-    println!("START");
+    let sf2_path = Path::new("RLNDGM.SF2");
+    let mut sf2_reader = File::open(&sf2_path).unwrap();
+    let sound_font = Rc::new(SoundFont::new(&mut sf2_reader).unwrap());
 
-    let sound_font_path = Path::new("TimGM6mb.sf2");
-    let mut sound_font_file = File::open(&sound_font_path).unwrap();
+    let mid_path = Path::new("town.mid");
+    let mut mid_reader = File::open(&mid_path).unwrap();
+    let midi_file = Rc::new(MidiFile::new(&mut mid_reader).unwrap());
 
-    let sound_font = Rc::new(SoundFont::new(&mut sound_font_file).unwrap());
     let settings = SynthesizerSettings::new(44100);
     let mut synthesizer = Synthesizer::new(&sound_font, &settings).unwrap();
+    let mut sequencer = MidiFileSequencer::new(&synthesizer);
 
-    synthesizer.note_on(0, 60, 100);
-    synthesizer.note_on(0, 64, 100);
-    synthesizer.note_on(0, 67, 100);
+    sequencer.play(&mut synthesizer, &midi_file, false);
 
-    let mut left: Vec<f32> = vec![0_f32; 3 * settings.sample_rate as usize];
-    let mut right: Vec<f32> = vec![0_f32; 3 * settings.sample_rate as usize];
-    synthesizer.render(&mut left[..], &mut right[..]);
+    let sample_count = (settings.sample_rate as f64 * midi_file.get_length()) as usize;
+    let mut left: Vec<f32> = vec![0_f32; sample_count];
+    let mut right: Vec<f32> = vec![0_f32; sample_count];
+    sequencer.render(&mut synthesizer, &mut left[..], &mut right[..]);
+
+    let mut max: f32 = 0_f32;
+    for t in 0..left.len()
+    {
+        if left[t].abs() > max { max = left[t].abs(); }
+        if right[t].abs() > max { max = right[t].abs(); }
+    }
+    let a = 0.99_f32 / max;
 
     let mut buffer: Vec<u8> = vec![0; 4 * left.len()];
     for t in 0..left.len()
     {
-        let left_i16 = (left[t] * 32768_f32) as i16;
-        let right_i16 = (right[t] * 32768_f32) as i16;
+        let left_i16 = (a * left[t] * 32768_f32) as i16;
+        let right_i16 = (a * right[t] * 32768_f32) as i16;
         let offset = 4 * t;
         buffer[offset + 0] = left_i16 as u8;
         buffer[offset + 1] = (left_i16 >> 8) as u8;
@@ -38,9 +49,7 @@ fn main()
         buffer[offset + 3] = (right_i16 >> 8) as u8;
     }
 
-    let pcm_path = Path::new("test.pcm");
-    let mut pcm_file = File::create(&pcm_path).unwrap();
-    pcm_file.write_all(&buffer[..]);
-
-    println!("END");
+    let pcm_path = Path::new("out.pcm");
+    let mut pcm_writer = File::create(&pcm_path).unwrap();
+    pcm_writer.write_all(&buffer[..]).unwrap();
 }
