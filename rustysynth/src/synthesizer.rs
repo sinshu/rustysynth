@@ -202,7 +202,7 @@ impl Synthesizer
                 match self.preset_lookup.get(&gm_preset_id)
                 {
                     Some(value) => preset = *value,
-                    None => preset = self.default_preset, // No corresponding preset was found. Use the default one...
+                    None => (), // No corresponding preset was found. Use the default one...
                 }
             },
         }
