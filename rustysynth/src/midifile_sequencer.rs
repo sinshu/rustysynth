@@ -10,6 +10,8 @@ use crate::midifile::Message;
 #[non_exhaustive]
 pub struct MidiFileSequencer
 {
+    synthesizer: Synthesizer,
+
     midi_file: Option<Rc<MidiFile>>,
     play_loop: bool,
 
@@ -24,40 +26,43 @@ pub struct MidiFileSequencer
 
 impl MidiFileSequencer
 {
-    pub fn new(synthesizer: &Synthesizer) -> Self
+    pub fn new(synthesizer: Synthesizer) -> Self
     {
+        let block_size = synthesizer.block_size;
+
         Self
         {
+            synthesizer: synthesizer,
             midi_file: None,
             play_loop: false,
             block_wrote: 0,
             current_time: 0.0,
             msg_index: 0,
-            block_left: vec![0_f32; synthesizer.block_size as usize],
-            block_right: vec![0_f32; synthesizer.block_size as usize],
+            block_left: vec![0_f32; block_size as usize],
+            block_right: vec![0_f32; block_size as usize],
         }
     }
 
-    pub fn play(&mut self, synthesizer: &mut Synthesizer, midi_file: &Rc<MidiFile>, play_loop: bool)
+    pub fn play(&mut self, midi_file: &Rc<MidiFile>, play_loop: bool)
     {
         self.midi_file = Some(Rc::clone(midi_file));
         self.play_loop = play_loop;
 
-        self.block_wrote = synthesizer.block_size as usize;
+        self.block_wrote = self.synthesizer.block_size as usize;
 
         self.current_time = 0.0;
         self.msg_index = 0;
 
-        synthesizer.reset()
+        self.synthesizer.reset()
     }
 
-    pub fn stop(&mut self, synthesizer: &mut Synthesizer)
+    pub fn stop(&mut self)
     {
         self.midi_file = None;
-        synthesizer.reset();
+        self.synthesizer.reset();
     }
 
-    pub fn render(&mut self, synthesizer: &mut Synthesizer, left: &mut[f32], right: &mut[f32])
+    pub fn render(&mut self, left: &mut[f32], right: &mut[f32])
     {
         if left.len() != right.len()
         {
@@ -68,25 +73,25 @@ impl MidiFileSequencer
         let mut wrote: usize = 0;
         while wrote < left_length
         {
-            if self.block_wrote == synthesizer.block_size as usize
+            if self.block_wrote == self.synthesizer.block_size as usize
             {
-                self.process_events(synthesizer);
+                self.process_events();
                 self.block_wrote = 0;
-                self.current_time += synthesizer.block_size as f64 / synthesizer.sample_rate as f64;
+                self.current_time += self.synthesizer.block_size as f64 / self.synthesizer.sample_rate as f64;
             }
 
-            let src_rem = synthesizer.block_size as usize - self.block_wrote;
+            let src_rem = self.synthesizer.block_size as usize - self.block_wrote;
             let dst_rem = left_length - wrote;
             let rem = cmp::min(src_rem, dst_rem);
 
-            synthesizer.render(&mut left[wrote..wrote + rem], &mut right[wrote..wrote + rem]);
+            self.synthesizer.render(&mut left[wrote..wrote + rem], &mut right[wrote..wrote + rem]);
 
             self.block_wrote += rem;
             wrote += rem;
         }
     }
 
-    fn process_events(&mut self, synthesizer: &mut Synthesizer)
+    fn process_events(&mut self)
     {
         let midi_file = match self.midi_file.as_ref()
         {
@@ -103,7 +108,7 @@ impl MidiFileSequencer
             {
                 if msg.get_message_type() == Message::NORMAL
                 {
-                    synthesizer.process_midi_message(msg.channel as i32, msg.command as i32, msg.data1 as i32, msg.data2 as i32);
+                    self.synthesizer.process_midi_message(msg.channel as i32, msg.command as i32, msg.data1 as i32, msg.data2 as i32);
                 }
                 self.msg_index += 1;
             }
@@ -117,7 +122,7 @@ impl MidiFileSequencer
         {
             self.current_time = 0.0;
             self.msg_index = 0;
-            synthesizer.note_off_all(false);
+            self.synthesizer.note_off_all(false);
         }
     }
 }
