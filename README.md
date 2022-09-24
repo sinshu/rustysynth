@@ -39,9 +39,6 @@ let mut right: Vec<f32> = vec![0_f32; sample_count];
 
 // Render the waveform.
 synthesizer.render(&mut left[..], &mut right[..]);
-
-// Write the waveform to the file.
-write_pcm(&left[..], &right[..], "simple_chord.pcm");
 ```
 
 Another example code to synthesize a MIDI file:
