@@ -15,12 +15,12 @@ use crate::instrument::Instrument;
 #[non_exhaustive]
 pub struct SoundFont
 {
-    pub info: SoundFontInfo,
-    pub bits_per_sample: i32,
-    pub wave_data: Rc<Vec<i16>>,
-    pub sample_headers: Vec<SampleHeader>,
-    pub presets: Vec<Preset>,
-    pub instruments: Vec<Instrument>,
+    pub(crate) info: SoundFontInfo,
+    pub(crate) bits_per_sample: i32,
+    pub(crate) wave_data: Rc<Vec<i16>>,
+    pub(crate) sample_headers: Vec<SampleHeader>,
+    pub(crate) presets: Vec<Preset>,
+    pub(crate) instruments: Vec<Instrument>,
 }
 
 impl SoundFont
@@ -54,5 +54,35 @@ impl SoundFont
             presets: parameters.presets,
             instruments: parameters.instruments,
         })
+    }
+
+    pub fn get_info(&self) -> &SoundFontInfo
+    {
+        &self.info
+    }
+
+    pub fn get_bits_per_sample(&self) -> i32
+    {
+        self.bits_per_sample
+    }
+
+    pub fn get_wave_data(&self) -> &[i16]
+    {
+        &self.wave_data[..]
+    }
+
+    pub fn get_sample_headers(&self) -> &[SampleHeader]
+    {
+        &self.sample_headers[..]
+    }
+
+    pub fn get_presets(&self) -> &[Preset]
+    {
+        &self.presets[..]
+    }
+
+    pub fn get_instruments(&self) -> &[Instrument]
+    {
+        &self.instruments[..]
     }
 }

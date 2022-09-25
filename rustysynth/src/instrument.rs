@@ -10,8 +10,8 @@ use crate::sample_header::SampleHeader;
 #[non_exhaustive]
 pub struct Instrument
 {
-    pub name: String,
-    pub regions: Vec<InstrumentRegion>,
+    pub(crate) name: String,
+    pub(crate) regions: Vec<InstrumentRegion>,
 }
 
 impl Instrument
@@ -55,5 +55,15 @@ impl Instrument
         }
 
         Ok(instruments)
+    }
+
+    pub fn get_name(&self) -> &str
+    {
+        &self.name
+    }
+
+    pub fn get_regions(&self) -> &[InstrumentRegion]
+    {
+        &self.regions[..]
     }
 }

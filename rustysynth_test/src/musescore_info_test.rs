@@ -12,25 +12,26 @@ fn soundfont_info()
     path.push("GeneralUser GS MuseScore v1.442.sf2");
     let mut file = File::open(&path).unwrap();
     let sf = SoundFont::new(&mut file).unwrap();
+    let info = sf.get_info();
 
-    assert_eq!(sf.info.version.major, 2);
-    assert_eq!(sf.info.version.minor, 1);
-    assert_eq!(sf.info.target_sound_engine.as_str(), "E-mu 10K2");
-    assert_eq!(sf.info.bank_name.as_str(), "GeneralUser GS MuseScore version 1.442");
-    assert_eq!(sf.info.rom_name.as_str(), "");
-    assert_eq!(sf.info.rom_version.major, 0);
-    assert_eq!(sf.info.rom_version.minor, 0);
-    assert_eq!(sf.info.creation_date.as_str(), "");
-    assert_eq!(sf.info.author.as_str(), "S. Christian Collins");
-    assert_eq!(sf.info.target_product.as_str(), "");
-    assert_eq!(sf.info.copyright.as_str(), "2012 by S. Christian Collins");
-    assert_eq!(sf.info.comments.len(), 2207);
-    assert_eq!(sf.info.tools.as_str(), ":SFEDT v1.10:SFEDT v1.36:");
+    assert_eq!(info.get_version().get_major(), 2);
+    assert_eq!(info.get_version().get_minor(), 1);
+    assert_eq!(info.get_target_sound_engine(), "E-mu 10K2");
+    assert_eq!(info.get_bank_name(), "GeneralUser GS MuseScore version 1.442");
+    assert_eq!(info.get_rom_name(), "");
+    assert_eq!(info.get_rom_version().get_major(), 0);
+    assert_eq!(info.get_rom_version().get_minor(), 0);
+    assert_eq!(info.get_creation_date(), "");
+    assert_eq!(info.get_author(), "S. Christian Collins");
+    assert_eq!(info.get_target_product(), "");
+    assert_eq!(info.get_copyright(), "2012 by S. Christian Collins");
+    assert_eq!(info.get_comments().len(), 2207);
+    assert_eq!(info.get_tools(), ":SFEDT v1.10:SFEDT v1.36:");
 
-    assert_eq!(sf.wave_data.len(), 15513098);
+    assert_eq!(sf.get_wave_data().len(), 15513098);
 
     let mut sum: i32 = 0;
-    for value in sf.wave_data.iter()
+    for value in sf.get_wave_data().iter()
     {
         sum += *value as i32;
     }
