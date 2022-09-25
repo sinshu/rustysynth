@@ -1,46 +1,87 @@
 use std::fs::File;
 use std::io::Write;
 use std::rc::Rc;
+use sfml::audio::SoundStream;
+use sfml::audio::SoundStreamPlayer;
+use sfml::system;
+use sfml::system::Time;
 use rustysynth::SoundFont;
 use rustysynth::SynthesizerSettings;
 use rustysynth::Synthesizer;
 use rustysynth::MidiFile;
 use rustysynth::MidiFileSequencer;
 
+struct MidiMusicStream
+{
+    sequencer: MidiFileSequencer,
+    left: Vec<f32>,
+    right: Vec<f32>,
+    batch: Vec<i16>,
+}
+
+impl MidiMusicStream
+{
+    const SAMPLE_RATE: u32 = 44100;
+    const SAMPLE_MIN: i32 = i16::MIN as i32;
+    const SAMPLE_MAX: i32 = i16::MAX as i32;
+
+    fn new(sequencer: MidiFileSequencer) -> Self
+    {
+        let batch_length = (MidiMusicStream::SAMPLE_RATE / 20) as usize;
+
+        Self
+        {
+            sequencer: sequencer,
+            left: vec![0_f32; batch_length],
+            right: vec![0_f32; batch_length],
+            batch: vec![0; 2 * batch_length],
+        }
+    }
+}
+
+impl SoundStream for MidiMusicStream
+{
+    fn get_data(&mut self) -> (&mut [i16], bool)
+    {
+        self.sequencer.render(&mut self.left[..], &mut self.right[..]);
+
+        let length = self.left.len();
+        for t in 0..length
+        {
+            let mut sample_left = (32768_f32 * self.left[t]) as i32;
+            if sample_left < MidiMusicStream::SAMPLE_MIN { sample_left = MidiMusicStream::SAMPLE_MIN };
+            if sample_left > MidiMusicStream::SAMPLE_MAX { sample_left = MidiMusicStream::SAMPLE_MAX };
+            let sample_left = sample_left as i16;
+
+            let mut sample_right = (32768_f32 * self.right[t]) as i32;
+            if sample_right < MidiMusicStream::SAMPLE_MIN { sample_right = MidiMusicStream::SAMPLE_MIN };
+            if sample_right > MidiMusicStream::SAMPLE_MAX { sample_right = MidiMusicStream::SAMPLE_MAX };
+            let sample_right = sample_right as i16;
+
+            let offset = 2 * t;
+            self.batch[offset + 0] = sample_left;
+            self.batch[offset + 1] = sample_right;
+        }
+
+        (&mut self.batch[..], true)
+    }
+
+    fn seek(&mut self, _offset: Time)
+    {
+    }
+
+    fn channel_count(&self) -> u32
+    {
+        2
+    }
+
+    fn sample_rate(&self) -> u32
+    {
+        MidiMusicStream::SAMPLE_RATE
+    }
+}
+
 fn main()
-{
-    simple_chord();
-    flourish();
-}
-
-fn simple_chord()
-{
-    // Load the SoundFont.
-    let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
-    let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
-
-    // Create the synthesizer.
-    let settings = SynthesizerSettings::new(44100);
-    let mut synthesizer = Synthesizer::new(&sound_font, &settings).unwrap();
-
-    // Play some notes (middle C, E, G).
-    synthesizer.note_on(0, 60, 100);
-    synthesizer.note_on(0, 64, 100);
-    synthesizer.note_on(0, 67, 100);
-
-    // The output buffer (3 seconds).
-    let sample_count = (3 * settings.sample_rate) as usize;
-    let mut left: Vec<f32> = vec![0_f32; sample_count];
-    let mut right: Vec<f32> = vec![0_f32; sample_count];
-
-    // Render the waveform.
-    synthesizer.render(&mut left[..], &mut right[..]);
-
-    // Write the waveform to the file.
-    write_pcm(&left[..], &right[..], "simple_chord.pcm");
-}
-
-fn flourish()
 {
     // Load the SoundFont.
     let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
@@ -58,41 +99,22 @@ fn flourish()
     // Play the MIDI file.
     sequencer.play(&midi_file, false);
 
-    // The output buffer.
-    let sample_count = (settings.sample_rate as f64 * midi_file.get_length()) as usize;
-    let mut left: Vec<f32> = vec![0_f32; sample_count];
-    let mut right: Vec<f32> = vec![0_f32; sample_count];
+    // Start the sound stream.
+    let mut stream = MidiMusicStream::new(sequencer);
+    let mut player = SoundStreamPlayer::new(&mut stream);
+    player.play();
 
-    // Render the waveform.
-    sequencer.render(&mut left[..], &mut right[..]);
-
-    // Write the waveform to the file.
-    write_pcm(&left[..], &right[..], "flourish.pcm");
-}
-
-fn write_pcm(left: &[f32], right: &[f32], path: &str)
-{
-    let mut max: f32 = 0_f32;
-    for t in 0..left.len()
+    let mut count: i32 = 0;
+    while count < 300
     {
-        if left[t].abs() > max { max = left[t].abs(); }
-        if right[t].abs() > max { max = right[t].abs(); }
+        // Leave some CPU time for other processes.
+        system::sleep(Time::milliseconds(100));
+
+        // Display the playing position.
+        print!("\rPlaying... {}", count);
+        let _ = std::io::stdout().flush();
+
+        count += 1;
     }
-    let a = 0.99_f32 / max;
-
-    let mut buf: Vec<u8> = vec![0; 4 * left.len()];
-    for t in 0..left.len()
-    {
-        let left_i16 = (a * left[t] * 32768_f32) as i16;
-        let right_i16 = (a * right[t] * 32768_f32) as i16;
-
-        let offset = 4 * t;
-        buf[offset + 0] = left_i16 as u8;
-        buf[offset + 1] = (left_i16 >> 8) as u8;
-        buf[offset + 2] = right_i16 as u8;
-        buf[offset + 3] = (right_i16 >> 8) as u8;
-    }
-
-    let mut pcm = File::create(path).unwrap();
-    pcm.write_all(&buf[..]).unwrap();
+    println!();
 }
