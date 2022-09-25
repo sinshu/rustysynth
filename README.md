@@ -18,13 +18,11 @@ An example code to synthesize a simple chord:
 
 ```rust
 // Load the SoundFont.
-let sf2_path = Path::new("TimGM6mb.sf2");
-let mut sf2_reader = File::open(&sf2_path).unwrap();
-let sound_font = Rc::new(SoundFont::new(&mut sf2_reader).unwrap());
+let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
+let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
 
 // Create the synthesizer.
-let sample_rate = 44100;
-let settings = SynthesizerSettings::new(sample_rate);
+let settings = SynthesizerSettings::new(44100);
 let mut synthesizer = Synthesizer::new(&sound_font, &settings).unwrap();
 
 // Play some notes (middle C, E, G).
@@ -45,14 +43,12 @@ Another example code to synthesize a MIDI file:
 
 ```rust
 // Load the SoundFont.
-let sf2_path = Path::new("TimGM6mb.sf2");
-let mut sf2_reader = File::open(&sf2_path).unwrap();
-let sound_font = Rc::new(SoundFont::new(&mut sf2_reader).unwrap());
+let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
+let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
 
 // Load the MIDI file.
-let mid_path = Path::new("flourish.mid");
-let mut mid_reader = File::open(&mid_path).unwrap();
-let midi_file = Rc::new(MidiFile::new(&mut mid_reader).unwrap());
+let mut mid = File::open("flourish.mid").unwrap();
+let midi_file = Rc::new(MidiFile::new(&mut mid).unwrap());
 
 // Create the MIDI file sequencer.
 let settings = SynthesizerSettings::new(44100);

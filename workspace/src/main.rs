@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::Write;
-use std::path::Path;
 use std::rc::Rc;
 use rustysynth::SoundFont;
 use rustysynth::SynthesizerSettings;
@@ -17,13 +16,11 @@ fn main()
 fn simple_chord()
 {
     // Load the SoundFont.
-    let sf2_path = Path::new("TimGM6mb.sf2");
-    let mut sf2_reader = File::open(&sf2_path).unwrap();
-    let sound_font = Rc::new(SoundFont::new(&mut sf2_reader).unwrap());
+    let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
+    let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
 
     // Create the synthesizer.
-    let sample_rate = 44100;
-    let settings = SynthesizerSettings::new(sample_rate);
+    let settings = SynthesizerSettings::new(44100);
     let mut synthesizer = Synthesizer::new(&sound_font, &settings).unwrap();
 
     // Play some notes (middle C, E, G).
@@ -41,20 +38,17 @@ fn simple_chord()
 
     // Write the waveform to the file.
     write_pcm(&left[..], &right[..], "simple_chord.pcm");
-
 }
 
 fn flourish()
 {
     // Load the SoundFont.
-    let sf2_path = Path::new("TimGM6mb.sf2");
-    let mut sf2_reader = File::open(&sf2_path).unwrap();
-    let sound_font = Rc::new(SoundFont::new(&mut sf2_reader).unwrap());
+    let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
+    let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
 
     // Load the MIDI file.
-    let mid_path = Path::new("flourish.mid");
-    let mut mid_reader = File::open(&mid_path).unwrap();
-    let midi_file = Rc::new(MidiFile::new(&mut mid_reader).unwrap());
+    let mut mid = File::open("flourish.mid").unwrap();
+    let midi_file = Rc::new(MidiFile::new(&mut mid).unwrap());
 
     // Create the MIDI file sequencer.
     let settings = SynthesizerSettings::new(44100);
@@ -99,7 +93,6 @@ fn write_pcm(left: &[f32], right: &[f32], path: &str)
         buf[offset + 3] = (right_i16 >> 8) as u8;
     }
 
-    let path = Path::new(path);
-    let mut writer = File::create(&path).unwrap();
-    writer.write_all(&buf[..]).unwrap();
+    let mut pcm = File::create(path).unwrap();
+    pcm.write_all(&buf[..]).unwrap();
 }
