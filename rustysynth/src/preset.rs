@@ -10,13 +10,13 @@ use crate::instrument::Instrument;
 #[non_exhaustive]
 pub struct Preset
 {
-    pub name: String,
-    pub patch_number: i32,
-    pub bank_number: i32,
-    pub library: i32,
-    pub genre: i32,
-    pub morphology: i32,
-    pub regions: Vec<PresetRegion>,
+    pub(crate) name: String,
+    pub(crate) patch_number: i32,
+    pub(crate) bank_number: i32,
+    pub(crate) library: i32,
+    pub(crate) genre: i32,
+    pub(crate) morphology: i32,
+    pub(crate) regions: Vec<PresetRegion>,
 }
 
 impl Preset
@@ -65,5 +65,40 @@ impl Preset
         }
 
         Ok(presets)
+    }
+
+    pub fn get_name(&self) -> &str
+    {
+        &self.name
+    }
+
+    pub fn get_patch_number(&self) -> i32
+    {
+        self.patch_number
+    }
+
+    pub fn get_bank_number(&self) -> i32
+    {
+        self.bank_number
+    }
+
+    pub fn get_library(&self) -> i32
+    {
+        self.library
+    }
+
+    pub fn get_genre(&self) -> i32
+    {
+        self.genre
+    }
+
+    pub fn get_morphology(&self) -> i32
+    {
+        self.morphology
+    }
+
+    pub fn get_regions(&self) -> &[PresetRegion]
+    {
+        &self.regions[..]
     }
 }

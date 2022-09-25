@@ -8,8 +8,8 @@ use crate::binary_reader::BinaryReader;
 #[non_exhaustive]
 pub struct SoundFontVersion
 {
-    pub major: i16,
-    pub minor: i16,
+    pub(crate) major: i16,
+    pub(crate) minor: i16,
 }
 
 impl SoundFontVersion
@@ -33,5 +33,15 @@ impl SoundFontVersion
             major: major,
             minor: minor,
         })
+    }
+
+    pub fn get_major(&self) -> i32
+    {
+        self.major as i32
+    }
+
+    pub fn get_minor(&self) -> i32
+    {
+        self.minor as i32
     }
 }

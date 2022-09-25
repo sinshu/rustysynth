@@ -8,16 +8,16 @@ use crate::binary_reader::BinaryReader;
 #[non_exhaustive]
 pub struct SampleHeader
 {
-    pub name: String,
-    pub start: i32,
-    pub end: i32,
-    pub start_loop: i32,
-    pub end_loop: i32,
-    pub sample_rate: i32,
-    pub original_pitch: u8,
-    pub pitch_correction: i8,
-    pub link: u16,
-    pub sample_type: u16,
+    pub(crate) name: String,
+    pub(crate) start: i32,
+    pub(crate) end: i32,
+    pub(crate) start_loop: i32,
+    pub(crate) end_loop: i32,
+    pub(crate) sample_rate: i32,
+    pub(crate) original_pitch: u8,
+    pub(crate) pitch_correction: i8,
+    pub(crate) link: u16,
+    pub(crate) sample_type: u16,
 }
 
 impl SampleHeader
@@ -69,5 +69,55 @@ impl SampleHeader
         SampleHeader::new(reader)?;
 
         Ok(headers)
+    }
+
+    pub fn get_name(&self) -> &str
+    {
+        &self.name
+    }
+
+    pub fn get_start(&self) -> i32
+    {
+        self.start
+    }
+
+    pub fn get_end(&self) -> i32
+    {
+        self.end
+    }
+
+    pub fn get_start_loop(&self) -> i32
+    {
+        self.start_loop
+    }
+
+    pub fn get_end_loop(&self) -> i32
+    {
+        self.end_loop
+    }
+
+    pub fn get_sample_rate(&self) -> i32
+    {
+        self.sample_rate
+    }
+
+    pub fn get_original_pitch(&self) -> i32
+    {
+        self.original_pitch as i32
+    }
+
+    pub fn get_pitch_correction(&self) -> i32
+    {
+        self.pitch_correction as i32
+    }
+
+    pub fn get_link(&self) -> i32
+    {
+        self.link as i32
+    }
+
+    pub fn get_sample_type(&self) -> i32
+    {
+        self.sample_type as i32
     }
 }

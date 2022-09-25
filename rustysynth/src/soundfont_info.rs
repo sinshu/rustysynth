@@ -9,17 +9,17 @@ use super::soundfont_version::SoundFontVersion;
 #[non_exhaustive]
 pub struct SoundFontInfo
 {
-    pub version: SoundFontVersion,
-    pub target_sound_engine: String,
-    pub bank_name: String,
-    pub rom_name: String,
-    pub rom_version: SoundFontVersion,
-    pub creation_date: String,
-    pub author: String,
-    pub target_product: String,
-    pub copyright: String,
-    pub comments: String,
-    pub tools: String,
+    pub(crate) version: SoundFontVersion,
+    pub(crate) target_sound_engine: String,
+    pub(crate) bank_name: String,
+    pub(crate) rom_name: String,
+    pub(crate) rom_version: SoundFontVersion,
+    pub(crate) creation_date: String,
+    pub(crate) author: String,
+    pub(crate) target_product: String,
+    pub(crate) copyright: String,
+    pub(crate) comments: String,
+    pub(crate) tools: String,
 }
 
 impl SoundFontInfo
@@ -195,5 +195,60 @@ impl SoundFontInfo
             comments: comments,
             tools: tools,
         })
+    }
+
+    pub fn get_version(&self) -> &SoundFontVersion
+    {
+        &self.version
+    }
+
+    pub fn get_target_sound_engine(&self) -> &str
+    {
+        &self.target_sound_engine
+    }
+
+    pub fn get_bank_name(&self) -> &str
+    {
+        &self.bank_name
+    }
+
+    pub fn get_rom_name(&self) -> &str
+    {
+        &self.rom_name
+    }
+
+    pub fn get_rom_version(&self) -> &SoundFontVersion
+    {
+        &self.rom_version
+    }
+
+    pub fn get_creation_date(&self) -> &str
+    {
+        &self.creation_date
+    }
+
+    pub fn get_author(&self) -> &str
+    {
+        &self.author
+    }
+
+    pub fn get_target_product(&self) -> &str
+    {
+        &self.target_product
+    }
+
+    pub fn get_copyright(&self) -> &str
+    {
+        &self.copyright
+    }
+
+    pub fn get_comments(&self) -> &str
+    {
+        &self.comments
+    }
+
+    pub fn get_tools(&self) -> &str
+    {
+        &self.tools
     }
 }
