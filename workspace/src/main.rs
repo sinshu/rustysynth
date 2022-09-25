@@ -104,14 +104,15 @@ fn main()
     let mut player = SoundStreamPlayer::new(&mut stream);
     player.play();
 
+    print!("PLAYING");
+
     let mut count: i32 = 0;
     while count < 300
     {
         // Leave some CPU time for other processes.
         system::sleep(Time::milliseconds(100));
-
-        // Display the playing position.
-        print!("\rPlaying... {}", count);
+        
+        print!(".");
         let _ = std::io::stdout().flush();
 
         count += 1;
