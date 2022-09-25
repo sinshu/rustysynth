@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use crate::soundfont_math::SoundFontMath;
 use crate::synthesizer_settings::SynthesizerSettings;
 use crate::envelope_stage::EnvelopeStage;

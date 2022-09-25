@@ -6,6 +6,7 @@ use std::io::Read;
 use crate::binary_reader::BinaryReader;
 
 #[derive(Clone, Copy)]
+#[non_exhaustive]
 pub(crate) struct Message
 {
     pub(crate) channel: u8,
