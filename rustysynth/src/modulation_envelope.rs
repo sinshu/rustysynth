@@ -92,7 +92,7 @@ impl ModulationEnvelope
             let end_time = match self.stage
             {
                 EnvelopeStage::DELAY => self.attack_start_time as f64,
-                EnvelopeStage::ATTACK => self.attack_start_time as f64,
+                EnvelopeStage::ATTACK => self.hold_start_time as f64,
                 EnvelopeStage::HOLD => self.decay_start_time as f64,
                 _ => panic!("Invalid envelope stage."),
             };
