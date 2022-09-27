@@ -16,11 +16,11 @@ use crate::channel::Channel;
 #[non_exhaustive]
 pub struct Synthesizer
 {
-    pub sound_font: Rc<SoundFont>,
-    pub sample_rate: i32,
-    pub block_size: i32,
-    pub maximum_polyphony: i32,
-    pub enable_reverb_and_chorus: bool,
+    pub(crate) sound_font: Rc<SoundFont>,
+    pub(crate) sample_rate: i32,
+    pub(crate) block_size: i32,
+    pub(crate) maximum_polyphony: i32,
+    pub(crate) enable_reverb_and_chorus: bool,
 
     pub(crate) minimum_voice_duration: i32,
 
@@ -38,7 +38,7 @@ pub struct Synthesizer
 
     block_read: usize,
 
-    pub master_volume: f32,
+    pub(crate) master_volume: f32,
 }
 
 impl Synthesizer
@@ -380,5 +380,35 @@ impl Synthesizer
             let step = inverse_block_size * (current_gain - previous_gain);
             ArrayMath::multiply_add_slope(previous_gain, step, source, destination);
         }
+    }
+
+    pub fn get_sound_font(&self) -> &SoundFont
+    {
+        &self.sound_font
+    }
+
+    pub fn get_sample_rate(&self) -> i32
+    {
+        self.sample_rate
+    }
+
+    pub fn get_maximum_polyphony(&self) -> i32
+    {
+        self.maximum_polyphony
+    }
+
+    pub fn get_enable_reverb_and_chorus(&self) -> bool
+    {
+        self.enable_reverb_and_chorus
+    }
+
+    pub fn get_master_volume(&self) -> f32
+    {
+        self.master_volume
+    }
+
+    pub fn set_master_volume(&mut self, master_volume: f32)
+    {
+        self.master_volume = master_volume;
     }
 }
