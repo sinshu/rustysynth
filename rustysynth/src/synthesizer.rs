@@ -22,12 +22,12 @@ pub struct Synthesizer
     pub(crate) maximum_polyphony: i32,
     pub(crate) enable_reverb_and_chorus: bool,
 
-    pub(crate) minimum_voice_duration: i32,
+    minimum_voice_duration: i32,
 
     preset_lookup: HashMap<i32, usize>,
     default_preset: usize,
 
-    pub(crate) channels: Vec<Channel>,
+    channels: Vec<Channel>,
 
     voices: VoiceCollection,
 
