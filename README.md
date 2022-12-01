@@ -4,6 +4,14 @@ RustySynth is a SoundFont MIDI synthesizer written in pure Rust, ported from [Me
 
 
 
+## Features
+
+* Suitable for both real-time and offline synthesis.
+* Support for standard MIDI files.
+* No dependencies other than the standard library.
+
+
+
 ## Demo
 
 https://www.youtube.com/watch?v=JzXjQqKzkWQ
