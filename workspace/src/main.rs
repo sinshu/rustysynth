@@ -1,15 +1,28 @@
 use std::fs::File;
 use std::io::Write;
 use std::rc::Rc;
+use std::sync::Mutex;
 use sfml::audio::SoundStream;
 use sfml::audio::SoundStreamPlayer;
+use sfml::graphics::Color;
+use sfml::graphics::PrimitiveType;
+use sfml::graphics::RenderStates;
+use sfml::graphics::RenderTarget;
+use sfml::graphics::RenderWindow;
+use sfml::graphics::Vertex;
 use sfml::system;
 use sfml::system::Time;
+use sfml::system::Vector2;
+use sfml::window;
+use sfml::window::Event;
+use sfml::window::Style;
 use rustysynth::SoundFont;
 use rustysynth::SynthesizerSettings;
 use rustysynth::Synthesizer;
 use rustysynth::MidiFile;
 use rustysynth::MidiFileSequencer;
+
+const WAVEFORM_LENGTH: usize = 1024;
 
 struct MidiMusicStream
 {
@@ -17,6 +30,7 @@ struct MidiMusicStream
     left: Vec<f32>,
     right: Vec<f32>,
     batch: Vec<i16>,
+    mutex: Rc<Mutex<Vec<f32>>>,
 }
 
 impl MidiMusicStream
@@ -25,7 +39,7 @@ impl MidiMusicStream
     const SAMPLE_MIN: i32 = i16::MIN as i32;
     const SAMPLE_MAX: i32 = i16::MAX as i32;
 
-    fn new(sequencer: MidiFileSequencer) -> Self
+    fn new(sequencer: MidiFileSequencer, mutex: Rc<Mutex<Vec<f32>>>) -> Self
     {
         let batch_length = (MidiMusicStream::SAMPLE_RATE / 20) as usize;
 
@@ -35,6 +49,7 @@ impl MidiMusicStream
             left: vec![0_f32; batch_length],
             right: vec![0_f32; batch_length],
             batch: vec![0; 2 * batch_length],
+            mutex: mutex,
         }
     }
 }
@@ -63,6 +78,16 @@ impl SoundStream for MidiMusicStream
             self.batch[offset + 1] = sample_right;
         }
 
+        let batch_length = (MidiMusicStream::SAMPLE_RATE / 20) as usize;
+
+        let mut a = self.mutex.lock().unwrap();
+        for i in 0..WAVEFORM_LENGTH
+        {
+            let p: f64 = (i as f64) / (WAVEFORM_LENGTH as f64) * (batch_length as f64);
+            let j = p as usize;
+            a[i] = self.left[j] + self.right[j];
+        }
+
         (&mut self.batch[..], true)
     }
 
@@ -83,6 +108,15 @@ impl SoundStream for MidiMusicStream
 
 fn main()
 {
+    let mut window = RenderWindow::new(
+        (1024, 768),
+        "MIDI Music Playback",
+        Style::TITLEBAR | Style::CLOSE,
+        &Default::default(),
+    );
+
+    window.set_framerate_limit(60);
+
     // Load the SoundFont.
     let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
     let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
@@ -99,23 +133,57 @@ fn main()
     // Play the MIDI file.
     sequencer.play(&midi_file, false);
 
+    let wav = vec![0_f32; WAVEFORM_LENGTH];
+    let mutex = Rc::new(Mutex::new(wav));
+    let mutex2 = mutex.clone();
+
     // Start the sound stream.
-    let mut stream = MidiMusicStream::new(sequencer);
+    let mut stream = MidiMusicStream::new(sequencer, mutex);
     let mut player = SoundStreamPlayer::new(&mut stream);
     player.play();
 
-    print!("PLAYING");
+    let mut waveform = vec![0_f32; WAVEFORM_LENGTH];
 
-    let mut count: i32 = 0;
-    while count < 300
+    while window.is_open()
     {
-        // Leave some CPU time for other processes.
-        system::sleep(Time::milliseconds(100));
-        
-        print!(".");
-        let _ = std::io::stdout().flush();
+        while let Some(event) = window.poll_event()
+        {
+            match event
+            {
+                Event::Closed => window.close(),
+                _ => {}
+            }
+        }
 
-        count += 1;
+        window.clear(Color::rgb(0, 32, 64));
+
+        {
+            let a = mutex2.lock().unwrap();
+            drawWaveform(&mut window, &a);
+        }
+
+        window.display();
     }
-    println!();
+}
+
+fn drawWaveform(window: &mut RenderWindow, data: &[f32])
+{
+    let mut vs: [Vertex; 4 * WAVEFORM_LENGTH] = [Vertex::default(); 4 * WAVEFORM_LENGTH];
+
+    for i in 0..WAVEFORM_LENGTH
+    {
+        let offset = 4 * i;
+        let val = data[i].abs();
+        let col = Color::rgb(0, 100, 200);
+        vs[offset + 0].color = col;
+        vs[offset + 0].position = Vector2::new((i + 0) as f32, -200_f32 * val + 384_f32);
+        vs[offset + 1].color = col;
+        vs[offset + 1].position = Vector2::new((i + 1) as f32, -200_f32 * val + 384_f32);
+        vs[offset + 2].color = col;
+        vs[offset + 2].position = Vector2::new((i + 1) as f32, 200_f32 * val + 384_f32);
+        vs[offset + 3].color = col;
+        vs[offset + 3].position = Vector2::new((i + 0) as f32, 200_f32 * val + 384_f32);
+    }
+
+    window.draw_primitives(&vs[..], PrimitiveType::QUADS, &RenderStates::DEFAULT);
 }
