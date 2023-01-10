@@ -159,14 +159,18 @@ fn main()
 
         {
             let a = mutex2.lock().unwrap();
-            drawWaveform(&mut window, &a);
+            for i in 0..WAVEFORM_LENGTH
+            {
+                waveform[i] = 0.5_f32 * waveform[i] + 0.5_f32 * a[i];
+            }
         }
+        draw_waveform(&mut window, &waveform);
 
         window.display();
     }
 }
 
-fn drawWaveform(window: &mut RenderWindow, data: &[f32])
+fn draw_waveform(window: &mut RenderWindow, data: &[f32])
 {
     let mut vs: [Vertex; 4 * WAVEFORM_LENGTH] = [Vertex::default(); 4 * WAVEFORM_LENGTH];
 
@@ -176,13 +180,13 @@ fn drawWaveform(window: &mut RenderWindow, data: &[f32])
         let val = data[i].abs();
         let col = Color::rgb(0, 100, 200);
         vs[offset + 0].color = col;
-        vs[offset + 0].position = Vector2::new((i + 0) as f32, -200_f32 * val + 384_f32);
+        vs[offset + 0].position = Vector2::new((i + 0) as f32, -300_f32 * val + 384_f32);
         vs[offset + 1].color = col;
-        vs[offset + 1].position = Vector2::new((i + 1) as f32, -200_f32 * val + 384_f32);
+        vs[offset + 1].position = Vector2::new((i + 1) as f32, -300_f32 * val + 384_f32);
         vs[offset + 2].color = col;
-        vs[offset + 2].position = Vector2::new((i + 1) as f32, 200_f32 * val + 384_f32);
+        vs[offset + 2].position = Vector2::new((i + 1) as f32, 300_f32 * val + 384_f32);
         vs[offset + 3].color = col;
-        vs[offset + 3].position = Vector2::new((i + 0) as f32, 200_f32 * val + 384_f32);
+        vs[offset + 3].position = Vector2::new((i + 0) as f32, 300_f32 * val + 384_f32);
     }
 
     window.draw_primitives(&vs[..], PrimitiveType::QUADS, &RenderStates::DEFAULT);
