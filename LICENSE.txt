@@ -1,3 +1,5 @@
+MIT License
+
 MeltySynth:
 Copyright (C) 2021 Nobuaki Tanaka
 
