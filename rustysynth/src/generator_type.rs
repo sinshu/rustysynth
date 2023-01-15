@@ -2,13 +2,10 @@
 
 #[allow(unused)]
 #[non_exhaustive]
-pub(crate) struct GeneratorType
-{
-}
+pub(crate) struct GeneratorType {}
 
 #[allow(unused)]
-impl GeneratorType
-{
+impl GeneratorType {
     pub(crate) const START_ADDRESS_OFFSET: u16 = 0;
     pub(crate) const END_ADDRESS_OFFSET: u16 = 1;
     pub(crate) const START_LOOP_ADDRESS_OFFSET: u16 = 2;

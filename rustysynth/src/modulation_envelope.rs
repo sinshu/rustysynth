@@ -1,12 +1,11 @@
 #![allow(dead_code)]
 
+use crate::envelope_stage::EnvelopeStage;
 use crate::soundfont_math::SoundFontMath;
 use crate::synthesizer_settings::SynthesizerSettings;
-use crate::envelope_stage::EnvelopeStage;
 
 #[non_exhaustive]
-pub(crate) struct ModulationEnvelope
-{
+pub(crate) struct ModulationEnvelope {
     sample_rate: i32,
 
     attack_slope: f64,
@@ -28,12 +27,9 @@ pub(crate) struct ModulationEnvelope
     value: f32,
 }
 
-impl ModulationEnvelope
-{
-    pub(crate) fn new(settings: &SynthesizerSettings) -> Self
-    {
-        Self
-        {
+impl ModulationEnvelope {
+    pub(crate) fn new(settings: &SynthesizerSettings) -> Self {
+        Self {
             sample_rate: settings.sample_rate,
             attack_slope: 0_f64,
             decay_slope: 0_f64,
@@ -51,8 +47,15 @@ impl ModulationEnvelope
         }
     }
 
-    pub(crate) fn start(&mut self, delay: f32, attack: f32, hold: f32, decay: f32, sustain: f32, release: f32)
-    {
+    pub(crate) fn start(
+        &mut self,
+        delay: f32,
+        attack: f32,
+        hold: f32,
+        decay: f32,
+        sustain: f32,
+        release: f32,
+    ) {
         self.attack_slope = 1_f64 / attack as f64;
         self.decay_slope = 1_f64 / decay as f64;
         self.release_slope = 1_f64 / release as f64;
@@ -74,72 +77,61 @@ impl ModulationEnvelope
         self.process(0);
     }
 
-    pub(crate) fn release(&mut self)
-    {
+    pub(crate) fn release(&mut self) {
         self.stage = EnvelopeStage::RELEASE;
         self.release_end_time += self.processed_sample_count as f64 / self.sample_rate as f64;
         self.release_level = self.value;
     }
 
-    pub(crate) fn process(&mut self, sample_count: i32) -> bool
-    {
+    pub(crate) fn process(&mut self, sample_count: i32) -> bool {
         self.processed_sample_count += sample_count;
 
         let current_time = self.processed_sample_count as f64 / self.sample_rate as f64;
 
-        while self.stage <= EnvelopeStage::HOLD
-        {
-            let end_time = match self.stage
-            {
+        while self.stage <= EnvelopeStage::HOLD {
+            let end_time = match self.stage {
                 EnvelopeStage::DELAY => self.attack_start_time as f64,
                 EnvelopeStage::ATTACK => self.hold_start_time as f64,
                 EnvelopeStage::HOLD => self.decay_start_time as f64,
                 _ => panic!("Invalid envelope stage."),
             };
 
-            if current_time < end_time
-            {
+            if current_time < end_time {
                 break;
-            }
-            else
-            {
+            } else {
                 self.stage += 1;
             }
         }
 
-        if self.stage == EnvelopeStage::DELAY
-        {
+        if self.stage == EnvelopeStage::DELAY {
             self.value = 0_f32;
             return true;
-        }
-        else if self.stage == EnvelopeStage::ATTACK
-        {
+        } else if self.stage == EnvelopeStage::ATTACK {
             self.value = (self.attack_slope * (current_time - self.attack_start_time)) as f32;
             return true;
-        }
-        else if self.stage == EnvelopeStage::HOLD
-        {
+        } else if self.stage == EnvelopeStage::HOLD {
             self.value = 1_f32;
             return true;
-        }
-        else if self.stage == EnvelopeStage::DECAY
-        {
-            self.value = SoundFontMath::max((self.decay_slope * (self.decay_end_time - current_time)) as f32, self.sustain_level);
+        } else if self.stage == EnvelopeStage::DECAY {
+            self.value = SoundFontMath::max(
+                (self.decay_slope * (self.decay_end_time - current_time)) as f32,
+                self.sustain_level,
+            );
             return self.value > SoundFontMath::NON_AUDIBLE;
-        }
-        else if self.stage == EnvelopeStage::RELEASE
-        {
-            self.value = SoundFontMath::max((self.release_level as f64 * self.release_slope * (self.release_end_time - current_time)) as f32, 0_f32);
+        } else if self.stage == EnvelopeStage::RELEASE {
+            self.value = SoundFontMath::max(
+                (self.release_level as f64
+                    * self.release_slope
+                    * (self.release_end_time - current_time)) as f32,
+                0_f32,
+            );
             return self.value > SoundFontMath::NON_AUDIBLE;
-        }
-        else
-        {
+        } else {
             panic!("Invalid envelope stage.");
         }
     }
 
-    pub(crate) fn get_value(&self) -> f32
-    {
+    pub(crate) fn get_value(&self) -> f32 {
         self.value
     }
 }

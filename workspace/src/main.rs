@@ -1,20 +1,18 @@
+use rustysynth::MidiFile;
+use rustysynth::MidiFileSequencer;
+use rustysynth::SoundFont;
+use rustysynth::Synthesizer;
+use rustysynth::SynthesizerSettings;
 use std::fs::File;
 use std::io::Write;
 use std::rc::Rc;
-use rustysynth::SoundFont;
-use rustysynth::SynthesizerSettings;
-use rustysynth::Synthesizer;
-use rustysynth::MidiFile;
-use rustysynth::MidiFileSequencer;
 
-fn main()
-{
+fn main() {
     simple_chord();
     flourish();
 }
 
-fn simple_chord()
-{
+fn simple_chord() {
     // Load the SoundFont.
     let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
     let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
@@ -40,8 +38,7 @@ fn simple_chord()
     write_pcm(&left[..], &right[..], "simple_chord.pcm");
 }
 
-fn flourish()
-{
+fn flourish() {
     // Load the SoundFont.
     let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
     let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
@@ -70,19 +67,20 @@ fn flourish()
     write_pcm(&left[..], &right[..], "flourish.pcm");
 }
 
-fn write_pcm(left: &[f32], right: &[f32], path: &str)
-{
+fn write_pcm(left: &[f32], right: &[f32], path: &str) {
     let mut max: f32 = 0_f32;
-    for t in 0..left.len()
-    {
-        if left[t].abs() > max { max = left[t].abs(); }
-        if right[t].abs() > max { max = right[t].abs(); }
+    for t in 0..left.len() {
+        if left[t].abs() > max {
+            max = left[t].abs();
+        }
+        if right[t].abs() > max {
+            max = right[t].abs();
+        }
     }
     let a = 0.99_f32 / max;
 
     let mut buf: Vec<u8> = vec![0; 4 * left.len()];
-    for t in 0..left.len()
-    {
+    for t in 0..left.len() {
         let left_i16 = (a * left[t] * 32768_f32) as i16;
         let right_i16 = (a * right[t] * 32768_f32) as i16;
 

@@ -6,16 +6,15 @@ use std::error::Error;
 use std::rc::Rc;
 
 use crate::array_math::ArrayMath;
-use crate::soundfont_math::SoundFontMath;
-use crate::soundfont::SoundFont;
+use crate::channel::Channel;
 use crate::region_pair::RegionPair;
+use crate::soundfont::SoundFont;
+use crate::soundfont_math::SoundFontMath;
 use crate::synthesizer_settings::SynthesizerSettings;
 use crate::voice_collection::VoiceCollection;
-use crate::channel::Channel;
 
 #[non_exhaustive]
-pub struct Synthesizer
-{
+pub struct Synthesizer {
     pub(crate) sound_font: Rc<SoundFont>,
     pub(crate) sample_rate: i32,
     pub(crate) block_size: i32,
@@ -41,13 +40,14 @@ pub struct Synthesizer
     pub(crate) master_volume: f32,
 }
 
-impl Synthesizer
-{
+impl Synthesizer {
     pub const CHANNEL_COUNT: i32 = 16;
     pub const PERCUSSION_CHANNEL: i32 = 9;
 
-    pub fn new(sound_font: &Rc<SoundFont>, settings: &SynthesizerSettings) -> Result<Self, Box<dyn Error>>
-    {
+    pub fn new(
+        sound_font: &Rc<SoundFont>,
+        settings: &SynthesizerSettings,
+    ) -> Result<Self, Box<dyn Error>> {
         settings.validate()?;
 
         let minimum_voice_duration = settings.sample_rate / 500;
@@ -56,8 +56,7 @@ impl Synthesizer
 
         let mut min_preset_id = i32::MAX;
         let mut default_preset: usize = 0;
-        for i in 0..sound_font.presets.len()
-        {
+        for i in 0..sound_font.presets.len() {
             let preset = &sound_font.presets[i];
 
             // The preset ID is Int32, where the upper 16 bits represent the bank number
@@ -69,16 +68,14 @@ impl Synthesizer
 
             // The preset with the minimum ID number will be default.
             // If the SoundFont is GM compatible, the piano will be chosen.
-            if preset_id < min_preset_id
-            {
+            if preset_id < min_preset_id {
                 default_preset = i;
                 min_preset_id = preset_id;
             }
         }
 
         let mut channels: Vec<Channel> = Vec::new();
-        for i in 0..Synthesizer::CHANNEL_COUNT
-        {
+        for i in 0..Synthesizer::CHANNEL_COUNT {
             channels.push(Channel::new(i == Synthesizer::PERCUSSION_CHANNEL));
         }
 
@@ -93,8 +90,7 @@ impl Synthesizer
 
         let master_volume = 0.5_f32;
 
-        Ok(Self
-        {
+        Ok(Self {
             sound_font: Rc::clone(sound_font),
             sample_rate: settings.sample_rate,
             block_size: settings.block_size,
@@ -113,18 +109,15 @@ impl Synthesizer
         })
     }
 
-    pub fn process_midi_message(&mut self, channel: i32, command: i32, data1: i32, data2: i32)
-    {
-        if !(0 <= channel && channel < self.channels.len() as i32)
-        {
+    pub fn process_midi_message(&mut self, channel: i32, command: i32, data1: i32, data2: i32) {
+        if !(0 <= channel && channel < self.channels.len() as i32) {
             return;
         }
 
         let channel_info = &mut self.channels[channel as usize];
 
-        match command
-        {
-            0x80 => self.note_off(channel, data1), // Note Off
+        match command {
+            0x80 => self.note_off(channel, data1),       // Note Off
             0x90 => self.note_on(channel, data1, data2), // Note On
             0xB0 => match data1 // Controller
             {
@@ -148,40 +141,33 @@ impl Synthesizer
                 0x79 => self.reset_all_controllers_channel(channel), // Reset All Controllers
                 0x7B => self.note_off_all_channel(channel, false), // All Note Off
                 _ => (),
-            }
+            },
             0xC0 => channel_info.set_patch(data1), // Program Change
             0xE0 => channel_info.set_pitch_bend(data1, data2), // Pitch Bend
             _ => (),
         }
     }
 
-    pub fn note_off(&mut self, channel: i32, key: i32)
-    {
-        if !(0 <= channel && channel < self.channels.len() as i32)
-        {
+    pub fn note_off(&mut self, channel: i32, key: i32) {
+        if !(0 <= channel && channel < self.channels.len() as i32) {
             return;
         }
 
-        for i in 0..self.voices.active_voice_count as usize
-        {
+        for i in 0..self.voices.active_voice_count as usize {
             let voice = self.voices.voices[i].as_mut();
-            if voice.channel == channel && voice.key == key
-            {
+            if voice.channel == channel && voice.key == key {
                 voice.end();
             }
         }
     }
 
-    pub fn note_on(&mut self, channel: i32, key: i32, velocity: i32)
-    {
-        if velocity == 0
-        {
+    pub fn note_on(&mut self, channel: i32, key: i32, velocity: i32) {
+        if velocity == 0 {
             self.note_off(channel, key);
             return;
         }
 
-        if !(0 <= channel && channel < self.channels.len() as i32)
-        {
+        if !(0 <= channel && channel < self.channels.len() as i32) {
             return;
         }
 
@@ -190,40 +176,42 @@ impl Synthesizer
         let preset_id = (channel_info.get_bank_number() << 16) | channel_info.get_patch_number();
 
         let mut preset = self.default_preset;
-        match self.preset_lookup.get(&preset_id)
-        {
+        match self.preset_lookup.get(&preset_id) {
             Some(value) => preset = *value,
-            None =>
-            {
+            None => {
                 // Try fallback to the GM sound set.
                 // Normally, the given patch number + the bank number 0 will work.
                 // For drums (bank number >= 128), it seems to be better to select the standard set (128:0).
-                let gm_preset_id = if channel_info.get_bank_number() < 128 { channel_info.get_patch_number() } else { 128 << 16 };
-                match self.preset_lookup.get(&gm_preset_id)
-                {
+                let gm_preset_id = if channel_info.get_bank_number() < 128 {
+                    channel_info.get_patch_number()
+                } else {
+                    128 << 16
+                };
+                match self.preset_lookup.get(&gm_preset_id) {
                     Some(value) => preset = *value,
                     None => (), // No corresponding preset was found. Use the default one...
                 }
-            },
+            }
         }
 
         let preset = &self.sound_font.presets[preset];
-        for pr in 0..preset.regions.len()
-        {
+        for pr in 0..preset.regions.len() {
             let preset_region = &preset.regions[pr];
-            if preset_region.contains(key, velocity)
-            {
+            if preset_region.contains(key, velocity) {
                 let instrument = &self.sound_font.instruments[preset_region.instrument];
-                for ir in 0..instrument.regions.len()
-                {
+                for ir in 0..instrument.regions.len() {
                     let instrument_region = &instrument.regions[ir];
-                    if instrument_region.contains(key, velocity)
-                    {
+                    if instrument_region.contains(key, velocity) {
                         let region_pair = RegionPair::new(preset_region, instrument_region);
 
-                        match self.voices.request_new(instrument_region, channel)
-                        {
-                            Some(value) => value.start(&self.sound_font.wave_data, &region_pair, channel, key, velocity),
+                        match self.voices.request_new(instrument_region, channel) {
+                            Some(value) => value.start(
+                                &self.sound_font.wave_data,
+                                &region_pair,
+                                channel,
+                                key,
+                                velocity,
+                            ),
                             None => (),
                         }
                     }
@@ -232,76 +220,56 @@ impl Synthesizer
         }
     }
 
-    pub fn note_off_all(&mut self, immediate: bool)
-    {
-        if immediate
-        {
+    pub fn note_off_all(&mut self, immediate: bool) {
+        if immediate {
             self.voices.clear();
-        }
-        else
-        {
-            for i in 0..self.voices.active_voice_count as usize
-            {
+        } else {
+            for i in 0..self.voices.active_voice_count as usize {
                 self.voices.voices[i].end();
             }
         }
     }
 
-    pub fn note_off_all_channel(&mut self, channel: i32, immediate: bool)
-    {
-        if immediate
-        {
-            for i in 0..self.voices.active_voice_count as usize
-            {
+    pub fn note_off_all_channel(&mut self, channel: i32, immediate: bool) {
+        if immediate {
+            for i in 0..self.voices.active_voice_count as usize {
                 let voice = self.voices.voices[i].as_mut();
-                if voice.channel == channel
-                {
+                if voice.channel == channel {
                     voice.kill();
                 }
             }
-        }
-        else
-        {
-            for i in 0..self.voices.active_voice_count as usize
-            {
+        } else {
+            for i in 0..self.voices.active_voice_count as usize {
                 let voice = self.voices.voices[i].as_mut();
-                if voice.channel == channel
-                {
+                if voice.channel == channel {
                     voice.end();
                 }
             }
         }
     }
 
-    pub fn reset_all_controllers(&mut self)
-    {
-        for channel in &mut self.channels
-        {
+    pub fn reset_all_controllers(&mut self) {
+        for channel in &mut self.channels {
             channel.reset_all_controllers();
         }
     }
 
-    pub fn reset_all_controllers_channel(&mut self, channel: i32)
-    {
-        if !(0 <= channel && channel < self.channels.len() as i32)
-        {
+    pub fn reset_all_controllers_channel(&mut self, channel: i32) {
+        if !(0 <= channel && channel < self.channels.len() as i32) {
             return;
         }
 
         self.channels[channel as usize].reset_all_controllers();
     }
 
-    pub fn reset(&mut self)
-    {
+    pub fn reset(&mut self) {
         self.voices.clear();
 
-        for channel in &mut self.channels
-        {
+        for channel in &mut self.channels {
             channel.reset();
         }
 
-        if self.enable_reverb_and_chorus
-        {
+        if self.enable_reverb_and_chorus {
             // reverb!.Mute();
             // chorus!.Mute();
         }
@@ -309,20 +277,16 @@ impl Synthesizer
         self.block_read = self.block_size as usize;
     }
 
-    pub fn render(&mut self, left: &mut[f32], right: &mut[f32])
-    {
-        if left.len() != right.len()
-        {
+    pub fn render(&mut self, left: &mut [f32], right: &mut [f32]) {
+        if left.len() != right.len() {
             panic!("The output buffers for the left and right must be the same length.");
         }
 
         let left_length = left.len();
 
         let mut wrote = 0;
-        while wrote < left_length
-        {
-            if self.block_read == self.block_size as usize
-            {
+        while wrote < left_length {
+            if self.block_read == self.block_size as usize {
                 self.render_block();
                 self.block_read = 0;
             }
@@ -331,8 +295,7 @@ impl Synthesizer
             let dst_rem = left_length - wrote;
             let rem = cmp::min(src_rem, dst_rem);
 
-            for t in 0..rem
-            {
+            for t in 0..rem {
                 left[wrote + t] = self.block_left[self.block_read + t];
                 right[wrote + t] = self.block_right[self.block_read + t];
             }
@@ -342,73 +305,77 @@ impl Synthesizer
         }
     }
 
-    fn render_block(&mut self)
-    {
+    fn render_block(&mut self) {
         self.voices.process(&self.channels);
 
-        for t in 0..self.block_size as usize
-        {
+        for t in 0..self.block_size as usize {
             self.block_left[t] = 0_f32;
             self.block_right[t] = 0_f32;
         }
 
-        for i in 0..self.voices.active_voice_count as usize
-        {
+        for i in 0..self.voices.active_voice_count as usize {
             let voice = self.voices.voices[i].as_ref();
             let previous_gain_left = self.master_volume * voice.previous_mix_gain_left;
             let current_gain_left = self.master_volume * voice.current_mix_gain_left;
-            Synthesizer::write_block(previous_gain_left, current_gain_left, &voice.block[..], &mut self.block_left[..], self.inverse_block_size);
+            Synthesizer::write_block(
+                previous_gain_left,
+                current_gain_left,
+                &voice.block[..],
+                &mut self.block_left[..],
+                self.inverse_block_size,
+            );
             let previous_gain_right = self.master_volume * voice.previous_mix_gain_right;
             let current_gain_right = self.master_volume * voice.current_mix_gain_right;
-            Synthesizer::write_block(previous_gain_right, current_gain_right, &voice.block[..], &mut self.block_right[..], self.inverse_block_size);
+            Synthesizer::write_block(
+                previous_gain_right,
+                current_gain_right,
+                &voice.block[..],
+                &mut self.block_right[..],
+                self.inverse_block_size,
+            );
         }
     }
 
-    fn write_block(previous_gain: f32, current_gain: f32, source: &[f32], destination: &mut[f32], inverse_block_size: f32)
-    {
-        if SoundFontMath::max(previous_gain, current_gain) < SoundFontMath::NON_AUDIBLE
-        {
+    fn write_block(
+        previous_gain: f32,
+        current_gain: f32,
+        source: &[f32],
+        destination: &mut [f32],
+        inverse_block_size: f32,
+    ) {
+        if SoundFontMath::max(previous_gain, current_gain) < SoundFontMath::NON_AUDIBLE {
             return;
         }
 
-        if (current_gain - previous_gain).abs() < 1.0E-3_f32
-        {
+        if (current_gain - previous_gain).abs() < 1.0E-3_f32 {
             ArrayMath::multiply_add(current_gain, source, destination);
-        }
-        else
-        {
+        } else {
             let step = inverse_block_size * (current_gain - previous_gain);
             ArrayMath::multiply_add_slope(previous_gain, step, source, destination);
         }
     }
 
-    pub fn get_sound_font(&self) -> &SoundFont
-    {
+    pub fn get_sound_font(&self) -> &SoundFont {
         &self.sound_font
     }
 
-    pub fn get_sample_rate(&self) -> i32
-    {
+    pub fn get_sample_rate(&self) -> i32 {
         self.sample_rate
     }
 
-    pub fn get_maximum_polyphony(&self) -> i32
-    {
+    pub fn get_maximum_polyphony(&self) -> i32 {
         self.maximum_polyphony
     }
 
-    pub fn get_enable_reverb_and_chorus(&self) -> bool
-    {
+    pub fn get_enable_reverb_and_chorus(&self) -> bool {
         self.enable_reverb_and_chorus
     }
 
-    pub fn get_master_volume(&self) -> f32
-    {
+    pub fn get_master_volume(&self) -> f32 {
         self.master_volume
     }
 
-    pub fn set_master_volume(&mut self, master_volume: f32)
-    {
+    pub fn set_master_volume(&mut self, master_volume: f32) {
         self.master_volume = master_volume;
     }
 }

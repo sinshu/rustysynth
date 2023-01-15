@@ -2,8 +2,8 @@
 
 use std::rc::Rc;
 
-use crate::synthesizer_settings::SynthesizerSettings;
 use crate::loop_mode::LoopMode;
+use crate::synthesizer_settings::SynthesizerSettings;
 
 // In this class, fixed-point numbers are used for speed-up.
 // A fixed-point number is expressed by Int64, whose lower 24 bits represent the fraction part,
@@ -11,8 +11,7 @@ use crate::loop_mode::LoopMode;
 // For clarity, fixed-point number variables have a suffix "_fp".
 
 #[non_exhaustive]
-pub(crate) struct Oscillator
-{
+pub(crate) struct Oscillator {
     synthesizer_sample_rate: i32,
 
     data: Option<Rc<Vec<i16>>>,
@@ -33,16 +32,13 @@ pub(crate) struct Oscillator
     position_fp: i64,
 }
 
-impl Oscillator
-{
+impl Oscillator {
     const FRAC_BITS: i32 = 24;
     const FRAC_UNIT: i64 = 1_i64 << Oscillator::FRAC_BITS;
     const FP_TO_SAMPLE: f32 = 1_f32 / (32768 * Oscillator::FRAC_UNIT) as f32;
 
-    pub(crate) fn new(settings: &SynthesizerSettings) -> Self
-    {
-        Self
-        {
+    pub(crate) fn new(settings: &SynthesizerSettings) -> Self {
+        Self {
             synthesizer_sample_rate: settings.sample_rate,
             data: None,
             loop_mode: 0,
@@ -60,8 +56,20 @@ impl Oscillator
         }
     }
 
-    pub(crate) fn start(&mut self, data: &Rc<Vec<i16>>, loop_mode: i32, sample_rate: i32, start: i32, end: i32, start_loop: i32, end_loop: i32, root_key: i32, coarse_tune: i32, fine_tune: i32, scale_tuning: i32)
-    {
+    pub(crate) fn start(
+        &mut self,
+        data: &Rc<Vec<i16>>,
+        loop_mode: i32,
+        sample_rate: i32,
+        start: i32,
+        end: i32,
+        start_loop: i32,
+        end_loop: i32,
+        root_key: i32,
+        coarse_tune: i32,
+        fine_tune: i32,
+        scale_tuning: i32,
+    ) {
         self.data = Some(Rc::clone(data));
         self.loop_mode = loop_mode;
         self.sample_sample_rate = sample_rate;
@@ -75,68 +83,51 @@ impl Oscillator
         self.pitch_change_scale = 0.01_f32 * scale_tuning as f32;
         self.sample_rate_ratio = sample_rate as f32 / self.synthesizer_sample_rate as f32;
 
-        if self.loop_mode == LoopMode::NO_LOOP
-        {
+        if self.loop_mode == LoopMode::NO_LOOP {
             self.looping = false;
-        }
-        else
-        {
+        } else {
             self.looping = true;
         }
 
         self.position_fp = (start as i64) << Oscillator::FRAC_BITS;
     }
 
-    pub(crate) fn release(&mut self)
-    {
-        if self.loop_mode == LoopMode::LOOP_UNTIL_NOTE_OFF
-        {
+    pub(crate) fn release(&mut self) {
+        if self.loop_mode == LoopMode::LOOP_UNTIL_NOTE_OFF {
             self.looping = false;
         }
     }
 
-    pub(crate) fn process(&mut self, block: &mut [f32], pitch: f32) -> bool
-    {
+    pub(crate) fn process(&mut self, block: &mut [f32], pitch: f32) -> bool {
         let pitch_change = self.pitch_change_scale * (pitch - self.root_key as f32) + self.tune;
         let pitch_ratio = self.sample_rate_ratio * 2_f32.powf(pitch_change / 12_f32);
         return self.fill_block(block, pitch_ratio as f64);
     }
 
-    fn fill_block(&mut self, block: &mut [f32], pitch_ratio: f64) -> bool
-    {
+    fn fill_block(&mut self, block: &mut [f32], pitch_ratio: f64) -> bool {
         let pitch_ratio_fp = (Oscillator::FRAC_UNIT as f64 * pitch_ratio) as i64;
 
-        if self.looping
-        {
+        if self.looping {
             return self.fill_block_continuous(block, pitch_ratio_fp);
-        }
-        else
-        {
+        } else {
             return self.fill_block_no_loop(block, pitch_ratio_fp);
         }
     }
 
-    fn fill_block_no_loop(&mut self, block: &mut [f32], pitch_ratio_fp: i64) -> bool
-    {
+    fn fill_block_no_loop(&mut self, block: &mut [f32], pitch_ratio_fp: i64) -> bool {
         let data = &self.data.as_ref().unwrap()[..];
         let block_length = block.len();
 
-        for t in 0..block_length
-        {
+        for t in 0..block_length {
             let index = (self.position_fp >> Oscillator::FRAC_BITS) as usize;
 
-            if index >= self.end as usize
-            {
-                if t > 0
-                {
-                    for u in t..block_length
-                    {
+            if index >= self.end as usize {
+                if t > 0 {
+                    for u in t..block_length {
                         block[u] = 0_f32;
                     }
                     return true;
-                }
-                else
-                {
+                } else {
                     return false;
                 }
             }
@@ -144,7 +135,8 @@ impl Oscillator
             let x1 = data[index] as i64;
             let x2 = data[index + 1] as i64;
             let a_fp = self.position_fp & (Oscillator::FRAC_UNIT - 1);
-            block[t] = Oscillator::FP_TO_SAMPLE * ((x1 << Oscillator::FRAC_BITS) + a_fp * (x2 - x1)) as f32;
+            block[t] = Oscillator::FP_TO_SAMPLE
+                * ((x1 << Oscillator::FRAC_BITS) + a_fp * (x2 - x1)) as f32;
 
             self.position_fp += pitch_ratio_fp;
         }
@@ -152,8 +144,7 @@ impl Oscillator
         return true;
     }
 
-    fn fill_block_continuous(&mut self, block: &mut [f32], pitch_ratio_fp: i64) -> bool
-    {
+    fn fill_block_continuous(&mut self, block: &mut [f32], pitch_ratio_fp: i64) -> bool {
         let data = &self.data.as_ref().unwrap()[..];
         let block_length = block.len();
 
@@ -162,25 +153,23 @@ impl Oscillator
         let loop_length = (self.end_loop - self.start_loop) as i64;
         let loop_length_fp = loop_length << Oscillator::FRAC_BITS;
 
-        for t in 0..block_length
-        {
-            if self.position_fp >= end_loop_fp
-            {
+        for t in 0..block_length {
+            if self.position_fp >= end_loop_fp {
                 self.position_fp -= loop_length_fp;
             }
 
             let index1 = (self.position_fp >> Oscillator::FRAC_BITS) as usize;
             let mut index2 = index1 + 1;
 
-            if index2 >= self.end_loop as usize
-            {
+            if index2 >= self.end_loop as usize {
                 index2 -= loop_length as usize;
             }
 
             let x1 = data[index1] as i64;
             let x2 = data[index2] as i64;
             let a_fp = self.position_fp & (Oscillator::FRAC_UNIT - 1);
-            block[t] = Oscillator::FP_TO_SAMPLE * ((x1 << Oscillator::FRAC_BITS) + a_fp * (x2 - x1)) as f32;
+            block[t] = Oscillator::FP_TO_SAMPLE
+                * ((x1 << Oscillator::FRAC_BITS) + a_fp * (x2 - x1)) as f32;
 
             self.position_fp += pitch_ratio_fp;
         }

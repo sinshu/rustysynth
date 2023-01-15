@@ -6,8 +6,7 @@ use std::io::Read;
 use crate::binary_reader::BinaryReader;
 
 #[non_exhaustive]
-pub(crate) struct PresetInfo
-{
+pub(crate) struct PresetInfo {
     pub(crate) name: String,
     pub(crate) patch_number: i32,
     pub(crate) bank_number: i32,
@@ -18,10 +17,8 @@ pub(crate) struct PresetInfo
     pub(crate) morphology: i32,
 }
 
-impl PresetInfo
-{
-    fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>>
-    {
+impl PresetInfo {
+    fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
         let name = BinaryReader::read_fixed_length_string(reader, 20)?;
         let patch_number = BinaryReader::read_u16(reader)? as i32;
         let bank_number = BinaryReader::read_u16(reader)? as i32;
@@ -30,8 +27,7 @@ impl PresetInfo
         let genre = BinaryReader::read_i32(reader)?;
         let morphology = BinaryReader::read_i32(reader)?;
 
-        Ok(Self
-        {
+        Ok(Self {
             name: name,
             patch_number: patch_number,
             bank_number: bank_number,
@@ -43,23 +39,22 @@ impl PresetInfo
         })
     }
 
-    pub(crate) fn read_from_chunk<R: Read>(reader: &mut R, size: i32) -> Result<Vec<PresetInfo>, Box<dyn Error>>
-    {
-        if size % 38 != 0
-        {
+    pub(crate) fn read_from_chunk<R: Read>(
+        reader: &mut R,
+        size: i32,
+    ) -> Result<Vec<PresetInfo>, Box<dyn Error>> {
+        if size % 38 != 0 {
             return Err(format!("The preset list is invalid.").into());
         }
 
         let count = size / 38;
 
         let mut presets: Vec<PresetInfo> = Vec::new();
-        for _i in 0..count
-        {
+        for _i in 0..count {
             presets.push(PresetInfo::new(reader)?);
         }
 
-        for i in 0..(count - 1) as usize
-        {
+        for i in 0..(count - 1) as usize {
             presets[i].zone_end_index = presets[i + 1].zone_start_index - 1;
         }
 

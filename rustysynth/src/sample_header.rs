@@ -6,8 +6,7 @@ use std::io::Read;
 use crate::binary_reader::BinaryReader;
 
 #[non_exhaustive]
-pub struct SampleHeader
-{
+pub struct SampleHeader {
     pub(crate) name: String,
     pub(crate) start: i32,
     pub(crate) end: i32,
@@ -20,10 +19,8 @@ pub struct SampleHeader
     pub(crate) sample_type: u16,
 }
 
-impl SampleHeader
-{
-    fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>>
-    {
+impl SampleHeader {
+    fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
         let name = BinaryReader::read_fixed_length_string(reader, 20)?;
         let start = BinaryReader::read_i32(reader)?;
         let end = BinaryReader::read_i32(reader)?;
@@ -35,8 +32,7 @@ impl SampleHeader
         let link = BinaryReader::read_u16(reader)?;
         let sample_type = BinaryReader::read_u16(reader)?;
 
-        Ok(Self
-        {
+        Ok(Self {
             name: name,
             start: start,
             end: end,
@@ -50,18 +46,18 @@ impl SampleHeader
         })
     }
 
-    pub(crate) fn read_from_chunk<R: Read>(reader: &mut R, size: i32) -> Result<Vec<SampleHeader>, Box<dyn Error>>
-    {
-        if size % 46 != 0
-        {
+    pub(crate) fn read_from_chunk<R: Read>(
+        reader: &mut R,
+        size: i32,
+    ) -> Result<Vec<SampleHeader>, Box<dyn Error>> {
+        if size % 46 != 0 {
             return Err(format!("The sample header list is invalid.").into());
         }
 
         let count = size / 46 - 1;
 
         let mut headers: Vec<SampleHeader> = Vec::new();
-        for _i in 0..count
-        {
+        for _i in 0..count {
             headers.push(SampleHeader::new(reader)?);
         }
 
@@ -71,53 +67,43 @@ impl SampleHeader
         Ok(headers)
     }
 
-    pub fn get_name(&self) -> &str
-    {
+    pub fn get_name(&self) -> &str {
         &self.name
     }
 
-    pub fn get_start(&self) -> i32
-    {
+    pub fn get_start(&self) -> i32 {
         self.start
     }
 
-    pub fn get_end(&self) -> i32
-    {
+    pub fn get_end(&self) -> i32 {
         self.end
     }
 
-    pub fn get_start_loop(&self) -> i32
-    {
+    pub fn get_start_loop(&self) -> i32 {
         self.start_loop
     }
 
-    pub fn get_end_loop(&self) -> i32
-    {
+    pub fn get_end_loop(&self) -> i32 {
         self.end_loop
     }
 
-    pub fn get_sample_rate(&self) -> i32
-    {
+    pub fn get_sample_rate(&self) -> i32 {
         self.sample_rate
     }
 
-    pub fn get_original_pitch(&self) -> i32
-    {
+    pub fn get_original_pitch(&self) -> i32 {
         self.original_pitch as i32
     }
 
-    pub fn get_pitch_correction(&self) -> i32
-    {
+    pub fn get_pitch_correction(&self) -> i32 {
         self.pitch_correction as i32
     }
 
-    pub fn get_link(&self) -> i32
-    {
+    pub fn get_link(&self) -> i32 {
         self.link as i32
     }
 
-    pub fn get_sample_type(&self) -> i32
-    {
+    pub fn get_sample_type(&self) -> i32 {
         self.sample_type as i32
     }
 }

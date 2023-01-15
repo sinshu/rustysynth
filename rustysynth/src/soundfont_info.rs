@@ -7,8 +7,7 @@ use super::binary_reader::BinaryReader;
 use super::soundfont_version::SoundFontVersion;
 
 #[non_exhaustive]
-pub struct SoundFontInfo
-{
+pub struct SoundFontInfo {
     pub(crate) version: SoundFontVersion,
     pub(crate) target_sound_engine: String,
     pub(crate) bank_name: String,
@@ -22,13 +21,10 @@ pub struct SoundFontInfo
     pub(crate) tools: String,
 }
 
-impl SoundFontInfo
-{
-    pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>>
-    {
+impl SoundFontInfo {
+    pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
-        if chunk_id != "LIST"
-        {
+        if chunk_id != "LIST" {
             return Err(format!("The LIST chunk was not found.").into());
         }
 
@@ -37,9 +33,11 @@ impl SoundFontInfo
         let mut pos: i32 = 0;
 
         let list_type = BinaryReader::read_four_cc(reader)?;
-        if list_type != "INFO"
-        {
-            return Err(format!("The type of the LIST chunk must be 'INFO', but was '{list_type}'.").into());
+        if list_type != "INFO" {
+            return Err(format!(
+                "The type of the LIST chunk must be 'INFO', but was '{list_type}'."
+            )
+            .into());
         }
         pos += 4;
 
@@ -55,134 +53,98 @@ impl SoundFontInfo
         let mut comments: Option<String> = None;
         let mut tools: Option<String> = None;
 
-        while pos < end
-        {
+        while pos < end {
             let id = BinaryReader::read_four_cc(reader)?;
             pos += 4;
 
             let size = BinaryReader::read_i32(reader)?;
             pos += 4;
 
-            if id == "ifil"
-            {
+            if id == "ifil" {
                 version = Some(SoundFontVersion::new(reader)?);
-            }
-            else if id == "isng"
-            {
+            } else if id == "isng" {
                 target_sound_engine = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            }
-            else if id == "INAM"
-            {
+            } else if id == "INAM" {
                 bank_name = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            }
-            else if id == "irom"
-            {
+            } else if id == "irom" {
                 rom_name = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            }
-            else if id == "iver"
-            {
+            } else if id == "iver" {
                 rom_version = Some(SoundFontVersion::new(reader)?);
-            }
-            else if id == "ICRD"
-            {
+            } else if id == "ICRD" {
                 creation_date = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            }
-            else if id == "IENG"
-            {
+            } else if id == "IENG" {
                 author = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            }
-            else if id == "IPRD"
-            {
+            } else if id == "IPRD" {
                 target_product = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            }
-            else if id == "ICOP"
-            {
+            } else if id == "ICOP" {
                 copyright = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            }
-            else if id == "ICMT"
-            {
+            } else if id == "ICMT" {
                 comments = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            }
-            else if id == "ISFT"
-            {
+            } else if id == "ISFT" {
                 tools = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            }
-            else
-            {
+            } else {
                 return Err(format!("The INFO list contains an unknown ID '{id}'.").into());
             }
 
             pos += size;
         }
 
-        let version = match version
-        {
+        let version = match version {
             Some(value) => value,
             None => SoundFontVersion::default(),
         };
 
-        let target_sound_engine = match target_sound_engine
-        {
+        let target_sound_engine = match target_sound_engine {
             Some(value) => value,
             None => String::new(),
         };
 
-        let bank_name = match bank_name
-        {
+        let bank_name = match bank_name {
             Some(value) => value,
             None => String::new(),
         };
 
-        let rom_name = match rom_name
-        {
+        let rom_name = match rom_name {
             Some(value) => value,
             None => String::new(),
         };
 
-        let rom_version = match rom_version
-        {
+        let rom_version = match rom_version {
             Some(value) => value,
             None => SoundFontVersion::default(),
         };
 
-        let creation_date = match creation_date
-        {
+        let creation_date = match creation_date {
             Some(value) => value,
             None => String::new(),
         };
 
-        let author = match author
-        {
+        let author = match author {
             Some(value) => value,
             None => String::new(),
         };
 
-        let target_product = match target_product
-        {
+        let target_product = match target_product {
             Some(value) => value,
             None => String::new(),
         };
 
-        let copyright = match copyright
-        {
+        let copyright = match copyright {
             Some(value) => value,
             None => String::new(),
         };
 
-        let comments = match comments
-        {
+        let comments = match comments {
             Some(value) => value,
             None => String::new(),
         };
 
-        let tools = match tools
-        {
+        let tools = match tools {
             Some(value) => value,
             None => String::new(),
         };
 
-        Ok(Self
-        {
+        Ok(Self {
             version: version,
             target_sound_engine: target_sound_engine,
             bank_name: bank_name,
@@ -197,58 +159,47 @@ impl SoundFontInfo
         })
     }
 
-    pub fn get_version(&self) -> &SoundFontVersion
-    {
+    pub fn get_version(&self) -> &SoundFontVersion {
         &self.version
     }
 
-    pub fn get_target_sound_engine(&self) -> &str
-    {
+    pub fn get_target_sound_engine(&self) -> &str {
         &self.target_sound_engine
     }
 
-    pub fn get_bank_name(&self) -> &str
-    {
+    pub fn get_bank_name(&self) -> &str {
         &self.bank_name
     }
 
-    pub fn get_rom_name(&self) -> &str
-    {
+    pub fn get_rom_name(&self) -> &str {
         &self.rom_name
     }
 
-    pub fn get_rom_version(&self) -> &SoundFontVersion
-    {
+    pub fn get_rom_version(&self) -> &SoundFontVersion {
         &self.rom_version
     }
 
-    pub fn get_creation_date(&self) -> &str
-    {
+    pub fn get_creation_date(&self) -> &str {
         &self.creation_date
     }
 
-    pub fn get_author(&self) -> &str
-    {
+    pub fn get_author(&self) -> &str {
         &self.author
     }
 
-    pub fn get_target_product(&self) -> &str
-    {
+    pub fn get_target_product(&self) -> &str {
         &self.target_product
     }
 
-    pub fn get_copyright(&self) -> &str
-    {
+    pub fn get_copyright(&self) -> &str {
         &self.copyright
     }
 
-    pub fn get_comments(&self) -> &str
-    {
+    pub fn get_comments(&self) -> &str {
         &self.comments
     }
 
-    pub fn get_tools(&self) -> &str
-    {
+    pub fn get_tools(&self) -> &str {
         &self.tools
     }
 }
