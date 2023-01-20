@@ -90,31 +90,136 @@ impl Reverb {
         apfs_r.push(AllPassFilter::new(Reverb::APF_TUNING_R3));
         apfs_r.push(AllPassFilter::new(Reverb::APF_TUNING_R4));
 
-        let gain: f32 = 0.0;
-        let room_size: f32 = Reverb::INITIAL_ROOM;
-        let room_size1: f32 = 0.0;
-        let damp: f32 = Reverb::INITIAL_DAMP;
-        let damp1: f32 = 0.0;
-        let wet: f32 = Reverb::INITIAL_WET;
-        let wet1: f32 = 0.0;
-        let wet2: f32 = 0.0;
-        let width: f32 = Reverb::INITIAL_WIDTH;
+        for apf in apfs_l.iter_mut() {
+            apf.set_feedback(0.5_f32);
+        }
 
-        Self {
+        for apf in apfs_r.iter_mut() {
+            apf.set_feedback(0.5_f32);
+        }
+
+        let mut reverb = Reverb {
             cfs_l: cfs_l,
             cfs_r: cfs_r,
             apfs_l: apfs_l,
             apfs_r: apfs_r,
-            gain: gain,
-            room_size: room_size,
-            room_size1: room_size1,
-            damp: damp,
-            damp1: damp1,
-            wet: wet,
-            wet1: wet1,
-            wet2: wet2,
-            width: width
+            gain: 0_f32,
+            room_size: 0_f32,
+            room_size1: 0_f32,
+            damp: 0_f32,
+            damp1: 0_f32,
+            wet: 0_f32,
+            wet1: 0_f32,
+            wet2: 0_f32,
+            width: 0_f32,
+        };
+
+        reverb.set_wet(Reverb::INITIAL_WET);
+        reverb.set_room_size(Reverb::INITIAL_ROOM);
+        reverb.set_damp(Reverb::INITIAL_DAMP);
+        reverb.set_width(Reverb::INITIAL_WIDTH);
+
+        reverb
+    }
+
+    pub fn mute(&mut self) {
+        for cf in self.cfs_l.iter_mut() {
+            cf.mute();
         }
+
+        for cf in self.cfs_r.iter_mut() {
+            cf.mute();
+        }
+
+        for apf in self.apfs_l.iter_mut() {
+            apf.mute();
+        }
+
+        for apf in self.apfs_r.iter_mut() {
+            apf.mute();
+        }
+    }
+
+    pub fn process(&mut self, input: &[f32], output_left: &mut [f32], output_right: &mut [f32]) {
+        let input_length = input.len();
+        let output_left_length = output_left.len();
+        let output_right_length = output_right.len();
+
+        for i in 0..output_left_length {
+            output_left[i] = 0_f32;
+        }
+        for i in 0..output_right_length {
+            output_right[i] = 0_f32;
+        }
+
+        for cf in self.cfs_l.iter_mut() {
+            cf.process(input, output_left);
+        }
+
+        for apf in self.apfs_l.iter_mut() {
+            apf.process(output_left);
+        }
+
+        for cf in self.cfs_r.iter_mut() {
+            cf.process(input, output_right);
+        }
+
+        for apf in self.apfs_r.iter_mut() {
+            apf.process(output_right);
+        }
+
+        // With the default settings, we can skip this part.
+        if 1_f32 - self.wet1 > 1.0E-3_f32 || self.wet2 > 1.0E-3_f32 {
+            for t in 0..input_length {
+                let left = output_left[t];
+                let right = output_right[t];
+                output_left[t] = left * self.wet1 + right * self.wet2;
+                output_right[t] = right * self.wet1 + left * self.wet2;
+            }
+        }
+    }
+
+    fn update(&mut self) {
+        self.wet1 = self.wet * (self.width / 2_f32 + 0.5_f32);
+        self.wet2 = self.wet * ((1_f32 - self.width) / 2_f32);
+
+        self.room_size1 = self.room_size;
+        self.damp1 = self.damp;
+        self.gain = Reverb::FIXED_GAIN;
+
+        for cf in self.cfs_l.iter_mut() {
+            cf.set_feedback(self.room_size1);
+            cf.set_damp(self.damp1);
+        }
+
+        for cf in self.cfs_r.iter_mut() {
+            cf.set_feedback(self.room_size1);
+            cf.set_damp(self.damp1);
+        }
+    }
+
+    pub(crate) fn get_input_gain(&self) {
+        self.gain;
+    }
+
+    fn set_room_size(&mut self, value: f32) {
+        self.room_size = (value * Reverb::SCALE_ROOM) + Reverb::OFFSET_ROOM;
+        self.update();
+    }
+
+    fn set_damp(&mut self, value: f32) {
+        self.damp = value * Reverb::SCALE_DAMP;
+        self.update();
+    }
+
+    fn set_wet(&mut self, value: f32) {
+        self.wet = value * Reverb::SCALE_WET;
+        self.update();
+    }
+
+    fn set_width(&mut self, value: f32) {
+        self.width = value;
+        self.update();
     }
 }
 
@@ -194,6 +299,15 @@ impl CombFilter {
             block_index += rem;
         }
     }
+
+    fn set_feedback(&mut self, value: f32) {
+        self.feedback = value;
+    }
+
+    fn set_damp(&mut self, value: f32) {
+        self.damp1 = value;
+        self.damp2 = 1_f32 - value;
+    }
 }
 
 #[non_exhaustive]
@@ -253,5 +367,9 @@ impl AllPassFilter {
             self.buffer_index += rem;
             block_index += rem;
         }
+    }
+
+    fn set_feedback(&mut self, value: f32) {
+        self.feedback = value;
     }
 }
