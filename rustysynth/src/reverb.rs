@@ -1,5 +1,7 @@
 #![allow(dead_code)]
 
+use std::cmp;
+
 #[non_exhaustive]
 pub(crate) struct Reverb {
     cfs_l: Vec<CombFilter>,
@@ -118,24 +120,138 @@ impl Reverb {
 
 #[non_exhaustive]
 struct CombFilter {
-    
+    buffer: Vec<f32>,
+
+    buffer_index: usize,
+    filter_store: f32,
+
+    feedback: f32,
+    damp1: f32,
+    damp2: f32,
 }
 
 impl CombFilter {
     fn new(buffer_size: usize) -> Self {
         Self {
+            buffer: vec![0_f32; buffer_size],
+            buffer_index: 0,
+            filter_store: 0_f32,
+            feedback: 0_f32,
+            damp1: 0_f32,
+            damp2: 0_f32,
+        }
+    }
+
+    fn mute(&mut self) {
+        let buffer_length = self.buffer.len();
+        for i in 0..buffer_length {
+            self.buffer[i] = 0_f32;
+        }
+
+        self.filter_store = 0_f32;
+    }
+
+    fn process(&mut self, input_block: &[f32], output_block: &mut [f32]) {
+        let buffer_length = self.buffer.len();
+        let output_block_length = output_block.len();
+        
+        let mut block_index: usize = 0;
+        while block_index < output_block_length {
+            if self.buffer_index == buffer_length {
+                self.buffer_index = 0;
+            }
+
+            let src_rem = buffer_length - self.buffer_index;
+            let dst_rem = output_block_length - block_index;
+            let rem = cmp::min(src_rem, dst_rem);
+
+            for t in 0..rem {
+                let block_pos = block_index + t;
+                let buffer_pos = self.buffer_index + t;
+
+                let input = input_block[block_pos];
+
+                // The following ifs are to avoid performance problem due to denormalized number.
+                // The original implementation uses unsafe cast to detect denormalized number.
+                // I tried to reproduce the original implementation using Unsafe.As,
+                // but the simple Math.Abs version was faster according to some benchmarks.
+
+                let mut output = self.buffer[buffer_pos];
+                if output.abs() < 1.0E-6_f32 {
+                    output = 0_f32;
+                }
+
+                self.filter_store = (output * self.damp2) + (self.filter_store * self.damp1);
+                if self.filter_store.abs() < 1.0E-6_f32 {
+                    self.filter_store = 0_f32;
+                }
+
+                self.buffer[buffer_pos] = input + (self.filter_store * self.feedback);
+                output_block[block_pos] += output;
+            }
+
+            self.buffer_index += rem;
+            block_index += rem;
         }
     }
 }
 
 #[non_exhaustive]
 struct AllPassFilter {
-    
+    buffer: Vec<f32>,
+
+    buffer_index: usize,
+
+    feedback: f32,
 }
 
 impl AllPassFilter {
     fn new(buffer_size: usize) -> Self {
         Self {
+            buffer: vec![0_f32; buffer_size],
+            buffer_index: 0,
+            feedback: 0_f32,
+        }
+    }
+
+    fn mute(&mut self) {
+        let buffer_length = self.buffer.len();
+        for i in 0..buffer_length {
+            self.buffer[i] = 0_f32;
+        }
+    }
+
+    fn process(&mut self, block: &mut [f32]) {
+        let buffer_length = self.buffer.len();
+        let block_length = block.len();
+
+        let mut block_index: usize = 0;
+        while block_index < block_length {
+            if self.buffer_index == buffer_length {
+                self.buffer_index = 0;
+            }
+
+            let src_rem = buffer_length - self.buffer_index;
+            let dst_rem = block_length - block_index;
+            let rem = cmp::min(src_rem, dst_rem);
+
+            for t in 0..rem {
+                let block_pos = block_index + t;
+                let buffer_pos = self.buffer_index + t;
+
+                let input = block[block_pos];
+
+                let mut bufout = self.buffer[buffer_pos];
+                if bufout.abs() < 1.0E-6_f32 {
+                    bufout = 0_f32;
+                }
+
+                block[block_pos] = bufout - input;
+                self.buffer[buffer_pos] = input + (bufout * self.feedback);
+            }
+
+            self.buffer_index += rem;
+            block_index += rem;
         }
     }
 }
