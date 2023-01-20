@@ -12,6 +12,7 @@ use crate::soundfont::SoundFont;
 use crate::soundfont_math::SoundFontMath;
 use crate::synthesizer_settings::SynthesizerSettings;
 use crate::voice_collection::VoiceCollection;
+use crate::reverb::Reverb;
 
 #[non_exhaustive]
 pub struct Synthesizer {
@@ -38,6 +39,11 @@ pub struct Synthesizer {
     block_read: usize,
 
     pub(crate) master_volume: f32,
+
+    reverb: Option<Reverb>,
+    reverb_input: Option<Vec<f32>>,
+    reverb_output_left: Option<Vec<f32>>,
+    reverb_output_right: Option<Vec<f32>>,
 }
 
 impl Synthesizer {
@@ -90,6 +96,11 @@ impl Synthesizer {
 
         let master_volume = 0.5_f32;
 
+        let reverb = if settings.enable_reverb_and_chorus { Some(Reverb::new(settings.sample_rate)) } else { None };
+        let reverb_input = if settings.enable_reverb_and_chorus { Some(vec![0_f32; settings.block_size as usize]) } else { None };
+        let reverb_output_left = if settings.enable_reverb_and_chorus { Some(vec![0_f32; settings.block_size as usize]) } else { None };
+        let reverb_output_right = if settings.enable_reverb_and_chorus { Some(vec![0_f32; settings.block_size as usize]) } else { None };
+
         Ok(Self {
             sound_font: Rc::clone(sound_font),
             sample_rate: settings.sample_rate,
@@ -106,6 +117,10 @@ impl Synthesizer {
             inverse_block_size: inverse_block_size,
             block_read: block_read,
             master_volume: master_volume,
+            reverb: reverb,
+            reverb_input: reverb_input,
+            reverb_output_left: reverb_output_left,
+            reverb_output_right: reverb_output_right,
         })
     }
 
@@ -333,6 +348,28 @@ impl Synthesizer {
                 &mut self.block_right[..],
                 self.inverse_block_size,
             );
+        }
+
+        if self.enable_reverb_and_chorus {
+            let reverb = self.reverb.as_mut().unwrap();
+            let reverb_input = self.reverb_input.as_mut().unwrap();
+            let reverb_output_left = self.reverb_output_left.as_mut().unwrap();
+            let reverb_output_right = self.reverb_output_right.as_mut().unwrap();
+
+            let reverb_input_length = reverb_input.len();
+            for i in 0..reverb_input_length {
+                reverb_input[i] = 0_f32;
+            }
+            for i in 0..self.voices.active_voice_count as usize {
+                let voice = self.voices.voices[i].as_ref();
+                let previous_gain = reverb.get_input_gain() * voice.previous_reverb_send * (voice.previous_mix_gain_left + voice.previous_mix_gain_right);
+                let current_gain = reverb.get_input_gain() * voice.current_reverb_send * (voice.current_mix_gain_left + voice.current_mix_gain_right);
+                Synthesizer::write_block(previous_gain, current_gain, &voice.block[..], &mut reverb_input[..], self.inverse_block_size);
+            }
+
+            reverb.process(&reverb_input, reverb_output_left, reverb_output_right);
+            ArrayMath::multiply_add(self.master_volume, &reverb_output_left, &mut self.block_left[..]);
+            ArrayMath::multiply_add(self.master_volume, &reverb_output_right, &mut self.block_right[..]);
         }
     }
 

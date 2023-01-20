@@ -202,8 +202,8 @@ impl Reverb {
         }
     }
 
-    pub(crate) fn get_input_gain(&self) {
-        self.gain;
+    pub fn get_input_gain(&self) -> f32 {
+        self.gain
     }
 
     fn set_room_size(&mut self, value: f32) {
