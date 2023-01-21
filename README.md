@@ -98,11 +98,10 @@ sequencer.render(&mut left[..], &mut right[..]);
     - [x] Pitch bend
     - [x] Tuning
 * __Effects__
-    - [ ] Reverb
-    - [ ] Chorus
+    - [x] Reverb
+    - [x] Chorus
 * __Other things__
     - [x] Standard MIDI file support
-    - [ ] Loop extension support
     - [x] Performace optimization
 
 
