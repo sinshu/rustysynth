@@ -37,6 +37,7 @@ mod volume_envelope;
 mod midifile;
 mod midifile_sequencer;
 
+mod chorus;
 mod reverb;
 
 pub use self::instrument::Instrument;

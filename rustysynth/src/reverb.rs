@@ -59,36 +59,108 @@ impl Reverb {
 
     pub(crate) fn new(sample_rate: i32) -> Self {
         let mut cfs_l: Vec<CombFilter> = Vec::new();
-        cfs_l.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_L1)));
-        cfs_l.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_L2)));
-        cfs_l.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_L3)));
-        cfs_l.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_L4)));
-        cfs_l.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_L5)));
-        cfs_l.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_L6)));
-        cfs_l.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_L7)));
-        cfs_l.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_L8)));
+        cfs_l.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_L1,
+        )));
+        cfs_l.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_L2,
+        )));
+        cfs_l.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_L3,
+        )));
+        cfs_l.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_L4,
+        )));
+        cfs_l.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_L5,
+        )));
+        cfs_l.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_L6,
+        )));
+        cfs_l.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_L7,
+        )));
+        cfs_l.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_L8,
+        )));
 
         let mut cfs_r: Vec<CombFilter> = Vec::new();
-        cfs_r.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_R1)));
-        cfs_r.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_R2)));
-        cfs_r.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_R3)));
-        cfs_r.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_R4)));
-        cfs_r.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_R5)));
-        cfs_r.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_R6)));
-        cfs_r.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_R7)));
-        cfs_r.push(CombFilter::new(Reverb::scale_tuning(sample_rate, Reverb::CF_TUNING_R8)));
+        cfs_r.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_R1,
+        )));
+        cfs_r.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_R2,
+        )));
+        cfs_r.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_R3,
+        )));
+        cfs_r.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_R4,
+        )));
+        cfs_r.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_R5,
+        )));
+        cfs_r.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_R6,
+        )));
+        cfs_r.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_R7,
+        )));
+        cfs_r.push(CombFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::CF_TUNING_R8,
+        )));
 
-        let mut apfs_l : Vec<AllPassFilter> = Vec::new();
-        apfs_l.push(AllPassFilter::new(Reverb::scale_tuning(sample_rate, Reverb::APF_TUNING_L1)));
-        apfs_l.push(AllPassFilter::new(Reverb::scale_tuning(sample_rate, Reverb::APF_TUNING_L2)));
-        apfs_l.push(AllPassFilter::new(Reverb::scale_tuning(sample_rate, Reverb::APF_TUNING_L3)));
-        apfs_l.push(AllPassFilter::new(Reverb::scale_tuning(sample_rate, Reverb::APF_TUNING_L4)));
+        let mut apfs_l: Vec<AllPassFilter> = Vec::new();
+        apfs_l.push(AllPassFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::APF_TUNING_L1,
+        )));
+        apfs_l.push(AllPassFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::APF_TUNING_L2,
+        )));
+        apfs_l.push(AllPassFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::APF_TUNING_L3,
+        )));
+        apfs_l.push(AllPassFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::APF_TUNING_L4,
+        )));
 
-        let mut apfs_r : Vec<AllPassFilter> = Vec::new();
-        apfs_r.push(AllPassFilter::new(Reverb::scale_tuning(sample_rate, Reverb::APF_TUNING_R1)));
-        apfs_r.push(AllPassFilter::new(Reverb::scale_tuning(sample_rate, Reverb::APF_TUNING_R2)));
-        apfs_r.push(AllPassFilter::new(Reverb::scale_tuning(sample_rate, Reverb::APF_TUNING_R3)));
-        apfs_r.push(AllPassFilter::new(Reverb::scale_tuning(sample_rate, Reverb::APF_TUNING_R4)));
+        let mut apfs_r: Vec<AllPassFilter> = Vec::new();
+        apfs_r.push(AllPassFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::APF_TUNING_R1,
+        )));
+        apfs_r.push(AllPassFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::APF_TUNING_R2,
+        )));
+        apfs_r.push(AllPassFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::APF_TUNING_R3,
+        )));
+        apfs_r.push(AllPassFilter::new(Reverb::scale_tuning(
+            sample_rate,
+            Reverb::APF_TUNING_R4,
+        )));
 
         for apf in apfs_l.iter_mut() {
             apf.set_feedback(0.5_f32);
@@ -144,7 +216,12 @@ impl Reverb {
         ((sample_rate as f64) / 44100_f64 * (tuning as f64)).round() as usize
     }
 
-    pub(crate) fn process(&mut self, input: &[f32], output_left: &mut [f32], output_right: &mut [f32]) {
+    pub(crate) fn process(
+        &mut self,
+        input: &[f32],
+        output_left: &mut [f32],
+        output_right: &mut [f32],
+    ) {
         let input_length = input.len();
         let output_left_length = output_left.len();
         let output_right_length = output_right.len();
@@ -263,7 +340,7 @@ impl CombFilter {
     fn process(&mut self, input_block: &[f32], output_block: &mut [f32]) {
         let buffer_length = self.buffer.len();
         let output_block_length = output_block.len();
-        
+
         let mut block_index: usize = 0;
         while block_index < output_block_length {
             if self.buffer_index == buffer_length {
