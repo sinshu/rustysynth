@@ -22,6 +22,16 @@ https://www.youtube.com/watch?v=o9rPTJIPmVk
 
 
 
+## Installation
+
+RustySynth is available on [crates.io](https://crates.io/crates/rustysynth):
+
+```
+cargo add rustysynth
+```
+
+
+
 ## Examples
 
 An example code to synthesize a simple chord:
