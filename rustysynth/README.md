@@ -19,7 +19,7 @@ An example code to synthesize a simple chord:
 ```rust
 // Load the SoundFont.
 let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
-let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
+let sound_font = Arc::new(SoundFont::new(&mut sf2).unwrap());
 
 // Create the synthesizer.
 let settings = SynthesizerSettings::new(44100);
@@ -44,11 +44,11 @@ Another example code to synthesize a MIDI file:
 ```rust
 // Load the SoundFont.
 let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
-let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
+let sound_font = Arc::new(SoundFont::new(&mut sf2).unwrap());
 
 // Load the MIDI file.
 let mut mid = File::open("flourish.mid").unwrap();
-let midi_file = Rc::new(MidiFile::new(&mut mid).unwrap());
+let midi_file = Arc::new(MidiFile::new(&mut mid).unwrap());
 
 // Create the MIDI file sequencer.
 let settings = SynthesizerSettings::new(44100);

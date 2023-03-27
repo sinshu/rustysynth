@@ -2,7 +2,7 @@
 
 use std::error::Error;
 use std::io::Read;
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::binary_reader::BinaryReader;
 use crate::instrument::Instrument;
@@ -16,7 +16,7 @@ use crate::soundfont_sampledata::SoundFontSampleData;
 pub struct SoundFont {
     pub(crate) info: SoundFontInfo,
     pub(crate) bits_per_sample: i32,
-    pub(crate) wave_data: Rc<Vec<i16>>,
+    pub(crate) wave_data: Arc<Vec<i16>>,
     pub(crate) sample_headers: Vec<SampleHeader>,
     pub(crate) presets: Vec<Preset>,
     pub(crate) instruments: Vec<Instrument>,
@@ -46,7 +46,7 @@ impl SoundFont {
         Ok(Self {
             info: info,
             bits_per_sample: 16,
-            wave_data: Rc::new(sample_data.wave_data),
+            wave_data: Arc::new(sample_data.wave_data),
             sample_headers: parameters.sample_headers,
             presets: parameters.presets,
             instruments: parameters.instruments,

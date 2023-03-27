@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::loop_mode::LoopMode;
 use crate::synthesizer_settings::SynthesizerSettings;
@@ -14,7 +14,7 @@ use crate::synthesizer_settings::SynthesizerSettings;
 pub(crate) struct Oscillator {
     synthesizer_sample_rate: i32,
 
-    data: Option<Rc<Vec<i16>>>,
+    data: Option<Arc<Vec<i16>>>,
     loop_mode: i32,
     sample_sample_rate: i32,
     start: i32,
@@ -58,7 +58,7 @@ impl Oscillator {
 
     pub(crate) fn start(
         &mut self,
-        data: &Rc<Vec<i16>>,
+        data: &Arc<Vec<i16>>,
         loop_mode: i32,
         sample_rate: i32,
         start: i32,
@@ -70,7 +70,7 @@ impl Oscillator {
         fine_tune: i32,
         scale_tuning: i32,
     ) {
-        self.data = Some(Rc::clone(data));
+        self.data = Some(Arc::clone(data));
         self.loop_mode = loop_mode;
         self.sample_sample_rate = sample_rate;
         self.start = start;

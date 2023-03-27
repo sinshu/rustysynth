@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use std::cmp;
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::midifile::Message;
 use crate::midifile::MidiFile;
@@ -11,7 +11,7 @@ use crate::synthesizer::Synthesizer;
 pub struct MidiFileSequencer {
     synthesizer: Synthesizer,
 
-    midi_file: Option<Rc<MidiFile>>,
+    midi_file: Option<Arc<MidiFile>>,
     play_loop: bool,
 
     block_wrote: usize,
@@ -39,8 +39,8 @@ impl MidiFileSequencer {
         }
     }
 
-    pub fn play(&mut self, midi_file: &Rc<MidiFile>, play_loop: bool) {
-        self.midi_file = Some(Rc::clone(midi_file));
+    pub fn play(&mut self, midi_file: &Arc<MidiFile>, play_loop: bool) {
+        self.midi_file = Some(Arc::clone(midi_file));
         self.play_loop = play_loop;
 
         self.block_wrote = self.synthesizer.block_size as usize;
