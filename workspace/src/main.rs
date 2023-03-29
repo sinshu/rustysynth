@@ -5,7 +5,7 @@ use rustysynth::Synthesizer;
 use rustysynth::SynthesizerSettings;
 use std::fs::File;
 use std::io::Write;
-use std::rc::Rc;
+use std::sync::Arc;
 
 fn main() {
     simple_chord();
@@ -15,7 +15,7 @@ fn main() {
 fn simple_chord() {
     // Load the SoundFont.
     let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
-    let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
+    let sound_font = Arc::new(SoundFont::new(&mut sf2).unwrap());
 
     // Create the synthesizer.
     let settings = SynthesizerSettings::new(44100);
@@ -41,11 +41,11 @@ fn simple_chord() {
 fn flourish() {
     // Load the SoundFont.
     let mut sf2 = File::open("TimGM6mb.sf2").unwrap();
-    let sound_font = Rc::new(SoundFont::new(&mut sf2).unwrap());
+    let sound_font = Arc::new(SoundFont::new(&mut sf2).unwrap());
 
     // Load the MIDI file.
     let mut mid = File::open("flourish.mid").unwrap();
-    let midi_file = Rc::new(MidiFile::new(&mut mid).unwrap());
+    let midi_file = Arc::new(MidiFile::new(&mut mid).unwrap());
 
     // Create the MIDI file sequencer.
     let settings = SynthesizerSettings::new(44100);

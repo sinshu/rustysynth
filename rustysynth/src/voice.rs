@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use std::f32::consts;
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::bi_quad_filter::BiQuadFilter;
 use crate::channel::Channel;
@@ -125,7 +125,7 @@ impl Voice {
 
     pub(crate) fn start(
         &mut self,
-        data: &Rc<Vec<i16>>,
+        data: &Arc<Vec<i16>>,
         region: &RegionPair,
         channel: i32,
         key: i32,

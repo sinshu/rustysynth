@@ -3,7 +3,7 @@
 use std::cmp;
 use std::collections::HashMap;
 use std::error::Error;
-use std::rc::Rc;
+use std::sync::Arc;
 
 use crate::array_math::ArrayMath;
 use crate::channel::Channel;
@@ -17,7 +17,7 @@ use crate::voice_collection::VoiceCollection;
 
 #[non_exhaustive]
 pub struct Synthesizer {
-    pub(crate) sound_font: Rc<SoundFont>,
+    pub(crate) sound_font: Arc<SoundFont>,
     pub(crate) sample_rate: i32,
     pub(crate) block_size: i32,
     pub(crate) maximum_polyphony: i32,
@@ -58,7 +58,7 @@ impl Synthesizer {
     pub const PERCUSSION_CHANNEL: i32 = 9;
 
     pub fn new(
-        sound_font: &Rc<SoundFont>,
+        sound_font: &Arc<SoundFont>,
         settings: &SynthesizerSettings,
     ) -> Result<Self, Box<dyn Error>> {
         settings.validate()?;
@@ -151,7 +151,7 @@ impl Synthesizer {
         };
 
         Ok(Self {
-            sound_font: Rc::clone(sound_font),
+            sound_font: Arc::clone(sound_font),
             sample_rate: settings.sample_rate,
             block_size: settings.block_size,
             maximum_polyphony: settings.maximum_polyphony,
