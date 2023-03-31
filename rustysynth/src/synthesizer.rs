@@ -275,7 +275,6 @@ impl Synthesizer {
 
                         match self.voices.request_new(instrument_region, channel) {
                             Some(value) => value.start(
-                                &self.sound_font.wave_data,
                                 &region_pair,
                                 channel,
                                 key,
@@ -375,7 +374,7 @@ impl Synthesizer {
     }
 
     fn render_block(&mut self) {
-        self.voices.process(&self.channels);
+        self.voices.process(&self.sound_font.wave_data, &self.channels);
 
         for t in 0..self.block_size as usize {
             self.block_left[t] = 0_f32;

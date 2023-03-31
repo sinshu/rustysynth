@@ -1,7 +1,5 @@
 #![allow(dead_code)]
 
-use std::sync::Arc;
-
 use crate::loop_mode::LoopMode;
 use crate::synthesizer_settings::SynthesizerSettings;
 
@@ -14,7 +12,6 @@ use crate::synthesizer_settings::SynthesizerSettings;
 pub(crate) struct Oscillator {
     synthesizer_sample_rate: i32,
 
-    data: Option<Arc<Vec<i16>>>,
     loop_mode: i32,
     sample_sample_rate: i32,
     start: i32,
@@ -40,7 +37,6 @@ impl Oscillator {
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self {
         Self {
             synthesizer_sample_rate: settings.sample_rate,
-            data: None,
             loop_mode: 0,
             sample_sample_rate: 0,
             start: 0,
@@ -58,7 +54,6 @@ impl Oscillator {
 
     pub(crate) fn start(
         &mut self,
-        data: &Arc<Vec<i16>>,
         loop_mode: i32,
         sample_rate: i32,
         start: i32,
@@ -70,7 +65,6 @@ impl Oscillator {
         fine_tune: i32,
         scale_tuning: i32,
     ) {
-        self.data = Some(Arc::clone(data));
         self.loop_mode = loop_mode;
         self.sample_sample_rate = sample_rate;
         self.start = start;
@@ -98,24 +92,23 @@ impl Oscillator {
         }
     }
 
-    pub(crate) fn process(&mut self, block: &mut [f32], pitch: f32) -> bool {
+    pub(crate) fn process(&mut self, data: &[i16], block: &mut [f32], pitch: f32) -> bool {
         let pitch_change = self.pitch_change_scale * (pitch - self.root_key as f32) + self.tune;
         let pitch_ratio = self.sample_rate_ratio * 2_f32.powf(pitch_change / 12_f32);
-        return self.fill_block(block, pitch_ratio as f64);
+        return self.fill_block(data, block, pitch_ratio as f64);
     }
 
-    fn fill_block(&mut self, block: &mut [f32], pitch_ratio: f64) -> bool {
+    fn fill_block(&mut self, data: &[i16], block: &mut [f32], pitch_ratio: f64) -> bool {
         let pitch_ratio_fp = (Oscillator::FRAC_UNIT as f64 * pitch_ratio) as i64;
 
         if self.looping {
-            return self.fill_block_continuous(block, pitch_ratio_fp);
+            return self.fill_block_continuous(data, block, pitch_ratio_fp);
         } else {
-            return self.fill_block_no_loop(block, pitch_ratio_fp);
+            return self.fill_block_no_loop(data, block, pitch_ratio_fp);
         }
     }
 
-    fn fill_block_no_loop(&mut self, block: &mut [f32], pitch_ratio_fp: i64) -> bool {
-        let data = &self.data.as_ref().unwrap()[..];
+    fn fill_block_no_loop(&mut self, data: &[i16], block: &mut [f32], pitch_ratio_fp: i64) -> bool {
         let block_length = block.len();
 
         for t in 0..block_length {
@@ -144,8 +137,7 @@ impl Oscillator {
         return true;
     }
 
-    fn fill_block_continuous(&mut self, block: &mut [f32], pitch_ratio_fp: i64) -> bool {
-        let data = &self.data.as_ref().unwrap()[..];
+    fn fill_block_continuous(&mut self, data: &[i16], block: &mut [f32], pitch_ratio_fp: i64) -> bool {
         let block_length = block.len();
 
         let end_loop_fp = (self.end_loop as i64) << Oscillator::FRAC_BITS;

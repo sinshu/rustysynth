@@ -69,7 +69,7 @@ impl VoiceCollection {
         return Some(self.voices[candidate].as_mut());
     }
 
-    pub(crate) fn process(&mut self, channels: &Vec<Channel>) {
+    pub(crate) fn process(&mut self, data: &[i16], channels: &Vec<Channel>) {
         let mut i: usize = 0;
 
         loop {
@@ -77,7 +77,7 @@ impl VoiceCollection {
                 return;
             }
 
-            if self.voices[i].as_mut().process(channels) {
+            if self.voices[i].as_mut().process(data, channels) {
                 i += 1;
             } else {
                 self.active_voice_count -= 1;

@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
 use std::f32::consts;
-use std::sync::Arc;
 
 use crate::bi_quad_filter::BiQuadFilter;
 use crate::channel::Channel;
@@ -125,7 +124,6 @@ impl Voice {
 
     pub(crate) fn start(
         &mut self,
-        data: &Arc<Vec<i16>>,
         region: &RegionPair,
         channel: i32,
         key: i32,
@@ -171,7 +169,7 @@ impl Voice {
         RegionEx::start_modulation_envelope(&mut self.mod_env, region, key, velocity);
         RegionEx::start_vibrato(&mut self.vib_lfo, region, key, velocity);
         RegionEx::start_modulation(&mut self.mod_lfo, region, key, velocity);
-        RegionEx::start_oscillator(&mut self.oscillator, data, region);
+        RegionEx::start_oscillator(&mut self.oscillator, region);
         self.filter.clear_buffer();
         self.filter.set_low_pass_filter(self.cutoff, self.resonance);
 
@@ -191,7 +189,7 @@ impl Voice {
         self.note_gain = 0_f32;
     }
 
-    pub(crate) fn process(&mut self, channels: &Vec<Channel>) -> bool {
+    pub(crate) fn process(&mut self, data: &[i16], channels: &Vec<Channel>) -> bool {
         if self.note_gain < SoundFontMath::NON_AUDIBLE {
             return false;
         }
@@ -214,7 +212,7 @@ impl Voice {
             + self.mod_env_to_pitch * self.mod_env.get_value();
         let channel_pitch_change = channel_info.get_tune() + channel_info.get_pitch_bend();
         let pitch = self.key as f32 + vib_pitch_change + mod_pitch_change + channel_pitch_change;
-        if !self.oscillator.process(&mut self.block[..], pitch) {
+        if !self.oscillator.process(data, &mut self.block[..], pitch) {
             return false;
         }
 

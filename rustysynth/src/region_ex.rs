@@ -1,7 +1,5 @@
 #![allow(dead_code)]
 
-use std::sync::Arc;
-
 use crate::lfo::Lfo;
 use crate::modulation_envelope::ModulationEnvelope;
 use crate::oscillator::Oscillator;
@@ -16,7 +14,6 @@ pub(crate) struct RegionEx {}
 impl RegionEx {
     pub(crate) fn start_oscillator(
         oscillator: &mut Oscillator,
-        data: &Arc<Vec<i16>>,
         region: &RegionPair,
     ) {
         let sample_rate = region.instrument.sample_sample_rate;
@@ -31,7 +28,6 @@ impl RegionEx {
         let scale_tuning = region.get_scale_tuning();
 
         oscillator.start(
-            data,
             loop_mode,
             sample_rate,
             start,
