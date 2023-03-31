@@ -137,7 +137,12 @@ impl Oscillator {
         return true;
     }
 
-    fn fill_block_continuous(&mut self, data: &[i16], block: &mut [f32], pitch_ratio_fp: i64) -> bool {
+    fn fill_block_continuous(
+        &mut self,
+        data: &[i16],
+        block: &mut [f32],
+        pitch_ratio_fp: i64,
+    ) -> bool {
         let block_length = block.len();
 
         let end_loop_fp = (self.end_loop as i64) << Oscillator::FRAC_BITS;

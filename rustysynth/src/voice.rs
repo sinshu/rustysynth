@@ -122,13 +122,7 @@ impl Voice {
         }
     }
 
-    pub(crate) fn start(
-        &mut self,
-        region: &RegionPair,
-        channel: i32,
-        key: i32,
-        velocity: i32,
-    ) {
+    pub(crate) fn start(&mut self, region: &RegionPair, channel: i32, key: i32, velocity: i32) {
         self.exclusive_class = region.get_exclusive_class();
         self.channel = channel;
         self.key = key;

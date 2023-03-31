@@ -274,12 +274,7 @@ impl Synthesizer {
                         let region_pair = RegionPair::new(preset_region, instrument_region);
 
                         match self.voices.request_new(instrument_region, channel) {
-                            Some(value) => value.start(
-                                &region_pair,
-                                channel,
-                                key,
-                                velocity,
-                            ),
+                            Some(value) => value.start(&region_pair, channel, key, velocity),
                             None => (),
                         }
                     }
@@ -374,7 +369,8 @@ impl Synthesizer {
     }
 
     fn render_block(&mut self) {
-        self.voices.process(&self.sound_font.wave_data, &self.channels);
+        self.voices
+            .process(&self.sound_font.wave_data, &self.channels);
 
         for t in 0..self.block_size as usize {
             self.block_left[t] = 0_f32;
