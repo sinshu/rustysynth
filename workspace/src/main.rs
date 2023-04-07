@@ -6,9 +6,9 @@ use rustysynth::SynthesizerSettings;
 use std::fs::File;
 use std::io::Write;
 use std::sync::Arc;
+use std::time::Instant;
 
 fn main() {
-    simple_chord();
     flourish();
 }
 
@@ -48,7 +48,8 @@ fn flourish() {
     let midi_file = Arc::new(MidiFile::new(&mut mid).unwrap());
 
     // Create the MIDI file sequencer.
-    let settings = SynthesizerSettings::new(44100);
+    let mut settings = SynthesizerSettings::new(44100);
+    settings.enable_reverb_and_chorus = false;
     let synthesizer = Synthesizer::new(&sound_font, &settings).unwrap();
     let mut sequencer = MidiFileSequencer::new(synthesizer);
 
@@ -61,7 +62,10 @@ fn flourish() {
     let mut right: Vec<f32> = vec![0_f32; sample_count];
 
     // Render the waveform.
+    let start = Instant::now();
     sequencer.render(&mut left[..], &mut right[..]);
+    let end = start.elapsed();
+    println!("Time: {}.{:03}", end.as_secs(), end.subsec_nanos() / 1_000_000);
 
     // Write the waveform to the file.
     write_pcm(&left[..], &right[..], "flourish.pcm");
