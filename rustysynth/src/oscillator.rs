@@ -52,6 +52,7 @@ impl Oscillator {
         }
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn start(
         &mut self,
         loop_mode: i32,
