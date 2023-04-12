@@ -256,9 +256,10 @@ impl Synthesizer {
                 } else {
                     128 << 16
                 };
-                match self.preset_lookup.get(&gm_preset_id) {
-                    Some(value) => preset = *value,
-                    None => (), // No corresponding preset was found. Use the default one...
+
+                // If no corresponding preset was found. Use the default one...
+                if let Some(value) = self.preset_lookup.get(&gm_preset_id) {
+                    preset = *value
                 }
             }
         }
@@ -273,9 +274,8 @@ impl Synthesizer {
                     if instrument_region.contains(key, velocity) {
                         let region_pair = RegionPair::new(preset_region, instrument_region);
 
-                        match self.voices.request_new(instrument_region, channel) {
-                            Some(value) => value.start(&region_pair, channel, key, velocity),
-                            None => (),
+                        if let Some(value) = self.voices.request_new(instrument_region, channel) {
+                            value.start(&region_pair, channel, key, velocity)
                         }
                     }
                 }
