@@ -78,7 +78,7 @@ impl BinaryReader {
 
         for i in 0..4 {
             let value = data[i];
-            if !(32 <= value && value <= 126) {
+            if !(32..=126).contains(&value) {
                 data[i] = 63; // '?'
             }
         }

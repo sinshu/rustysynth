@@ -33,7 +33,7 @@ impl SynthesizerSettings {
     }
 
     fn check_sample_rate(value: i32) -> Result<(), Box<dyn Error>> {
-        if !(16000 <= value && value <= 192000) {
+        if !(16_000..=192_000).contains(&value) {
             return Err("The sample rate must be between 16000 and 192000.".into());
         }
 
@@ -41,7 +41,7 @@ impl SynthesizerSettings {
     }
 
     fn check_block_size(value: i32) -> Result<(), Box<dyn Error>> {
-        if !(8 <= value && value <= 1024) {
+        if !(8..=1024).contains(&value) {
             return Err("The block size must be between 8 and 1024.".into());
         }
 
@@ -49,7 +49,7 @@ impl SynthesizerSettings {
     }
 
     fn check_maximum_polyphony(value: i32) -> Result<(), Box<dyn Error>> {
-        if !(8 <= value && value <= 256) {
+        if !(8..=256).contains(&value) {
             return Err("The maximum number of polyphony must be between 8 and 256.".into());
         }
 
