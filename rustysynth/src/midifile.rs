@@ -199,8 +199,8 @@ impl MidiFile {
     }
 
     fn merge_tracks(
-        message_lists: &Vec<Vec<Message>>,
-        tick_lists: &Vec<Vec<i32>>,
+        message_lists: &[Vec<Message>],
+        tick_lists: &[Vec<i32>],
         resolution: i32,
     ) -> (Vec<Message>, Vec<f64>) {
         let mut merged_messages: Vec<Message> = Vec::new();

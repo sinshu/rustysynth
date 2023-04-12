@@ -15,7 +15,7 @@ impl Zone {
         }
     }
 
-    fn new(info: &ZoneInfo, generators: &Vec<Generator>) -> Self {
+    fn new(info: &ZoneInfo, generators: &[Generator]) -> Self {
         let mut segment: Vec<Generator> = Vec::new();
 
         for i in 0..info.generator_count {
@@ -28,8 +28,8 @@ impl Zone {
     }
 
     pub(crate) fn create(
-        infos: &Vec<ZoneInfo>,
-        generators: &Vec<Generator>,
+        infos: &[ZoneInfo],
+        generators: &[Generator],
     ) -> Result<Vec<Zone>, Box<dyn Error>> {
         if infos.len() <= 1 {
             return Err("No valid zone was found.".into());

@@ -16,8 +16,8 @@ pub struct Instrument {
 impl Instrument {
     fn new(
         info: &InstrumentInfo,
-        zones: &Vec<Zone>,
-        samples: &Vec<SampleHeader>,
+        zones: &[Zone],
+        samples: &[SampleHeader],
     ) -> Result<Self, Box<dyn Error>> {
         let name = info.name.clone();
 
@@ -35,9 +35,9 @@ impl Instrument {
     }
 
     pub(crate) fn create(
-        infos: &Vec<InstrumentInfo>,
-        zones: &Vec<Zone>,
-        samples: &Vec<SampleHeader>,
+        infos: &[InstrumentInfo],
+        zones: &[Zone],
+        samples: &[SampleHeader],
     ) -> Result<Vec<Instrument>, Box<dyn Error>> {
         if infos.len() <= 1 {
             return Err("No valid instrument was found.".into());

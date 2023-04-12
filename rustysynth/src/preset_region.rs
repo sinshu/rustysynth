@@ -28,7 +28,7 @@ impl PresetRegion {
         name: &String,
         global: &Zone,
         local: &Zone,
-        samples: &Vec<Instrument>,
+        samples: &[Instrument],
     ) -> Result<Self, Box<dyn Error>> {
         let mut gs: [i16; GeneratorType::COUNT] = [0; GeneratorType::COUNT];
         gs[GeneratorType::KEY_RANGE as usize] = 0x7F00;
@@ -55,7 +55,7 @@ impl PresetRegion {
     pub(crate) fn create(
         name: &String,
         zones: &[Zone],
-        instruments: &Vec<Instrument>,
+        instruments: &[Instrument],
     ) -> Result<Vec<PresetRegion>, Box<dyn Error>> {
         // Is the first one the global zone?
         if zones[0].generators.is_empty()
