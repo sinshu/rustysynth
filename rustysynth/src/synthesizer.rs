@@ -223,7 +223,7 @@ impl Synthesizer {
         }
 
         for i in 0..self.voices.active_voice_count as usize {
-            let voice = self.voices.voices[i].as_mut();
+            let voice = &mut self.voices.voices[i];
             if voice.channel == channel && voice.key == key {
                 voice.end();
             }
@@ -296,14 +296,14 @@ impl Synthesizer {
     pub fn note_off_all_channel(&mut self, channel: i32, immediate: bool) {
         if immediate {
             for i in 0..self.voices.active_voice_count as usize {
-                let voice = self.voices.voices[i].as_mut();
+                let voice = &mut self.voices.voices[i];
                 if voice.channel == channel {
                     voice.kill();
                 }
             }
         } else {
             for i in 0..self.voices.active_voice_count as usize {
-                let voice = self.voices.voices[i].as_mut();
+                let voice = &mut self.voices.voices[i];
                 if voice.channel == channel {
                     voice.end();
                 }
@@ -378,7 +378,7 @@ impl Synthesizer {
         }
 
         for i in 0..self.voices.active_voice_count as usize {
-            let voice = self.voices.voices[i].as_ref();
+            let voice = &self.voices.voices[i];
             let previous_gain_left = self.master_volume * voice.previous_mix_gain_left;
             let current_gain_left = self.master_volume * voice.current_mix_gain_left;
             Synthesizer::write_block(
@@ -410,7 +410,7 @@ impl Synthesizer {
                 chorus_input_right[i] = 0_f32;
             }
             for i in 0..self.voices.active_voice_count as usize {
-                let voice = self.voices.voices[i].as_ref();
+                let voice = &self.voices.voices[i];
                 let previous_gain_left = voice.previous_chorus_send * voice.previous_mix_gain_left;
                 let current_gain_left = voice.current_chorus_send * voice.current_mix_gain_left;
                 Synthesizer::write_block(
@@ -456,7 +456,7 @@ impl Synthesizer {
                 reverb_input[i] = 0_f32;
             }
             for i in 0..self.voices.active_voice_count as usize {
-                let voice = self.voices.voices[i].as_ref();
+                let voice = &self.voices.voices[i];
                 let previous_gain = reverb.get_input_gain()
                     * voice.previous_reverb_send
                     * (voice.previous_mix_gain_left + voice.previous_mix_gain_right);
