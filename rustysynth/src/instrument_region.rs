@@ -102,12 +102,7 @@ impl InstrumentRegion {
             let count = zones.len() - 1;
             let mut regions: Vec<InstrumentRegion> = Vec::new();
             for i in 0..count {
-                regions.push(InstrumentRegion::new(
-                    name,
-                    global,
-                    &zones[i + 1],
-                    &samples,
-                )?);
+                regions.push(InstrumentRegion::new(name, global, &zones[i + 1], samples)?);
             }
 
             Ok(regions)
@@ -120,7 +115,7 @@ impl InstrumentRegion {
                     name,
                     &Zone::empty(),
                     &zones[i],
-                    &samples,
+                    samples,
                 )?);
             }
 

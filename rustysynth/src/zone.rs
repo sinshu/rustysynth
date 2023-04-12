@@ -40,7 +40,7 @@ impl Zone {
 
         let mut zones: Vec<Zone> = Vec::new();
         for i in 0..count {
-            zones.push(Zone::new(&infos[i], &generators));
+            zones.push(Zone::new(&infos[i], generators));
         }
 
         Ok(zones)

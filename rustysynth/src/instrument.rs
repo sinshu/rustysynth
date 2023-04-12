@@ -29,7 +29,7 @@ impl Instrument {
         let span_start = info.zone_start_index as usize;
         let span_end = span_start + zone_count as usize;
         let zone_span = &zones[span_start..span_end];
-        let regions = InstrumentRegion::create(&name, zone_span, &samples)?;
+        let regions = InstrumentRegion::create(&name, zone_span, samples)?;
 
         Ok(Self { name, regions })
     }
@@ -48,7 +48,7 @@ impl Instrument {
 
         let mut instruments: Vec<Instrument> = Vec::new();
         for i in 0..count {
-            instruments.push(Instrument::new(&infos[i], &zones, &samples)?);
+            instruments.push(Instrument::new(&infos[i], zones, samples)?);
         }
 
         Ok(instruments)

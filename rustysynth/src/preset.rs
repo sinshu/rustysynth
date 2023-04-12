@@ -34,7 +34,7 @@ impl Preset {
         let span_start = info.zone_start_index as usize;
         let span_end = span_start + zone_count as usize;
         let zone_span = &zones[span_start..span_end];
-        let regions = PresetRegion::create(&name, zone_span, &instruments)?;
+        let regions = PresetRegion::create(&name, zone_span, instruments)?;
 
         Ok(Self {
             name,
@@ -61,7 +61,7 @@ impl Preset {
 
         let mut presets: Vec<Preset> = Vec::new();
         for i in 0..count {
-            presets.push(Preset::new(&infos[i], &zones, &instruments)?);
+            presets.push(Preset::new(&infos[i], zones, instruments)?);
         }
 
         Ok(presets)
