@@ -76,10 +76,9 @@ impl BinaryReader {
         let mut data: [u8; 4] = [0; 4];
         reader.read_exact(&mut data)?;
 
-        for i in 0..4 {
-            let value = data[i];
-            if !(32..=126).contains(&value) {
-                data[i] = 63; // '?'
+        for value in &mut data {
+            if !(32..=126).contains(value) {
+                *value = 63; // '?'
             }
         }
 

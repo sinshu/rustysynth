@@ -158,11 +158,11 @@ impl Reverb {
         let output_left_length = output_left.len();
         let output_right_length = output_right.len();
 
-        for i in 0..output_left_length {
-            output_left[i] = 0_f32;
+        for lsample in output_left.iter_mut().take(output_left_length) {
+            *lsample = 0_f32;
         }
-        for i in 0..output_right_length {
-            output_right[i] = 0_f32;
+        for rsample in output_right.iter_mut().take(output_right_length) {
+            *rsample = 0_f32;
         }
 
         for cf in self.cfs_l.iter_mut() {

@@ -60,8 +60,8 @@ impl Preset {
         let count = infos.len() - 1;
 
         let mut presets: Vec<Preset> = Vec::new();
-        for i in 0..count {
-            presets.push(Preset::new(&infos[i], zones, instruments)?);
+        for info in infos.iter().take(count) {
+            presets.push(Preset::new(info, zones, instruments)?);
         }
 
         Ok(presets)

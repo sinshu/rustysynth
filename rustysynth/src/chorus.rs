@@ -23,9 +23,9 @@ impl Chorus {
 
         let mut delay_table = vec![0_f32; ((sample_rate as f64) / frequency).round() as usize];
         let delay_table_length = delay_table.len();
-        for t in 0..delay_table_length {
+        for (t, input) in delay_table.iter_mut().enumerate().take(delay_table_length) {
             let phase = 2.0 * consts::PI * (t as f64) / (delay_table_length as f64);
-            delay_table[t] = ((sample_rate as f64) * (delay + depth * phase.sin())) as f32;
+            *input = ((sample_rate as f64) * (delay + depth * phase.sin())) as f32;
         }
 
         let buffer_index_l: usize = 0;

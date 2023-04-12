@@ -47,8 +47,8 @@ impl Instrument {
         let count = infos.len() - 1;
 
         let mut instruments: Vec<Instrument> = Vec::new();
-        for i in 0..count {
-            instruments.push(Instrument::new(&infos[i], zones, samples)?);
+        for info in infos.iter().take(count) {
+            instruments.push(Instrument::new(info, zones, samples)?);
         }
 
         Ok(instruments)

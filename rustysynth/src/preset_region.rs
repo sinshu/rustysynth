@@ -76,13 +76,8 @@ impl PresetRegion {
             // No global zone.
             let count = zones.len();
             let mut regions: Vec<PresetRegion> = Vec::new();
-            for i in 0..count {
-                regions.push(PresetRegion::new(
-                    name,
-                    &Zone::empty(),
-                    &zones[i],
-                    instruments,
-                )?);
+            for zone in zones.iter().take(count) {
+                regions.push(PresetRegion::new(name, &Zone::empty(), zone, instruments)?);
             }
 
             Ok(regions)

@@ -39,8 +39,8 @@ impl Zone {
         let count = infos.len() - 1;
 
         let mut zones: Vec<Zone> = Vec::new();
-        for i in 0..count {
-            zones.push(Zone::new(&infos[i], generators));
+        for info in infos.iter().take(count) {
+            zones.push(Zone::new(info, generators));
         }
 
         Ok(zones)

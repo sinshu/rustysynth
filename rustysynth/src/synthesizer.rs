@@ -452,8 +452,8 @@ impl Synthesizer {
             let reverb_input = self.reverb_input.as_mut().unwrap();
             let reverb_output_left = self.reverb_output_left.as_mut().unwrap();
             let reverb_output_right = self.reverb_output_right.as_mut().unwrap();
-            for i in 0..self.block_size as usize {
-                reverb_input[i] = 0_f32;
+            for input in reverb_input.iter_mut().take(self.block_size as usize) {
+                *input = 0_f32;
             }
             for i in 0..self.voices.active_voice_count as usize {
                 let voice = &self.voices.voices[i];
