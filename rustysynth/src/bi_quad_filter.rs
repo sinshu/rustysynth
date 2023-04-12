@@ -23,7 +23,7 @@ pub(crate) struct BiQuadFilter {
 }
 
 impl BiQuadFilter {
-    const RESONANCE_PEAK_OFFSET: f32 = 1_f32 - 1_f32 / 1.41421356237_f32;
+    const RESONANCE_PEAK_OFFSET: f32 = 1_f32 - 1_f32 / core::f32::consts::SQRT_2;
 
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self {
         Self {
