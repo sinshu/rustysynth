@@ -58,7 +58,7 @@ impl PresetRegion {
         instruments: &Vec<Instrument>,
     ) -> Result<Vec<PresetRegion>, Box<dyn Error>> {
         // Is the first one the global zone?
-        if zones[0].generators.len() == 0
+        if zones[0].generators.is_empty()
             || zones[0].generators.last().unwrap().generator_type != GeneratorType::INSTRUMENT
         {
             // The first one is the global zone.
