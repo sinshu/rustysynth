@@ -13,19 +13,19 @@ impl SoundFontMath {
 
     pub(crate) fn max(x: f32, y: f32) -> f32 {
         if x > y {
-            return x;
+            x
         } else {
-            return y;
+            y
         }
     }
 
     pub(crate) fn clamp(value: f32, min: f32, max: f32) -> f32 {
         if value < min {
-            return min;
+            min
         } else if value > max {
-            return max;
+            max
         } else {
-            return value;
+            value
         }
     }
 
@@ -55,9 +55,9 @@ impl SoundFontMath {
 
     pub(crate) fn exp_cutoff(x: f64) -> f64 {
         if x < SoundFontMath::LOG_NON_AUDIBLE as f64 {
-            return 0_f64;
+            0_f64
         } else {
-            return x.exp();
+            x.exp()
         }
     }
 }

@@ -98,7 +98,7 @@ impl PresetRegion {
         let contains_key = self.get_key_range_start() <= key && key <= self.get_key_range_end();
         let contains_velocity = self.get_velocity_range_start() <= velocity
             && velocity <= self.get_velocity_range_end();
-        return contains_key && contains_velocity;
+        contains_key && contains_velocity
     }
 
     pub fn get_modulation_lfo_to_pitch(&self) -> i32 {

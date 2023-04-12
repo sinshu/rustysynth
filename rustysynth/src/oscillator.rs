@@ -95,16 +95,16 @@ impl Oscillator {
     pub(crate) fn process(&mut self, data: &[i16], block: &mut [f32], pitch: f32) -> bool {
         let pitch_change = self.pitch_change_scale * (pitch - self.root_key as f32) + self.tune;
         let pitch_ratio = self.sample_rate_ratio * 2_f32.powf(pitch_change / 12_f32);
-        return self.fill_block(data, block, pitch_ratio as f64);
+        self.fill_block(data, block, pitch_ratio as f64)
     }
 
     fn fill_block(&mut self, data: &[i16], block: &mut [f32], pitch_ratio: f64) -> bool {
         let pitch_ratio_fp = (Oscillator::FRAC_UNIT as f64 * pitch_ratio) as i64;
 
         if self.looping {
-            return self.fill_block_continuous(data, block, pitch_ratio_fp);
+            self.fill_block_continuous(data, block, pitch_ratio_fp)
         } else {
-            return self.fill_block_no_loop(data, block, pitch_ratio_fp);
+            self.fill_block_no_loop(data, block, pitch_ratio_fp)
         }
     }
 
@@ -134,7 +134,7 @@ impl Oscillator {
             self.position_fp += pitch_ratio_fp;
         }
 
-        return true;
+        true
     }
 
     fn fill_block_continuous(
@@ -171,6 +171,6 @@ impl Oscillator {
             self.position_fp += pitch_ratio_fp;
         }
 
-        return true;
+        true
     }
 }
