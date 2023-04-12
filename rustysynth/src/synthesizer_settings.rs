@@ -17,7 +17,7 @@ impl SynthesizerSettings {
 
     pub fn new(sample_rate: i32) -> Self {
         Self {
-            sample_rate: sample_rate,
+            sample_rate,
             block_size: SynthesizerSettings::DEFAULT_BLOCK_SIZE,
             maximum_polyphony: SynthesizerSettings::DEFAULT_MAXIMUM_POLYPHONY,
             enable_reverb_and_chorus: SynthesizerSettings::DEFAULT_ENABLE_REVERB_AND_CHORUS,

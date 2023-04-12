@@ -18,8 +18,8 @@ impl Generator {
         let value = BinaryReader::read_u16(reader)?;
 
         Ok(Self {
-            generator_type: generator_type,
-            value: value,
+            generator_type,
+            value,
         })
     }
 

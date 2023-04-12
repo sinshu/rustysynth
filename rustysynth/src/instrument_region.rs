@@ -75,7 +75,7 @@ impl InstrumentRegion {
         let sample = &samples[id];
 
         Ok(Self {
-            gs: gs,
+            gs,
             sample_start: sample.start,
             sample_end: sample.end,
             sample_start_loop: sample.start_loop,

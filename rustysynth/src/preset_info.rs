@@ -28,14 +28,14 @@ impl PresetInfo {
         let morphology = BinaryReader::read_i32(reader)?;
 
         Ok(Self {
-            name: name,
-            patch_number: patch_number,
-            bank_number: bank_number,
-            zone_start_index: zone_start_index,
+            name,
+            patch_number,
+            bank_number,
+            zone_start_index,
             zone_end_index: 0,
-            library: library,
-            genre: genre,
-            morphology: morphology,
+            library,
+            genre,
+            morphology,
         })
     }
 

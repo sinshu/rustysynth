@@ -23,7 +23,7 @@ impl Message {
         Self {
             channel: status & 0x0F,
             command: status & 0xF0,
-            data1: data1,
+            data1,
             data2: 0,
         }
     }
@@ -32,8 +32,8 @@ impl Message {
         Self {
             channel: status & 0x0F,
             command: status & 0xF0,
-            data1: data1,
-            data2: data2,
+            data1,
+            data2,
         }
     }
 
@@ -107,10 +107,7 @@ impl MidiFile {
 
         let (messages, times) = MidiFile::merge_tracks(&message_lists, &tick_lists, resolution);
 
-        Ok(Self {
-            messages: messages,
-            times: times,
-        })
+        Ok(Self { messages, times })
     }
 
     fn discard_data<R: Read>(reader: &mut R) -> Result<(), Box<dyn Error>> {

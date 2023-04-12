@@ -18,8 +18,8 @@ impl InstrumentInfo {
         let zone_start_index = BinaryReader::read_u16(reader)? as i32;
 
         Ok(Self {
-            name: name,
-            zone_start_index: zone_start_index,
+            name,
+            zone_start_index,
             zone_end_index: 0,
         })
     }

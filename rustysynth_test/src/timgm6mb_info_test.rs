@@ -1,12 +1,11 @@
 #![allow(unused_imports)]
 
+use rustysynth::SoundFont;
 use std::fs::File;
 use std::path::PathBuf;
-use rustysynth::SoundFont;
 
 #[test]
-fn soundfont_info()
-{
+fn soundfont_info() {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
     path.push("TimGM6mb.sf2");
@@ -33,8 +32,7 @@ fn soundfont_info()
     assert_eq!(sound_font.get_wave_data().len(), 2882168);
 
     let mut sum: i32 = 0;
-    for value in sound_font.get_wave_data().iter()
-    {
+    for value in sound_font.get_wave_data().iter() {
         sum += *value as i32;
     }
     assert_eq!(sum, 713099516)

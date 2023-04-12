@@ -49,10 +49,7 @@ impl PresetRegion {
             );
         }
 
-        Ok(Self {
-            gs: gs,
-            instrument: id,
-        })
+        Ok(Self { gs, instrument: id })
     }
 
     pub(crate) fn create(

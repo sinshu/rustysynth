@@ -28,7 +28,7 @@ impl MidiFileSequencer {
         let block_size = synthesizer.block_size;
 
         Self {
-            synthesizer: synthesizer,
+            synthesizer,
             midi_file: None,
             play_loop: false,
             block_wrote: 0,

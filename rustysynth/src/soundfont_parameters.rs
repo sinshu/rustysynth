@@ -123,9 +123,9 @@ impl SoundFontParameters {
         let presets = Preset::create(&preset_infos, &preset_zones, &instruments)?;
 
         Ok(Self {
-            sample_headers: sample_headers,
-            presets: presets,
-            instruments: instruments,
+            sample_headers,
+            presets,
+            instruments,
         })
     }
 }

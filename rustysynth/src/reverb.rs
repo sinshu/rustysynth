@@ -171,10 +171,10 @@ impl Reverb {
         }
 
         let mut reverb = Reverb {
-            cfs_l: cfs_l,
-            cfs_r: cfs_r,
-            apfs_l: apfs_l,
-            apfs_r: apfs_r,
+            cfs_l,
+            cfs_r,
+            apfs_l,
+            apfs_r,
             gain: 0_f32,
             room_size: 0_f32,
             room_size1: 0_f32,

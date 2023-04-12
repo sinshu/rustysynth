@@ -17,8 +17,8 @@ impl ZoneInfo {
         let modulator_index = BinaryReader::read_u16(reader)? as i32;
 
         Ok(Self {
-            generator_index: generator_index,
-            modulator_index: modulator_index,
+            generator_index,
+            modulator_index,
             generator_count: 0,
             modulator_count: 0,
         })

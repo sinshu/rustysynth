@@ -37,13 +37,13 @@ impl Preset {
         let regions = PresetRegion::create(&name, zone_span, &instruments)?;
 
         Ok(Self {
-            name: name,
+            name,
             patch_number: info.patch_number,
             bank_number: info.bank_number,
             library: info.library,
             genre: info.genre,
             morphology: info.morphology,
-            regions: regions,
+            regions,
         })
     }
 

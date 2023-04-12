@@ -145,17 +145,17 @@ impl SoundFontInfo {
         };
 
         Ok(Self {
-            version: version,
-            target_sound_engine: target_sound_engine,
-            bank_name: bank_name,
-            rom_name: rom_name,
-            rom_version: rom_version,
-            creation_date: creation_date,
-            author: author,
-            target_product: target_product,
-            copyright: copyright,
-            comments: comments,
-            tools: tools,
+            version,
+            target_sound_engine,
+            bank_name,
+            rom_name,
+            rom_version,
+            creation_date,
+            author,
+            target_product,
+            copyright,
+            comments,
+            tools,
         })
     }
 

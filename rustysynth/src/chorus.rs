@@ -35,13 +35,13 @@ impl Chorus {
         let delay_table_index_r: usize = delay_table_length / 4;
 
         Self {
-            buffer_l: buffer_l,
-            buffer_r: buffer_r,
-            delay_table: delay_table,
-            buffer_index_l: buffer_index_l,
-            buffer_index_r: buffer_index_r,
-            delay_table_index_l: delay_table_index_l,
-            delay_table_index_r: delay_table_index_r,
+            buffer_l,
+            buffer_r,
+            delay_table,
+            buffer_index_l,
+            buffer_index_r,
+            delay_table_index_l,
+            delay_table_index_r,
         }
     }
 

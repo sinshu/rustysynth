@@ -1,14 +1,13 @@
 #![allow(unused_imports)]
 
+use rustysynth::SoundFont;
 use std::fs::File;
 use std::path::PathBuf;
-use rustysynth::SoundFont;
 
 use crate::sample_util;
 
 #[test]
-fn samples()
-{
+fn samples() {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
     path.push("GeneralUser GS MuseScore v1.442.sf2");
@@ -299,59 +298,59 @@ fn samples()
     let values: [i32; 7] = [1382508, 1383591, 1383323, 1383583, 44100, 60, 0];
     sample_util::check(&sf.get_sample_headers()[70], &values);
 
-    // French Horn D#6    
+    // French Horn D#6
     let values: [i32; 7] = [1383623, 1384048, 1384033, 1384043, 24891, 60, 0];
     sample_util::check(&sf.get_sample_headers()[71], &values);
 
-    // French Horn D#4    
+    // French Horn D#4
     let values: [i32; 7] = [1384080, 1389467, 1389409, 1389462, 32984, 60, 0];
     sample_util::check(&sf.get_sample_headers()[72], &values);
 
-    // FrenchHrn A#3-43   
+    // FrenchHrn A#3-43
     let values: [i32; 7] = [1389499, 1392876, 1392801, 1392871, 32632, 60, 0];
     sample_util::check(&sf.get_sample_headers()[73], &values);
 
-    // French Horn F3     
+    // French Horn F3
     let values: [i32; 7] = [1392908, 1397959, 1397861, 1397954, 32479, 60, 0];
     sample_util::check(&sf.get_sample_headers()[74], &values);
 
-    // French Horn C3     
+    // French Horn C3
     let values: [i32; 7] = [1397991, 1406330, 1406203, 1406325, 31920, 60, 0];
     sample_util::check(&sf.get_sample_headers()[75], &values);
 
-    // French Horn F2     
+    // French Horn F2
     let values: [i32; 7] = [1406362, 1410815, 1410633, 1410810, 30908, 60, 0];
     sample_util::check(&sf.get_sample_headers()[76], &values);
 
-    // French Horn D2     
+    // French Horn D2
     let values: [i32; 7] = [1410847, 1415099, 1414890, 1415094, 29954, 60, 0];
     sample_util::check(&sf.get_sample_headers()[77], &values);
 
-    // Fr Horn mf D#6     
+    // Fr Horn mf D#6
     let values: [i32; 7] = [1415131, 1415493, 1415478, 1415488, 24891, 60, 0];
     sample_util::check(&sf.get_sample_headers()[78], &values);
 
-    // Fr Horn mf D#4     
+    // Fr Horn mf D#4
     let values: [i32; 7] = [1415525, 1420379, 1420330, 1420374, 27385, 60, 0];
     sample_util::check(&sf.get_sample_headers()[79], &values);
 
-    // FrHorn mf A#3-41   
+    // FrHorn mf A#3-41
     let values: [i32; 7] = [1420411, 1426368, 1426304, 1426363, 27507, 60, 0];
     sample_util::check(&sf.get_sample_headers()[80], &values);
 
-    // FrHornmf F3 -44    
+    // FrHornmf F3 -44
     let values: [i32; 7] = [1426400, 1430277, 1430193, 1430272, 27592, 60, 0];
     sample_util::check(&sf.get_sample_headers()[81], &values);
 
-    // Fr Horn mf  C3     
+    // Fr Horn mf  C3
     let values: [i32; 7] = [1430309, 1433942, 1433831, 1433937, 27734, 60, 0];
     sample_util::check(&sf.get_sample_headers()[82], &values);
 
-    // Fr Horn mf G2      
+    // Fr Horn mf G2
     let values: [i32; 7] = [1433974, 1439217, 1439071, 1439212, 27636, 60, 0];
     sample_util::check(&sf.get_sample_headers()[83], &values);
 
-    // FrHornmfD2 -52     
+    // FrHornmfD2 -52
     let values: [i32; 7] = [1439249, 1446958, 1446764, 1446953, 27752, 60, 0];
     sample_util::check(&sf.get_sample_headers()[84], &values);
 

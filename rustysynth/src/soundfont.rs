@@ -44,7 +44,7 @@ impl SoundFont {
         let parameters = SoundFontParameters::new(reader)?;
 
         Ok(Self {
-            info: info,
+            info,
             bits_per_sample: 16,
             wave_data: Arc::new(sample_data.wave_data),
             sample_headers: parameters.sample_headers,

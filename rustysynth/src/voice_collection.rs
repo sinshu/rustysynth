@@ -19,7 +19,7 @@ impl VoiceCollection {
         }
 
         Self {
-            voices: voices,
+            voices,
             active_voice_count: 0,
         }
     }

@@ -1,14 +1,14 @@
 #![allow(unused_imports)]
 
+use rustysynth::SoundFont;
 use std::fs::File;
 use std::path::PathBuf;
-use rustysynth::SoundFont;
 
 use crate::instrument_util;
 
 #[test]
-fn regions()
-{
+#[rustfmt::skip]
+fn regions() {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
     path.push("TimGM6mb.sf2");

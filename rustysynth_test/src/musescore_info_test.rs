@@ -1,12 +1,11 @@
 #![allow(unused_imports)]
 
+use rustysynth::SoundFont;
 use std::fs::File;
 use std::path::PathBuf;
-use rustysynth::SoundFont;
 
 #[test]
-fn soundfont_info()
-{
+fn soundfont_info() {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
     path.push("GeneralUser GS MuseScore v1.442.sf2");
@@ -17,7 +16,10 @@ fn soundfont_info()
     assert_eq!(info.get_version().get_major(), 2);
     assert_eq!(info.get_version().get_minor(), 1);
     assert_eq!(info.get_target_sound_engine(), "E-mu 10K2");
-    assert_eq!(info.get_bank_name(), "GeneralUser GS MuseScore version 1.442");
+    assert_eq!(
+        info.get_bank_name(),
+        "GeneralUser GS MuseScore version 1.442"
+    );
     assert_eq!(info.get_rom_name(), "");
     assert_eq!(info.get_rom_version().get_major(), 0);
     assert_eq!(info.get_rom_version().get_minor(), 0);
@@ -31,8 +33,7 @@ fn soundfont_info()
     assert_eq!(sf.get_wave_data().len(), 15513098);
 
     let mut sum: i32 = 0;
-    for value in sf.get_wave_data().iter()
-    {
+    for value in sf.get_wave_data().iter() {
         sum += *value as i32;
     }
     assert_eq!(sum, 101035585)

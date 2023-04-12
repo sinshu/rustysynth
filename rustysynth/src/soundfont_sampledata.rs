@@ -58,7 +58,7 @@ impl SoundFontSampleData {
 
         Ok(Self {
             bits_per_sample: 16,
-            wave_data: wave_data,
+            wave_data,
         })
     }
 }
