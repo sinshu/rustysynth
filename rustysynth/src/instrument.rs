@@ -40,7 +40,7 @@ impl Instrument {
         samples: &Vec<SampleHeader>,
     ) -> Result<Vec<Instrument>, Box<dyn Error>> {
         if infos.len() <= 1 {
-            return Err(format!("No valid instrument was found.").into());
+            return Err("No valid instrument was found.".into());
         }
 
         // The last one is the terminator.

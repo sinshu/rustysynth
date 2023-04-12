@@ -44,7 +44,7 @@ impl PresetInfo {
         size: i32,
     ) -> Result<Vec<PresetInfo>, Box<dyn Error>> {
         if size % 38 != 0 {
-            return Err(format!("The preset list is invalid.").into());
+            return Err("The preset list is invalid.".into());
         }
 
         let count = size / 38;

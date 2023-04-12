@@ -51,7 +51,7 @@ impl SampleHeader {
         size: i32,
     ) -> Result<Vec<SampleHeader>, Box<dyn Error>> {
         if size % 46 != 0 {
-            return Err(format!("The sample header list is invalid.").into());
+            return Err("The sample header list is invalid.".into());
         }
 
         let count = size / 46 - 1;

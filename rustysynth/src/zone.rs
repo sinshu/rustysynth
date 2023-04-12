@@ -32,7 +32,7 @@ impl Zone {
         generators: &Vec<Generator>,
     ) -> Result<Vec<Zone>, Box<dyn Error>> {
         if infos.len() <= 1 {
-            return Err(format!("No valid zone was found.").into());
+            return Err("No valid zone was found.".into());
         }
 
         // The last one is the terminator.

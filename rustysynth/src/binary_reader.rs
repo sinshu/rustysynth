@@ -65,9 +65,7 @@ impl BinaryReader {
             }
             count += 1;
             if count == 4 {
-                return Err(
-                    format!("The length of the value must be equal to or less than 4.").into(),
-                );
+                return Err("The length of the value must be equal to or less than 4.".into());
             }
         }
 

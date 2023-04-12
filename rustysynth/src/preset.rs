@@ -53,7 +53,7 @@ impl Preset {
         instruments: &Vec<Instrument>,
     ) -> Result<Vec<Preset>, Box<dyn Error>> {
         if infos.len() <= 1 {
-            return Err(format!("No valid preset was found.").into());
+            return Err("No valid preset was found.".into());
         }
 
         // The last one is the terminator.

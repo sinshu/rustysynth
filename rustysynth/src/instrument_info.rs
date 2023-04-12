@@ -29,7 +29,7 @@ impl InstrumentInfo {
         size: i32,
     ) -> Result<Vec<InstrumentInfo>, Box<dyn Error>> {
         if size % 22 != 0 {
-            return Err(format!("The instrument list is invalid.").into());
+            return Err("The instrument list is invalid.".into());
         }
 
         let count = size / 22;

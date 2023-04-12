@@ -15,7 +15,7 @@ impl SoundFontSampleData {
     pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "LIST" {
-            return Err(format!("The LIST chunk was not found.").into());
+            return Err("The LIST chunk was not found.".into());
         }
 
         let end = BinaryReader::read_i32(reader)?;
@@ -53,7 +53,7 @@ impl SoundFontSampleData {
 
         let wave_data = match wave_data {
             Some(value) => value,
-            None => return Err(format!("No valid sample data was found.").into()),
+            None => return Err("No valid sample data was found.".into()),
         };
 
         Ok(Self {

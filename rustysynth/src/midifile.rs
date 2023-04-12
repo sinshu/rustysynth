@@ -85,7 +85,7 @@ impl MidiFile {
 
         let size = BinaryReader::read_i32_big_endian(reader)?;
         if size != 6 {
-            return Err(format!("The MThd chunk has invalid data.").into());
+            return Err("The MThd chunk has invalid data.".into());
         }
 
         let format = BinaryReader::read_i16_big_endian(reader)?;
@@ -119,7 +119,7 @@ impl MidiFile {
     fn read_tempo<R: Read>(reader: &mut R) -> Result<i32, Box<dyn Error>> {
         let size = BinaryReader::read_i32_variable_length(reader)?;
         if size != 3 {
-            return Err(format!("Failed to read the tempo value.").into());
+            return Err("Failed to read the tempo value.".into());
         }
 
         let b1 = BinaryReader::read_u8(reader)? as i32;

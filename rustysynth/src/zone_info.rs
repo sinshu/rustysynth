@@ -29,7 +29,7 @@ impl ZoneInfo {
         size: i32,
     ) -> Result<Vec<ZoneInfo>, Box<dyn Error>> {
         if size % 4 != 0 {
-            return Err(format!("The zone list is invalid.").into());
+            return Err("The zone list is invalid.".into());
         }
 
         let count = size / 4;
