@@ -23,7 +23,7 @@ pub(crate) struct BiQuadFilter {
 }
 
 impl BiQuadFilter {
-    const RESONANCE_PEAK_OFFSET: f32 = 1_f32 - 1_f32 / 1.41421356237_f32;
+    const RESONANCE_PEAK_OFFSET: f32 = 1_f32 - 1_f32 / core::f32::consts::SQRT_2;
 
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self {
         Self {
@@ -78,18 +78,17 @@ impl BiQuadFilter {
         let block_length = block.len();
 
         if self.active {
-            for t in 0..block_length {
-                let input = block[t];
-                let output = self.a0 * input + self.a1 * self.x1 + self.a2 * self.x2
+            for input in block.iter_mut().take(block_length) {
+                let output = self.a0 * *input + self.a1 * self.x1 + self.a2 * self.x2
                     - self.a3 * self.y1
                     - self.a4 * self.y2;
 
                 self.x2 = self.x1;
-                self.x1 = input;
+                self.x1 = *input;
                 self.y2 = self.y1;
                 self.y1 = output;
 
-                block[t] = output;
+                *input = output;
             }
         } else {
             self.x2 = block[block_length - 2];

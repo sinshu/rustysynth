@@ -33,16 +33,16 @@ impl SampleHeader {
         let sample_type = BinaryReader::read_u16(reader)?;
 
         Ok(Self {
-            name: name,
-            start: start,
-            end: end,
-            start_loop: start_loop,
-            end_loop: end_loop,
-            sample_rate: sample_rate,
-            original_pitch: original_pitch,
-            pitch_correction: pitch_correction,
-            link: link,
-            sample_type: sample_type,
+            name,
+            start,
+            end,
+            start_loop,
+            end_loop,
+            sample_rate,
+            original_pitch,
+            pitch_correction,
+            link,
+            sample_type,
         })
     }
 
@@ -51,7 +51,7 @@ impl SampleHeader {
         size: i32,
     ) -> Result<Vec<SampleHeader>, Box<dyn Error>> {
         if size % 46 != 0 {
-            return Err(format!("The sample header list is invalid.").into());
+            return Err("The sample header list is invalid.".into());
         }
 
         let count = size / 46 - 1;

@@ -21,8 +21,8 @@ pub struct Preset {
 impl Preset {
     fn new(
         info: &PresetInfo,
-        zones: &Vec<Zone>,
-        instruments: &Vec<Instrument>,
+        zones: &[Zone],
+        instruments: &[Instrument],
     ) -> Result<Self, Box<dyn Error>> {
         let name = info.name.clone();
 
@@ -34,34 +34,34 @@ impl Preset {
         let span_start = info.zone_start_index as usize;
         let span_end = span_start + zone_count as usize;
         let zone_span = &zones[span_start..span_end];
-        let regions = PresetRegion::create(&name, zone_span, &instruments)?;
+        let regions = PresetRegion::create(&name, zone_span, instruments)?;
 
         Ok(Self {
-            name: name,
+            name,
             patch_number: info.patch_number,
             bank_number: info.bank_number,
             library: info.library,
             genre: info.genre,
             morphology: info.morphology,
-            regions: regions,
+            regions,
         })
     }
 
     pub(crate) fn create(
-        infos: &Vec<PresetInfo>,
-        zones: &Vec<Zone>,
-        instruments: &Vec<Instrument>,
+        infos: &[PresetInfo],
+        zones: &[Zone],
+        instruments: &[Instrument],
     ) -> Result<Vec<Preset>, Box<dyn Error>> {
         if infos.len() <= 1 {
-            return Err(format!("No valid preset was found.").into());
+            return Err("No valid preset was found.".into());
         }
 
         // The last one is the terminator.
         let count = infos.len() - 1;
 
         let mut presets: Vec<Preset> = Vec::new();
-        for i in 0..count {
-            presets.push(Preset::new(&infos[i], &zones, &instruments)?);
+        for info in infos.iter().take(count) {
+            presets.push(Preset::new(info, zones, instruments)?);
         }
 
         Ok(presets)

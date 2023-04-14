@@ -3,10 +3,8 @@
 
 use rustysynth::PresetRegion;
 
-fn are_equal(x: f64, y: f64) -> bool
-{
-    if x.floor() == x.ceil() && y.floor() == y.ceil()
-    {
+fn are_equal(x: f64, y: f64) -> bool {
+    if x.floor() == x.ceil() && y.floor() == y.ceil() {
         return x == y;
     }
 
@@ -17,8 +15,8 @@ fn are_equal(x: f64, y: f64) -> bool
     delta < limit
 }
 
-pub fn check(region: &PresetRegion, values: &[f64; 39])
-{
+#[rustfmt::skip]
+pub fn check(region: &PresetRegion, values: &[f64; 39]) {
     assert!(are_equal(region.get_modulation_lfo_to_pitch() as f64, values[0]));
     assert!(are_equal(region.get_vibrato_lfo_to_pitch() as f64, values[1]));
     assert!(are_equal(region.get_modulation_envelope_to_pitch() as f64, values[2]));

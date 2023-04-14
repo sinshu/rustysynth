@@ -88,9 +88,9 @@ impl VolumeEnvelope {
 
         while self.stage <= EnvelopeStage::HOLD {
             let end_time = match self.stage {
-                EnvelopeStage::DELAY => self.attack_start_time as f64,
-                EnvelopeStage::ATTACK => self.hold_start_time as f64,
-                EnvelopeStage::HOLD => self.decay_start_time as f64,
+                EnvelopeStage::DELAY => self.attack_start_time,
+                EnvelopeStage::ATTACK => self.hold_start_time,
+                EnvelopeStage::HOLD => self.decay_start_time,
                 _ => panic!("Invalid envelope stage."),
             };
 
@@ -104,15 +104,15 @@ impl VolumeEnvelope {
         if self.stage == EnvelopeStage::DELAY {
             self.value = 0_f32;
             self.priority = 4_f32 + self.value;
-            return true;
+            true
         } else if self.stage == EnvelopeStage::ATTACK {
             self.value = (self.attack_slope * (current_time - self.attack_start_time)) as f32;
             self.priority = 3_f32 + self.value;
-            return true;
+            true
         } else if self.stage == EnvelopeStage::HOLD {
             self.value = 1_f32;
             self.priority = 2_f32 + self.value;
-            return true;
+            true
         } else if self.stage == EnvelopeStage::DECAY {
             self.value = SoundFontMath::max(
                 SoundFontMath::exp_cutoff(self.decay_slope * (current_time - self.decay_start_time))
@@ -120,14 +120,14 @@ impl VolumeEnvelope {
                 self.sustain_level,
             );
             self.priority = 1_f32 + self.value;
-            return self.value > SoundFontMath::NON_AUDIBLE;
+            self.value > SoundFontMath::NON_AUDIBLE
         } else if self.stage == EnvelopeStage::RELEASE {
             self.value = (self.release_level as f64
                 * SoundFontMath::exp_cutoff(
                     self.release_slope * (current_time - self.release_start_time),
                 )) as f32;
             self.priority = self.value;
-            return self.value > SoundFontMath::NON_AUDIBLE;
+            self.value > SoundFontMath::NON_AUDIBLE
         } else {
             panic!("Invalid envelope stage.");
         }

@@ -17,7 +17,7 @@ impl SynthesizerSettings {
 
     pub fn new(sample_rate: i32) -> Self {
         Self {
-            sample_rate: sample_rate,
+            sample_rate,
             block_size: SynthesizerSettings::DEFAULT_BLOCK_SIZE,
             maximum_polyphony: SynthesizerSettings::DEFAULT_MAXIMUM_POLYPHONY,
             enable_reverb_and_chorus: SynthesizerSettings::DEFAULT_ENABLE_REVERB_AND_CHORUS,
@@ -33,26 +33,24 @@ impl SynthesizerSettings {
     }
 
     fn check_sample_rate(value: i32) -> Result<(), Box<dyn Error>> {
-        if !(16000 <= value && value <= 192000) {
-            return Err(format!("The sample rate must be between 16000 and 192000.").into());
+        if !(16_000..=192_000).contains(&value) {
+            return Err("The sample rate must be between 16000 and 192000.".into());
         }
 
         Ok(())
     }
 
     fn check_block_size(value: i32) -> Result<(), Box<dyn Error>> {
-        if !(8 <= value && value <= 1024) {
-            return Err(format!("The block size must be between 8 and 1024.").into());
+        if !(8..=1024).contains(&value) {
+            return Err("The block size must be between 8 and 1024.".into());
         }
 
         Ok(())
     }
 
     fn check_maximum_polyphony(value: i32) -> Result<(), Box<dyn Error>> {
-        if !(8 <= value && value <= 256) {
-            return Err(
-                format!("The maximum number of polyphony must be between 8 and 256.").into(),
-            );
+        if !(8..=256).contains(&value) {
+            return Err("The maximum number of polyphony must be between 8 and 256.".into());
         }
 
         Ok(())

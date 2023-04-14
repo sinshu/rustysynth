@@ -26,7 +26,7 @@ impl SoundFont {
     pub fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "RIFF" {
-            return Err(format!("The RIFF chunk was not found.").into());
+            return Err("The RIFF chunk was not found.".into());
         }
 
         let _size = BinaryReader::read_i32(reader);
@@ -44,7 +44,7 @@ impl SoundFont {
         let parameters = SoundFontParameters::new(reader)?;
 
         Ok(Self {
-            info: info,
+            info,
             bits_per_sample: 16,
             wave_data: Arc::new(sample_data.wave_data),
             sample_headers: parameters.sample_headers,

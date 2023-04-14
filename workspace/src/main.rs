@@ -85,7 +85,7 @@ fn write_pcm(left: &[f32], right: &[f32], path: &str) {
         let right_i16 = (a * right[t] * 32768_f32) as i16;
 
         let offset = 4 * t;
-        buf[offset + 0] = left_i16 as u8;
+        buf[offset] = left_i16 as u8;
         buf[offset + 1] = (left_i16 >> 8) as u8;
         buf[offset + 2] = right_i16 as u8;
         buf[offset + 3] = (right_i16 >> 8) as u8;

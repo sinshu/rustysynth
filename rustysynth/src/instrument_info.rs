@@ -18,8 +18,8 @@ impl InstrumentInfo {
         let zone_start_index = BinaryReader::read_u16(reader)? as i32;
 
         Ok(Self {
-            name: name,
-            zone_start_index: zone_start_index,
+            name,
+            zone_start_index,
             zone_end_index: 0,
         })
     }
@@ -29,7 +29,7 @@ impl InstrumentInfo {
         size: i32,
     ) -> Result<Vec<InstrumentInfo>, Box<dyn Error>> {
         if size % 22 != 0 {
-            return Err(format!("The instrument list is invalid.").into());
+            return Err("The instrument list is invalid.".into());
         }
 
         let count = size / 22;

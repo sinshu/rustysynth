@@ -24,7 +24,7 @@ impl SoundFontParameters {
     pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "LIST" {
-            return Err(format!("The LIST chunk was not found.").into());
+            return Err("The LIST chunk was not found.".into());
         }
 
         let end = BinaryReader::read_i32(reader)?;
@@ -82,37 +82,37 @@ impl SoundFontParameters {
 
         let preset_infos = match preset_infos {
             Some(value) => value,
-            None => return Err(format!("The PHDR sub-chunk was not found.").into()),
+            None => return Err("The PHDR sub-chunk was not found.".into()),
         };
 
         let preset_bag = match preset_bag {
             Some(value) => value,
-            None => return Err(format!("The PBAG sub-chunk was not found.").into()),
+            None => return Err("The PBAG sub-chunk was not found.".into()),
         };
 
         let preset_generators = match preset_generators {
             Some(value) => value,
-            None => return Err(format!("The PGEN sub-chunk was not found.").into()),
+            None => return Err("The PGEN sub-chunk was not found.".into()),
         };
 
         let instrument_infos = match instrument_infos {
             Some(value) => value,
-            None => return Err(format!("The INST sub-chunk was not found.").into()),
+            None => return Err("The INST sub-chunk was not found.".into()),
         };
 
         let instrument_bag = match instrument_bag {
             Some(value) => value,
-            None => return Err(format!("The IBAG sub-chunk was not found.").into()),
+            None => return Err("The IBAG sub-chunk was not found.".into()),
         };
 
         let instrument_generators = match instrument_generators {
             Some(value) => value,
-            None => return Err(format!("The IGEN sub-chunk was not found.").into()),
+            None => return Err("The IGEN sub-chunk was not found.".into()),
         };
 
         let sample_headers = match sample_headers {
             Some(value) => value,
-            None => return Err(format!("The SHDR sub-chunk was not found.").into()),
+            None => return Err("The SHDR sub-chunk was not found.".into()),
         };
 
         let instrument_zones = Zone::create(&instrument_bag, &instrument_generators)?;
@@ -123,9 +123,9 @@ impl SoundFontParameters {
         let presets = Preset::create(&preset_infos, &preset_zones, &instruments)?;
 
         Ok(Self {
-            sample_headers: sample_headers,
-            presets: presets,
-            instruments: instruments,
+            sample_headers,
+            presets,
+            instruments,
         })
     }
 }

@@ -183,7 +183,7 @@ impl Voice {
         self.note_gain = 0_f32;
     }
 
-    pub(crate) fn process(&mut self, data: &[i16], channels: &Vec<Channel>) -> bool {
+    pub(crate) fn process(&mut self, data: &[i16], channels: &[Channel]) -> bool {
         if self.note_gain < SoundFontMath::NON_AUDIBLE {
             return false;
         }
@@ -274,7 +274,7 @@ impl Voice {
 
         self.voice_length += self.block_size;
 
-        return true;
+        true
     }
 
     fn release_if_necessary(&mut self, channel_info: &Channel) {
@@ -293,9 +293,9 @@ impl Voice {
 
     pub(crate) fn get_priority(&self) -> f32 {
         if self.note_gain < SoundFontMath::NON_AUDIBLE {
-            return 0_f32;
+            0_f32
         } else {
-            return self.vol_env.get_priority();
+            self.vol_env.get_priority()
         }
     }
 }

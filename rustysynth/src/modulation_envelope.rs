@@ -90,9 +90,9 @@ impl ModulationEnvelope {
 
         while self.stage <= EnvelopeStage::HOLD {
             let end_time = match self.stage {
-                EnvelopeStage::DELAY => self.attack_start_time as f64,
-                EnvelopeStage::ATTACK => self.hold_start_time as f64,
-                EnvelopeStage::HOLD => self.decay_start_time as f64,
+                EnvelopeStage::DELAY => self.attack_start_time,
+                EnvelopeStage::ATTACK => self.hold_start_time,
+                EnvelopeStage::HOLD => self.decay_start_time,
                 _ => panic!("Invalid envelope stage."),
             };
 
@@ -105,19 +105,19 @@ impl ModulationEnvelope {
 
         if self.stage == EnvelopeStage::DELAY {
             self.value = 0_f32;
-            return true;
+            true
         } else if self.stage == EnvelopeStage::ATTACK {
             self.value = (self.attack_slope * (current_time - self.attack_start_time)) as f32;
-            return true;
+            true
         } else if self.stage == EnvelopeStage::HOLD {
             self.value = 1_f32;
-            return true;
+            true
         } else if self.stage == EnvelopeStage::DECAY {
             self.value = SoundFontMath::max(
                 (self.decay_slope * (self.decay_end_time - current_time)) as f32,
                 self.sustain_level,
             );
-            return self.value > SoundFontMath::NON_AUDIBLE;
+            self.value > SoundFontMath::NON_AUDIBLE
         } else if self.stage == EnvelopeStage::RELEASE {
             self.value = SoundFontMath::max(
                 (self.release_level as f64
@@ -125,7 +125,7 @@ impl ModulationEnvelope {
                     * (self.release_end_time - current_time)) as f32,
                 0_f32,
             );
-            return self.value > SoundFontMath::NON_AUDIBLE;
+            self.value > SoundFontMath::NON_AUDIBLE
         } else {
             panic!("Invalid envelope stage.");
         }

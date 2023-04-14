@@ -65,9 +65,7 @@ impl BinaryReader {
             }
             count += 1;
             if count == 4 {
-                return Err(
-                    format!("The length of the value must be equal to or less than 4.").into(),
-                );
+                return Err("The length of the value must be equal to or less than 4.".into());
             }
         }
 
@@ -78,10 +76,9 @@ impl BinaryReader {
         let mut data: [u8; 4] = [0; 4];
         reader.read_exact(&mut data)?;
 
-        for i in 0..4 {
-            let value = data[i];
-            if !(32 <= value && value <= 126) {
-                data[i] = 63; // '?'
+        for value in &mut data {
+            if !(32..=126).contains(value) {
+                *value = 63; // '?'
             }
         }
 

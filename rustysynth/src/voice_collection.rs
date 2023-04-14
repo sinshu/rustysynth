@@ -7,19 +7,19 @@ use crate::voice::Voice;
 
 #[non_exhaustive]
 pub(crate) struct VoiceCollection {
-    pub(crate) voices: Vec<Box<Voice>>,
+    pub(crate) voices: Vec<Voice>,
     pub(crate) active_voice_count: i32,
 }
 
 impl VoiceCollection {
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self {
-        let mut voices: Vec<Box<Voice>> = Vec::new();
+        let mut voices: Vec<Voice> = Vec::new();
         for _i in 0..settings.maximum_polyphony {
-            voices.push(Box::new(Voice::new(settings)));
+            voices.push(Voice::new(settings));
         }
 
         Self {
-            voices: voices,
+            voices,
             active_voice_count: 0,
         }
     }
@@ -34,9 +34,9 @@ impl VoiceCollection {
         let exclusive_class = region.get_exclusive_class();
         if exclusive_class != 0 {
             for i in 0..self.active_voice_count as usize {
-                let voice = self.voices[i].as_ref();
+                let voice = &self.voices[i];
                 if voice.exclusive_class == exclusive_class && voice.channel == channel {
-                    return Some(self.voices[i].as_mut());
+                    return Some(&mut self.voices[i]);
                 }
             }
         }
@@ -45,7 +45,7 @@ impl VoiceCollection {
         if (self.active_voice_count as usize) < self.voices.len() {
             let i = self.active_voice_count as usize;
             self.active_voice_count += 1;
-            return Some(self.voices[i].as_mut());
+            return Some(&mut self.voices[i]);
         }
 
         // Too many active voices...
@@ -53,7 +53,7 @@ impl VoiceCollection {
         let mut candidate: usize = 0;
         let mut lowest_priority = f32::MAX;
         for i in 0..self.active_voice_count as usize {
-            let voice = self.voices[i].as_ref();
+            let voice = &self.voices[i];
             let priority = voice.get_priority();
             if priority < lowest_priority {
                 lowest_priority = priority;
@@ -66,10 +66,10 @@ impl VoiceCollection {
                 }
             }
         }
-        return Some(self.voices[candidate].as_mut());
+        Some(&mut self.voices[candidate])
     }
 
-    pub(crate) fn process(&mut self, data: &[i16], channels: &Vec<Channel>) {
+    pub(crate) fn process(&mut self, data: &[i16], channels: &[Channel]) {
         let mut i: usize = 0;
 
         loop {
@@ -77,7 +77,7 @@ impl VoiceCollection {
                 return;
             }
 
-            if self.voices[i].as_mut().process(data, channels) {
+            if self.voices[i].process(data, channels) {
                 i += 1;
             } else {
                 self.active_voice_count -= 1;

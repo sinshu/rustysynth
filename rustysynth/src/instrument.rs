@@ -16,8 +16,8 @@ pub struct Instrument {
 impl Instrument {
     fn new(
         info: &InstrumentInfo,
-        zones: &Vec<Zone>,
-        samples: &Vec<SampleHeader>,
+        zones: &[Zone],
+        samples: &[SampleHeader],
     ) -> Result<Self, Box<dyn Error>> {
         let name = info.name.clone();
 
@@ -29,29 +29,26 @@ impl Instrument {
         let span_start = info.zone_start_index as usize;
         let span_end = span_start + zone_count as usize;
         let zone_span = &zones[span_start..span_end];
-        let regions = InstrumentRegion::create(&name, zone_span, &samples)?;
+        let regions = InstrumentRegion::create(&name, zone_span, samples)?;
 
-        Ok(Self {
-            name: name,
-            regions: regions,
-        })
+        Ok(Self { name, regions })
     }
 
     pub(crate) fn create(
-        infos: &Vec<InstrumentInfo>,
-        zones: &Vec<Zone>,
-        samples: &Vec<SampleHeader>,
+        infos: &[InstrumentInfo],
+        zones: &[Zone],
+        samples: &[SampleHeader],
     ) -> Result<Vec<Instrument>, Box<dyn Error>> {
         if infos.len() <= 1 {
-            return Err(format!("No valid instrument was found.").into());
+            return Err("No valid instrument was found.".into());
         }
 
         // The last one is the terminator.
         let count = infos.len() - 1;
 
         let mut instruments: Vec<Instrument> = Vec::new();
-        for i in 0..count {
-            instruments.push(Instrument::new(&infos[i], &zones, &samples)?);
+        for info in infos.iter().take(count) {
+            instruments.push(Instrument::new(info, zones, samples)?);
         }
 
         Ok(instruments)

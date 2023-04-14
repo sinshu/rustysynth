@@ -18,8 +18,8 @@ impl Generator {
         let value = BinaryReader::read_u16(reader)?;
 
         Ok(Self {
-            generator_type: generator_type,
-            value: value,
+            generator_type,
+            value,
         })
     }
 
@@ -28,7 +28,7 @@ impl Generator {
         size: i32,
     ) -> Result<Vec<Generator>, Box<dyn Error>> {
         if size % 4 != 0 {
-            return Err(format!("The generator list is invalid.").into());
+            return Err("The generator list is invalid.".into());
         }
 
         let count = size / 4 - 1;

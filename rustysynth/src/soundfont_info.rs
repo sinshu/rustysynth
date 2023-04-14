@@ -25,7 +25,7 @@ impl SoundFontInfo {
     pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "LIST" {
-            return Err(format!("The LIST chunk was not found.").into());
+            return Err("The LIST chunk was not found.".into());
         }
 
         let end = BinaryReader::read_i32(reader)?;
@@ -145,17 +145,17 @@ impl SoundFontInfo {
         };
 
         Ok(Self {
-            version: version,
-            target_sound_engine: target_sound_engine,
-            bank_name: bank_name,
-            rom_name: rom_name,
-            rom_version: rom_version,
-            creation_date: creation_date,
-            author: author,
-            target_product: target_product,
-            copyright: copyright,
-            comments: comments,
-            tools: tools,
+            version,
+            target_sound_engine,
+            bank_name,
+            rom_name,
+            rom_version,
+            creation_date,
+            author,
+            target_product,
+            copyright,
+            comments,
+            tools,
         })
     }
 

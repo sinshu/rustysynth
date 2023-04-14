@@ -156,25 +156,25 @@ impl Synthesizer {
             block_size: settings.block_size,
             maximum_polyphony: settings.maximum_polyphony,
             enable_reverb_and_chorus: settings.enable_reverb_and_chorus,
-            minimum_voice_duration: minimum_voice_duration,
-            preset_lookup: preset_lookup,
-            default_preset: default_preset,
-            channels: channels,
-            voices: voices,
-            block_left: block_left,
-            block_right: block_right,
-            inverse_block_size: inverse_block_size,
-            block_read: block_read,
-            master_volume: master_volume,
-            reverb: reverb,
-            reverb_input: reverb_input,
-            reverb_output_left: reverb_output_left,
-            reverb_output_right: reverb_output_right,
-            chorus: chorus,
-            chorus_input_left: chorus_input_left,
-            chorus_input_right: chorus_input_right,
-            chorus_output_left: chorus_output_left,
-            chorus_output_right: chorus_output_right,
+            minimum_voice_duration,
+            preset_lookup,
+            default_preset,
+            channels,
+            voices,
+            block_left,
+            block_right,
+            inverse_block_size,
+            block_read,
+            master_volume,
+            reverb,
+            reverb_input,
+            reverb_output_left,
+            reverb_output_right,
+            chorus,
+            chorus_input_left,
+            chorus_input_right,
+            chorus_output_left,
+            chorus_output_right,
         })
     }
 
@@ -223,7 +223,7 @@ impl Synthesizer {
         }
 
         for i in 0..self.voices.active_voice_count as usize {
-            let voice = self.voices.voices[i].as_mut();
+            let voice = &mut self.voices.voices[i];
             if voice.channel == channel && voice.key == key {
                 voice.end();
             }
@@ -256,9 +256,10 @@ impl Synthesizer {
                 } else {
                     128 << 16
                 };
-                match self.preset_lookup.get(&gm_preset_id) {
-                    Some(value) => preset = *value,
-                    None => (), // No corresponding preset was found. Use the default one...
+
+                // If no corresponding preset was found. Use the default one...
+                if let Some(value) = self.preset_lookup.get(&gm_preset_id) {
+                    preset = *value
                 }
             }
         }
@@ -273,9 +274,8 @@ impl Synthesizer {
                     if instrument_region.contains(key, velocity) {
                         let region_pair = RegionPair::new(preset_region, instrument_region);
 
-                        match self.voices.request_new(instrument_region, channel) {
-                            Some(value) => value.start(&region_pair, channel, key, velocity),
-                            None => (),
+                        if let Some(value) = self.voices.request_new(instrument_region, channel) {
+                            value.start(&region_pair, channel, key, velocity)
                         }
                     }
                 }
@@ -296,14 +296,14 @@ impl Synthesizer {
     pub fn note_off_all_channel(&mut self, channel: i32, immediate: bool) {
         if immediate {
             for i in 0..self.voices.active_voice_count as usize {
-                let voice = self.voices.voices[i].as_mut();
+                let voice = &mut self.voices.voices[i];
                 if voice.channel == channel {
                     voice.kill();
                 }
             }
         } else {
             for i in 0..self.voices.active_voice_count as usize {
-                let voice = self.voices.voices[i].as_mut();
+                let voice = &mut self.voices.voices[i];
                 if voice.channel == channel {
                     voice.end();
                 }
@@ -378,7 +378,7 @@ impl Synthesizer {
         }
 
         for i in 0..self.voices.active_voice_count as usize {
-            let voice = self.voices.voices[i].as_ref();
+            let voice = &self.voices.voices[i];
             let previous_gain_left = self.master_volume * voice.previous_mix_gain_left;
             let current_gain_left = self.master_volume * voice.current_mix_gain_left;
             Synthesizer::write_block(
@@ -410,7 +410,7 @@ impl Synthesizer {
                 chorus_input_right[i] = 0_f32;
             }
             for i in 0..self.voices.active_voice_count as usize {
-                let voice = self.voices.voices[i].as_ref();
+                let voice = &self.voices.voices[i];
                 let previous_gain_left = voice.previous_chorus_send * voice.previous_mix_gain_left;
                 let current_gain_left = voice.current_chorus_send * voice.current_mix_gain_left;
                 Synthesizer::write_block(
@@ -452,11 +452,11 @@ impl Synthesizer {
             let reverb_input = self.reverb_input.as_mut().unwrap();
             let reverb_output_left = self.reverb_output_left.as_mut().unwrap();
             let reverb_output_right = self.reverb_output_right.as_mut().unwrap();
-            for i in 0..self.block_size as usize {
-                reverb_input[i] = 0_f32;
+            for input in reverb_input.iter_mut().take(self.block_size as usize) {
+                *input = 0_f32;
             }
             for i in 0..self.voices.active_voice_count as usize {
-                let voice = self.voices.voices[i].as_ref();
+                let voice = &self.voices.voices[i];
                 let previous_gain = reverb.get_input_gain()
                     * voice.previous_reverb_send
                     * (voice.previous_mix_gain_left + voice.previous_mix_gain_right);

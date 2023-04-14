@@ -23,7 +23,7 @@ impl Message {
         Self {
             channel: status & 0x0F,
             command: status & 0xF0,
-            data1: data1,
+            data1,
             data2: 0,
         }
     }
@@ -32,8 +32,8 @@ impl Message {
         Self {
             channel: status & 0x0F,
             command: status & 0xF0,
-            data1: data1,
-            data2: data2,
+            data1,
+            data2,
         }
     }
 
@@ -85,7 +85,7 @@ impl MidiFile {
 
         let size = BinaryReader::read_i32_big_endian(reader)?;
         if size != 6 {
-            return Err(format!("The MThd chunk has invalid data.").into());
+            return Err("The MThd chunk has invalid data.".into());
         }
 
         let format = BinaryReader::read_i16_big_endian(reader)?;
@@ -107,10 +107,7 @@ impl MidiFile {
 
         let (messages, times) = MidiFile::merge_tracks(&message_lists, &tick_lists, resolution);
 
-        Ok(Self {
-            messages: messages,
-            times: times,
-        })
+        Ok(Self { messages, times })
     }
 
     fn discard_data<R: Read>(reader: &mut R) -> Result<(), Box<dyn Error>> {
@@ -122,7 +119,7 @@ impl MidiFile {
     fn read_tempo<R: Read>(reader: &mut R) -> Result<i32, Box<dyn Error>> {
         let size = BinaryReader::read_i32_variable_length(reader)?;
         if size != 3 {
-            return Err(format!("Failed to read the tempo value.").into());
+            return Err("Failed to read the tempo value.".into());
         }
 
         let b1 = BinaryReader::read_u8(reader)? as i32;
@@ -202,8 +199,8 @@ impl MidiFile {
     }
 
     fn merge_tracks(
-        message_lists: &Vec<Vec<Message>>,
-        tick_lists: &Vec<Vec<i32>>,
+        message_lists: &[Vec<Message>],
+        tick_lists: &[Vec<i32>],
         resolution: i32,
     ) -> (Vec<Message>, Vec<f64>) {
         let mut merged_messages: Vec<Message> = Vec::new();

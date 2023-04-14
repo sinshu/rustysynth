@@ -35,7 +35,7 @@ impl InstrumentRegion {
         name: &String,
         global: &Zone,
         local: &Zone,
-        samples: &Vec<SampleHeader>,
+        samples: &[SampleHeader],
     ) -> Result<Self, Box<dyn Error>> {
         let mut gs: [i16; GeneratorType::COUNT] = [0; GeneratorType::COUNT];
         gs[GeneratorType::INITIAL_FILTER_CUTOFF_FREQUENCY as usize] = 13500;
@@ -75,7 +75,7 @@ impl InstrumentRegion {
         let sample = &samples[id];
 
         Ok(Self {
-            gs: gs,
+            gs,
             sample_start: sample.start,
             sample_end: sample.end,
             sample_start_loop: sample.start_loop,
@@ -89,10 +89,10 @@ impl InstrumentRegion {
     pub(crate) fn create(
         name: &String,
         zones: &[Zone],
-        samples: &Vec<SampleHeader>,
+        samples: &[SampleHeader],
     ) -> Result<Vec<InstrumentRegion>, Box<dyn Error>> {
         // Is the first one the global zone?
-        if zones[0].generators.len() == 0
+        if zones[0].generators.is_empty()
             || zones[0].generators.last().unwrap().generator_type != GeneratorType::SAMPLE_ID
         {
             // The first one is the global zone.
@@ -102,12 +102,7 @@ impl InstrumentRegion {
             let count = zones.len() - 1;
             let mut regions: Vec<InstrumentRegion> = Vec::new();
             for i in 0..count {
-                regions.push(InstrumentRegion::new(
-                    name,
-                    global,
-                    &zones[i + 1],
-                    &samples,
-                )?);
+                regions.push(InstrumentRegion::new(name, global, &zones[i + 1], samples)?);
             }
 
             Ok(regions)
@@ -115,13 +110,8 @@ impl InstrumentRegion {
             // No global zone.
             let count = zones.len();
             let mut regions: Vec<InstrumentRegion> = Vec::new();
-            for i in 0..count {
-                regions.push(InstrumentRegion::new(
-                    name,
-                    &Zone::empty(),
-                    &zones[i],
-                    &samples,
-                )?);
+            for zone in zones.iter().take(count) {
+                regions.push(InstrumentRegion::new(name, &Zone::empty(), zone, samples)?);
             }
 
             Ok(regions)
@@ -132,7 +122,7 @@ impl InstrumentRegion {
         let contains_key = self.get_key_range_start() <= key && key <= self.get_key_range_end();
         let contains_velocity = self.get_velocity_range_start() <= velocity
             && velocity <= self.get_velocity_range_end();
-        return contains_key && contains_velocity;
+        contains_key && contains_velocity
     }
 
     pub fn get_sample_start(&self) -> i32 {

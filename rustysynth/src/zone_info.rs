@@ -17,8 +17,8 @@ impl ZoneInfo {
         let modulator_index = BinaryReader::read_u16(reader)? as i32;
 
         Ok(Self {
-            generator_index: generator_index,
-            modulator_index: modulator_index,
+            generator_index,
+            modulator_index,
             generator_count: 0,
             modulator_count: 0,
         })
@@ -29,7 +29,7 @@ impl ZoneInfo {
         size: i32,
     ) -> Result<Vec<ZoneInfo>, Box<dyn Error>> {
         if size % 4 != 0 {
-            return Err(format!("The zone list is invalid.").into());
+            return Err("The zone list is invalid.".into());
         }
 
         let count = size / 4;
