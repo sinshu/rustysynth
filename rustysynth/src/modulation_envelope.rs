@@ -22,7 +22,7 @@ pub(crate) struct ModulationEnvelope {
     sustain_level: f32,
     release_level: f32,
 
-    processed_sample_count: i32,
+    processed_sample_count: usize,
     stage: i32,
     value: f32,
 }
@@ -83,7 +83,7 @@ impl ModulationEnvelope {
         self.release_level = self.value;
     }
 
-    pub(crate) fn process(&mut self, sample_count: i32) -> bool {
+    pub(crate) fn process(&mut self, sample_count: usize) -> bool {
         self.processed_sample_count += sample_count;
 
         let current_time = self.processed_sample_count as f64 / self.sample_rate as f64;

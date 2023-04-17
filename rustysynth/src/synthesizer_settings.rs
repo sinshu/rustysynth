@@ -5,14 +5,14 @@ use std::error::Error;
 #[non_exhaustive]
 pub struct SynthesizerSettings {
     pub sample_rate: i32,
-    pub block_size: i32,
-    pub maximum_polyphony: i32,
+    pub block_size: usize,
+    pub maximum_polyphony: usize,
     pub enable_reverb_and_chorus: bool,
 }
 
 impl SynthesizerSettings {
-    const DEFAULT_BLOCK_SIZE: i32 = 64;
-    const DEFAULT_MAXIMUM_POLYPHONY: i32 = 64;
+    const DEFAULT_BLOCK_SIZE: usize = 64;
+    const DEFAULT_MAXIMUM_POLYPHONY: usize = 64;
     const DEFAULT_ENABLE_REVERB_AND_CHORUS: bool = true;
 
     pub fn new(sample_rate: i32) -> Self {
@@ -40,7 +40,7 @@ impl SynthesizerSettings {
         Ok(())
     }
 
-    fn check_block_size(value: i32) -> Result<(), Box<dyn Error>> {
+    fn check_block_size(value: usize) -> Result<(), Box<dyn Error>> {
         if !(8..=1024).contains(&value) {
             return Err("The block size must be between 8 and 1024.".into());
         }
@@ -48,7 +48,7 @@ impl SynthesizerSettings {
         Ok(())
     }
 
-    fn check_maximum_polyphony(value: i32) -> Result<(), Box<dyn Error>> {
+    fn check_maximum_polyphony(value: usize) -> Result<(), Box<dyn Error>> {
         if !(8..=256).contains(&value) {
             return Err("The maximum number of polyphony must be between 8 and 256.".into());
         }

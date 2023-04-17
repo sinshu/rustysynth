@@ -8,7 +8,7 @@ use crate::voice::Voice;
 #[non_exhaustive]
 pub(crate) struct VoiceCollection {
     pub(crate) voices: Vec<Voice>,
-    pub(crate) active_voice_count: i32,
+    pub(crate) active_voice_count: usize,
 }
 
 impl VoiceCollection {
@@ -33,7 +33,7 @@ impl VoiceCollection {
         // If found, reuse it to avoid playing multiple voices with the same class at a time.
         let exclusive_class = region.get_exclusive_class();
         if exclusive_class != 0 {
-            for i in 0..self.active_voice_count as usize {
+            for i in 0..self.active_voice_count {
                 let voice = &self.voices[i];
                 if voice.exclusive_class == exclusive_class && voice.channel == channel {
                     return Some(&mut self.voices[i]);
@@ -42,8 +42,8 @@ impl VoiceCollection {
         }
 
         // If the number of active voices is less than the limit, use a free one.
-        if (self.active_voice_count as usize) < self.voices.len() {
-            let i = self.active_voice_count as usize;
+        if (self.active_voice_count) < self.voices.len() {
+            let i = self.active_voice_count;
             self.active_voice_count += 1;
             return Some(&mut self.voices[i]);
         }
@@ -52,7 +52,7 @@ impl VoiceCollection {
         // Find one which has the lowest priority.
         let mut candidate: usize = 0;
         let mut lowest_priority = f32::MAX;
-        for i in 0..self.active_voice_count as usize {
+        for i in 0..self.active_voice_count {
             let voice = &self.voices[i];
             let priority = voice.get_priority();
             if priority < lowest_priority {
@@ -73,7 +73,7 @@ impl VoiceCollection {
         let mut i: usize = 0;
 
         loop {
-            if i == self.active_voice_count as usize {
+            if i == self.active_voice_count {
                 return;
             }
 
@@ -81,7 +81,7 @@ impl VoiceCollection {
                 i += 1;
             } else {
                 self.active_voice_count -= 1;
-                self.voices.swap(i, self.active_voice_count as usize);
+                self.voices.swap(i, self.active_voice_count);
             }
         }
     }

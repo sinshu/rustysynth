@@ -16,7 +16,7 @@ use crate::volume_envelope::VolumeEnvelope;
 #[non_exhaustive]
 pub(crate) struct Voice {
     sample_rate: i32,
-    block_size: i32,
+    block_size: usize,
 
     vol_env: VolumeEnvelope,
     mod_env: ModulationEnvelope,
@@ -73,8 +73,8 @@ pub(crate) struct Voice {
     smoothed_cutoff: f32,
 
     voice_state: i32,
-    pub(crate) voice_length: i32,
-    min_voice_length: i32,
+    pub(crate) voice_length: usize,
+    min_voice_length: usize,
 }
 
 impl Voice {
@@ -88,7 +88,7 @@ impl Voice {
             mod_lfo: Lfo::new(settings),
             oscillator: Oscillator::new(settings),
             filter: BiQuadFilter::new(settings),
-            block: vec![0_f32; settings.block_size as usize],
+            block: vec![0_f32; settings.block_size],
             previous_mix_gain_left: 0_f32,
             previous_mix_gain_right: 0_f32,
             current_mix_gain_left: 0_f32,
@@ -118,7 +118,7 @@ impl Voice {
             smoothed_cutoff: 0_f32,
             voice_state: 0,
             voice_length: 0,
-            min_voice_length: settings.sample_rate / 500,
+            min_voice_length: (settings.sample_rate / 500) as usize,
         }
     }
 

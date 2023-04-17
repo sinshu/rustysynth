@@ -34,8 +34,8 @@ impl MidiFileSequencer {
             block_wrote: 0,
             current_time: 0.0,
             msg_index: 0,
-            block_left: vec![0_f32; block_size as usize],
-            block_right: vec![0_f32; block_size as usize],
+            block_left: vec![0_f32; block_size],
+            block_right: vec![0_f32; block_size],
         }
     }
 
@@ -43,7 +43,7 @@ impl MidiFileSequencer {
         self.midi_file = Some(Arc::clone(midi_file));
         self.play_loop = play_loop;
 
-        self.block_wrote = self.synthesizer.block_size as usize;
+        self.block_wrote = self.synthesizer.block_size;
 
         self.current_time = 0.0;
         self.msg_index = 0;
@@ -64,14 +64,14 @@ impl MidiFileSequencer {
         let left_length = left.len();
         let mut wrote: usize = 0;
         while wrote < left_length {
-            if self.block_wrote == self.synthesizer.block_size as usize {
+            if self.block_wrote == self.synthesizer.block_size {
                 self.process_events();
                 self.block_wrote = 0;
                 self.current_time +=
                     self.synthesizer.block_size as f64 / self.synthesizer.sample_rate as f64;
             }
 
-            let src_rem = self.synthesizer.block_size as usize - self.block_wrote;
+            let src_rem = self.synthesizer.block_size - self.block_wrote;
             let dst_rem = left_length - wrote;
             let rem = cmp::min(src_rem, dst_rem);
 

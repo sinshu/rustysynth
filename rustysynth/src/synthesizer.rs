@@ -19,11 +19,9 @@ use crate::voice_collection::VoiceCollection;
 pub struct Synthesizer {
     pub(crate) sound_font: Arc<SoundFont>,
     pub(crate) sample_rate: i32,
-    pub(crate) block_size: i32,
-    pub(crate) maximum_polyphony: i32,
+    pub(crate) block_size: usize,
+    pub(crate) maximum_polyphony: usize,
     pub(crate) enable_reverb_and_chorus: bool,
-
-    minimum_voice_duration: i32,
 
     preset_lookup: HashMap<i32, usize>,
     default_preset: usize,
@@ -54,16 +52,14 @@ pub struct Synthesizer {
 }
 
 impl Synthesizer {
-    pub const CHANNEL_COUNT: i32 = 16;
-    pub const PERCUSSION_CHANNEL: i32 = 9;
+    pub const CHANNEL_COUNT: usize = 16;
+    pub const PERCUSSION_CHANNEL: usize = 9;
 
     pub fn new(
         sound_font: &Arc<SoundFont>,
         settings: &SynthesizerSettings,
     ) -> Result<Self, Box<dyn Error>> {
         settings.validate()?;
-
-        let minimum_voice_duration = settings.sample_rate / 500;
 
         let mut preset_lookup: HashMap<i32, usize> = HashMap::new();
 
@@ -94,12 +90,12 @@ impl Synthesizer {
 
         let voices = VoiceCollection::new(settings);
 
-        let block_left: Vec<f32> = vec![0_f32; settings.block_size as usize];
-        let block_right: Vec<f32> = vec![0_f32; settings.block_size as usize];
+        let block_left: Vec<f32> = vec![0_f32; settings.block_size];
+        let block_right: Vec<f32> = vec![0_f32; settings.block_size];
 
         let inverse_block_size = 1_f32 / settings.block_size as f32;
 
-        let block_read = settings.block_size as usize;
+        let block_read = settings.block_size;
 
         let master_volume = 0.5_f32;
 
@@ -109,17 +105,17 @@ impl Synthesizer {
             None
         };
         let reverb_input = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size as usize])
+            Some(vec![0_f32; settings.block_size])
         } else {
             None
         };
         let reverb_output_left = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size as usize])
+            Some(vec![0_f32; settings.block_size])
         } else {
             None
         };
         let reverb_output_right = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size as usize])
+            Some(vec![0_f32; settings.block_size])
         } else {
             None
         };
@@ -130,22 +126,22 @@ impl Synthesizer {
             None
         };
         let chorus_input_left = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size as usize])
+            Some(vec![0_f32; settings.block_size])
         } else {
             None
         };
         let chorus_input_right = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size as usize])
+            Some(vec![0_f32; settings.block_size])
         } else {
             None
         };
         let chorus_output_left = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size as usize])
+            Some(vec![0_f32; settings.block_size])
         } else {
             None
         };
         let chorus_output_right = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size as usize])
+            Some(vec![0_f32; settings.block_size])
         } else {
             None
         };
@@ -156,7 +152,6 @@ impl Synthesizer {
             block_size: settings.block_size,
             maximum_polyphony: settings.maximum_polyphony,
             enable_reverb_and_chorus: settings.enable_reverb_and_chorus,
-            minimum_voice_duration,
             preset_lookup,
             default_preset,
             channels,
@@ -222,7 +217,7 @@ impl Synthesizer {
             return;
         }
 
-        for i in 0..self.voices.active_voice_count as usize {
+        for i in 0..self.voices.active_voice_count {
             let voice = &mut self.voices.voices[i];
             if voice.channel == channel && voice.key == key {
                 voice.end();
@@ -287,7 +282,7 @@ impl Synthesizer {
         if immediate {
             self.voices.clear();
         } else {
-            for i in 0..self.voices.active_voice_count as usize {
+            for i in 0..self.voices.active_voice_count {
                 self.voices.voices[i].end();
             }
         }
@@ -295,14 +290,14 @@ impl Synthesizer {
 
     pub fn note_off_all_channel(&mut self, channel: i32, immediate: bool) {
         if immediate {
-            for i in 0..self.voices.active_voice_count as usize {
+            for i in 0..self.voices.active_voice_count {
                 let voice = &mut self.voices.voices[i];
                 if voice.channel == channel {
                     voice.kill();
                 }
             }
         } else {
-            for i in 0..self.voices.active_voice_count as usize {
+            for i in 0..self.voices.active_voice_count {
                 let voice = &mut self.voices.voices[i];
                 if voice.channel == channel {
                     voice.end();
@@ -337,7 +332,7 @@ impl Synthesizer {
             self.chorus.as_mut().unwrap().mute();
         }
 
-        self.block_read = self.block_size as usize;
+        self.block_read = self.block_size;
     }
 
     pub fn render(&mut self, left: &mut [f32], right: &mut [f32]) {
@@ -349,12 +344,12 @@ impl Synthesizer {
 
         let mut wrote = 0;
         while wrote < left_length {
-            if self.block_read == self.block_size as usize {
+            if self.block_read == self.block_size {
                 self.render_block();
                 self.block_read = 0;
             }
 
-            let src_rem = self.block_size as usize - self.block_read;
+            let src_rem = self.block_size - self.block_read;
             let dst_rem = left_length - wrote;
             let rem = cmp::min(src_rem, dst_rem);
 
@@ -372,12 +367,12 @@ impl Synthesizer {
         self.voices
             .process(&self.sound_font.wave_data, &self.channels);
 
-        for t in 0..self.block_size as usize {
+        for t in 0..self.block_size {
             self.block_left[t] = 0_f32;
             self.block_right[t] = 0_f32;
         }
 
-        for i in 0..self.voices.active_voice_count as usize {
+        for i in 0..self.voices.active_voice_count {
             let voice = &self.voices.voices[i];
             let previous_gain_left = self.master_volume * voice.previous_mix_gain_left;
             let current_gain_left = self.master_volume * voice.current_mix_gain_left;
@@ -405,11 +400,11 @@ impl Synthesizer {
             let chorus_input_right = self.chorus_input_right.as_mut().unwrap();
             let chorus_output_left = self.chorus_output_left.as_mut().unwrap();
             let chorus_output_right = self.chorus_output_right.as_mut().unwrap();
-            for i in 0..self.block_size as usize {
+            for i in 0..self.block_size {
                 chorus_input_left[i] = 0_f32;
                 chorus_input_right[i] = 0_f32;
             }
-            for i in 0..self.voices.active_voice_count as usize {
+            for i in 0..self.voices.active_voice_count {
                 let voice = &self.voices.voices[i];
                 let previous_gain_left = voice.previous_chorus_send * voice.previous_mix_gain_left;
                 let current_gain_left = voice.current_chorus_send * voice.current_mix_gain_left;
@@ -452,10 +447,10 @@ impl Synthesizer {
             let reverb_input = self.reverb_input.as_mut().unwrap();
             let reverb_output_left = self.reverb_output_left.as_mut().unwrap();
             let reverb_output_right = self.reverb_output_right.as_mut().unwrap();
-            for input in reverb_input.iter_mut().take(self.block_size as usize) {
+            for input in reverb_input.iter_mut().take(self.block_size) {
                 *input = 0_f32;
             }
-            for i in 0..self.voices.active_voice_count as usize {
+            for i in 0..self.voices.active_voice_count {
                 let voice = &self.voices.voices[i];
                 let previous_gain = reverb.get_input_gain()
                     * voice.previous_reverb_send
@@ -513,7 +508,11 @@ impl Synthesizer {
         self.sample_rate
     }
 
-    pub fn get_maximum_polyphony(&self) -> i32 {
+    pub fn get_block_size(&self) -> usize {
+        self.block_size
+    }
+
+    pub fn get_maximum_polyphony(&self) -> usize {
         self.maximum_polyphony
     }
 
