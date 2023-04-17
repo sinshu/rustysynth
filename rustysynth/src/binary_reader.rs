@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
-use std::error::Error;
 use std::io;
+use std::io::ErrorKind;
 use std::io::Read;
 use std::slice;
 use std::str;
@@ -53,7 +53,7 @@ impl BinaryReader {
         Ok(i32::from_be_bytes(data))
     }
 
-    pub(crate) fn read_i32_variable_length<R: Read>(reader: &mut R) -> Result<i32, Box<dyn Error>> {
+    pub(crate) fn read_i32_variable_length<R: Read>(reader: &mut R) -> Result<i32, io::Error> {
         let mut acc: i32 = 0;
         let mut count: i32 = 0;
 
@@ -65,7 +65,10 @@ impl BinaryReader {
             }
             count += 1;
             if count == 4 {
-                return Err("The length of the value must be equal to or less than 4.".into());
+                return Err(io::Error::new(
+                    ErrorKind::InvalidData,
+                    "the length of the value must be equal to or less than 4",
+                ));
             }
         }
 
