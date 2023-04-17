@@ -132,7 +132,7 @@ impl fmt::Display for SoundFontError {
 }
 
 #[derive(Debug)]
-pub enum MidiFIleError {
+pub enum MidiFileError {
     IoError(io::Error),
     InvalidChunkType {
         expected: &'static str,
@@ -143,26 +143,26 @@ pub enum MidiFIleError {
     InvalidTempoValue,
 }
 
-impl From<io::Error> for MidiFIleError {
+impl From<io::Error> for MidiFileError {
     fn from(err: io::Error) -> Self {
-        MidiFIleError::IoError(err)
+        MidiFileError::IoError(err)
     }
 }
 
-impl fmt::Display for MidiFIleError {
+impl fmt::Display for MidiFileError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            MidiFIleError::IoError(err) => err.fmt(f),
-            MidiFIleError::InvalidChunkType { expected, actual } => write!(
+            MidiFileError::IoError(err) => err.fmt(f),
+            MidiFileError::InvalidChunkType { expected, actual } => write!(
                 f,
                 "the chunk type must be '{}', but was '{}'",
                 expected, actual
             ),
-            MidiFIleError::InvalidChunkData(id) => write!(f, "the '{}' chunk has invalid data", id),
-            MidiFIleError::UnsupportedFormat(format) => {
+            MidiFileError::InvalidChunkData(id) => write!(f, "the '{}' chunk has invalid data", id),
+            MidiFileError::UnsupportedFormat(format) => {
                 write!(f, "the format {} is not supported", format)
             }
-            MidiFIleError::InvalidTempoValue => write!(f, "failed to read the tempo value"),
+            MidiFileError::InvalidTempoValue => write!(f, "failed to read the tempo value"),
         }
     }
 }
