@@ -2,12 +2,12 @@
 
 use std::cmp;
 use std::collections::HashMap;
-use std::error::Error;
 use std::sync::Arc;
 
 use crate::array_math::ArrayMath;
 use crate::channel::Channel;
 use crate::chorus::Chorus;
+use crate::error::SynthesizerError;
 use crate::region_pair::RegionPair;
 use crate::reverb::Reverb;
 use crate::soundfont::SoundFont;
@@ -58,7 +58,7 @@ impl Synthesizer {
     pub fn new(
         sound_font: &Arc<SoundFont>,
         settings: &SynthesizerSettings,
-    ) -> Result<Self, Box<dyn Error>> {
+    ) -> Result<Self, SynthesizerError> {
         settings.validate()?;
 
         let mut preset_lookup: HashMap<i32, usize> = HashMap::new();

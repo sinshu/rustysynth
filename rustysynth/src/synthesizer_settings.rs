@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use std::error::Error;
+use crate::error::SynthesizerError;
 
 #[non_exhaustive]
 pub struct SynthesizerSettings {
@@ -24,7 +24,7 @@ impl SynthesizerSettings {
         }
     }
 
-    pub(crate) fn validate(&self) -> Result<(), Box<dyn Error>> {
+    pub(crate) fn validate(&self) -> Result<(), SynthesizerError> {
         SynthesizerSettings::check_sample_rate(self.sample_rate)?;
         SynthesizerSettings::check_block_size(self.block_size)?;
         SynthesizerSettings::check_maximum_polyphony(self.maximum_polyphony)?;
@@ -32,25 +32,25 @@ impl SynthesizerSettings {
         Ok(())
     }
 
-    fn check_sample_rate(value: i32) -> Result<(), Box<dyn Error>> {
+    fn check_sample_rate(value: i32) -> Result<(), SynthesizerError> {
         if !(16_000..=192_000).contains(&value) {
-            return Err("The sample rate must be between 16000 and 192000.".into());
+            return Err(SynthesizerError::SampleRateOutOfRange(value));
         }
 
         Ok(())
     }
 
-    fn check_block_size(value: usize) -> Result<(), Box<dyn Error>> {
+    fn check_block_size(value: usize) -> Result<(), SynthesizerError> {
         if !(8..=1024).contains(&value) {
-            return Err("The block size must be between 8 and 1024.".into());
+            return Err(SynthesizerError::BlockSizeOutOfRange(value));
         }
 
         Ok(())
     }
 
-    fn check_maximum_polyphony(value: usize) -> Result<(), Box<dyn Error>> {
+    fn check_maximum_polyphony(value: usize) -> Result<(), SynthesizerError> {
         if !(8..=256).contains(&value) {
-            return Err("The maximum number of polyphony must be between 8 and 256.".into());
+            return Err(SynthesizerError::MaximumPolyphonyOutOfRange(value));
         }
 
         Ok(())
