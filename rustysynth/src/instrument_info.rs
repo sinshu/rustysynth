@@ -2,7 +2,8 @@
 
 use std::io::Read;
 
-use crate::{binary_reader::BinaryReader, error::SoundFontError};
+use crate::binary_reader::BinaryReader;
+use crate::error::SoundFontError;
 
 #[non_exhaustive]
 pub(crate) struct InstrumentInfo {

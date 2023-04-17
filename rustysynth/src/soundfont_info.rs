@@ -2,9 +2,9 @@
 
 use std::io::Read;
 
-use super::binary_reader::BinaryReader;
-use super::soundfont_version::SoundFontVersion;
+use crate::binary_reader::BinaryReader;
 use crate::error::SoundFontError;
+use crate::soundfont_version::SoundFontVersion;
 
 #[non_exhaustive]
 pub struct SoundFontInfo {
