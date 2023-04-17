@@ -76,6 +76,7 @@ impl BinaryReader {
         let mut data: [u8; 4] = [0; 4];
         reader.read_exact(&mut data)?;
 
+        // Replace non-ASCII characters with '?'.
         for value in &mut data {
             if !(32..=126).contains(value) {
                 *value = 63; // '?'
@@ -100,6 +101,7 @@ impl BinaryReader {
             actual_length += 1;
         }
 
+        // Replace non-ASCII characters with '?'.
         for value in &mut data[0..actual_length] {
             if !(32..=126).contains(value) {
                 *value = 63; // '?'
