@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
-use std::error::Error;
-
+use crate::error::SoundFontError;
 use crate::generator::Generator;
 use crate::generator_type::GeneratorType;
 use crate::loop_mode::LoopMode;
@@ -32,11 +31,11 @@ pub struct InstrumentRegion {
 
 impl InstrumentRegion {
     fn new(
-        name: &String,
+        name: &str,
         global: &Zone,
         local: &Zone,
         samples: &[SampleHeader],
-    ) -> Result<Self, Box<dyn Error>> {
+    ) -> Result<Self, SoundFontError> {
         let mut gs: [i16; GeneratorType::COUNT] = [0; GeneratorType::COUNT];
         gs[GeneratorType::INITIAL_FILTER_CUTOFF_FREQUENCY as usize] = 13500;
         gs[GeneratorType::DELAY_MODULATION_LFO as usize] = -12000;
@@ -68,9 +67,10 @@ impl InstrumentRegion {
 
         let id = gs[GeneratorType::SAMPLE_ID as usize] as usize;
         if id >= samples.len() {
-            return Err(
-                format!("The instrument '{name}' contains an invalid sample ID '{id}'.").into(),
-            );
+            return Err(SoundFontError::InvalidSampleId {
+                instrument_name: name.to_string(),
+                sample_id: id,
+            });
         }
         let sample = &samples[id];
 
@@ -87,10 +87,10 @@ impl InstrumentRegion {
     }
 
     pub(crate) fn create(
-        name: &String,
+        name: &str,
         zones: &[Zone],
         samples: &[SampleHeader],
-    ) -> Result<Vec<InstrumentRegion>, Box<dyn Error>> {
+    ) -> Result<Vec<InstrumentRegion>, SoundFontError> {
         // Is the first one the global zone?
         if zones[0].generators.is_empty()
             || zones[0].generators.last().unwrap().generator_type != GeneratorType::SAMPLE_ID

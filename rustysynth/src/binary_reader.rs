@@ -72,7 +72,7 @@ impl BinaryReader {
         Ok(acc)
     }
 
-    pub(crate) fn read_four_cc<R: Read>(reader: &mut R) -> Result<String, Box<dyn Error>> {
+    pub(crate) fn read_four_cc<R: Read>(reader: &mut R) -> Result<String, io::Error> {
         let mut data: [u8; 4] = [0; 4];
         reader.read_exact(&mut data)?;
 
@@ -82,41 +82,47 @@ impl BinaryReader {
             }
         }
 
-        Ok(str::from_utf8(&data)?.to_string())
+        Ok(str::from_utf8(&data).unwrap().to_string())
     }
 
     pub(crate) fn read_fixed_length_string<R: Read>(
         reader: &mut R,
-        length: i32,
-    ) -> Result<String, Box<dyn Error>> {
-        let mut data: Vec<u8> = vec![0; length as usize];
+        length: usize,
+    ) -> Result<String, io::Error> {
+        let mut data: Vec<u8> = vec![0; length];
         reader.read_exact(&mut data)?;
 
-        let mut actual_length: i32 = 0;
-        for i in 0..length {
-            if data[i as usize] == 0 {
+        let mut actual_length: usize = 0;
+        for value in &mut data {
+            if *value == 0 {
                 break;
             }
             actual_length += 1;
         }
 
-        Ok(str::from_utf8(&data[0..actual_length as usize])?.to_string())
+        for value in &mut data[0..actual_length] {
+            if !(32..=126).contains(value) {
+                *value = 63; // '?'
+            }
+        }
+
+        Ok(str::from_utf8(&data[0..actual_length]).unwrap().to_string())
     }
 
-    pub(crate) fn discard_data<R: Read>(reader: &mut R, size: i32) -> Result<(), io::Error> {
-        let mut data: Vec<u8> = vec![0; size as usize];
+    pub(crate) fn discard_data<R: Read>(reader: &mut R, size: usize) -> Result<(), io::Error> {
+        let mut data: Vec<u8> = vec![0; size];
         reader.read_exact(&mut data)
     }
 
     pub(crate) fn read_wave_data<R: Read>(
         reader: &mut R,
-        size: i32,
+        size: usize,
     ) -> Result<Vec<i16>, io::Error> {
-        let length = size as usize / 2;
+        let length = size / 2;
         let mut samples: Vec<i16> = vec![0; length];
 
         let ptr = samples.as_mut_ptr() as *mut u8;
-        let data = unsafe { slice::from_raw_parts_mut(ptr, size as usize) };
+        let data = unsafe { slice::from_raw_parts_mut(ptr, size) };
         reader.read_exact(data)?;
 
         Ok(samples)

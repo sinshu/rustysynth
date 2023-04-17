@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 
-use std::error::Error;
 use std::io::Read;
 use std::sync::Arc;
 
 use crate::binary_reader::BinaryReader;
+use crate::error::SoundFontError;
 use crate::instrument::Instrument;
 use crate::preset::Preset;
 use crate::sample_header::SampleHeader;
@@ -23,20 +23,20 @@ pub struct SoundFont {
 }
 
 impl SoundFont {
-    pub fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
+    pub fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "RIFF" {
-            return Err("The RIFF chunk was not found.".into());
+            return Err(SoundFontError::RiffChunkNotFound);
         }
 
         let _size = BinaryReader::read_i32(reader);
 
         let form_type = BinaryReader::read_four_cc(reader)?;
         if form_type != "sfbk" {
-            return Err(format!(
-                "The type of the RIFF chunk must be 'sfbk', but was '{form_type}'."
-            )
-            .into());
+            return Err(SoundFontError::InvalidRiffChunkType {
+                expected: "sfbk",
+                actual: form_type,
+            });
         }
 
         let info = SoundFontInfo::new(reader)?;

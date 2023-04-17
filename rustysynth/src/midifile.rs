@@ -111,7 +111,7 @@ impl MidiFile {
     }
 
     fn discard_data<R: Read>(reader: &mut R) -> Result<(), Box<dyn Error>> {
-        let size = BinaryReader::read_i32_variable_length(reader)?;
+        let size = BinaryReader::read_i32_variable_length(reader)? as usize;
         BinaryReader::discard_data(reader, size)?;
         Ok(())
     }

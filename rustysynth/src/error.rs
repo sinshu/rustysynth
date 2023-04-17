@@ -1,4 +1,5 @@
 use std::fmt;
+use std::io;
 
 #[derive(Debug)]
 pub enum SynthesizerError {
@@ -27,6 +28,105 @@ impl fmt::Display for SynthesizerError {
                     value
                 )
             }
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum SoundFontError {
+    IoError(io::Error),
+    RiffChunkNotFound,
+    InvalidRiffChunkType {
+        expected: &'static str,
+        actual: String,
+    },
+    ListChunkNotFound,
+    InvalidListChunkType {
+        expected: &'static str,
+        actual: String,
+    },
+    ListContainsUnknownId(String),
+    SampleDataNotFound,
+    SubChunkNotFound(&'static str),
+    InvalidPresetList,
+    InvalidInstrumentId {
+        preset_name: String,
+        instrument_id: usize,
+    },
+    InvalidPreset(String),
+    PresetNotFound,
+    InvalidInstrumentList,
+    InvalidSampleId {
+        instrument_name: String,
+        sample_id: usize,
+    },
+    InvalidInstrument(String),
+    InstrumentNotFound,
+    InvalidSampleHeaderList,
+    InvalidZoneList,
+    ZoneNotFound,
+    InvalidGeneratorList,
+}
+
+impl From<io::Error> for SoundFontError {
+    fn from(err: io::Error) -> Self {
+        SoundFontError::IoError(err)
+    }
+}
+
+impl fmt::Display for SoundFontError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            SoundFontError::IoError(err) => err.fmt(f),
+            SoundFontError::RiffChunkNotFound => write!(f, "the RIFF chunk was not found"),
+            SoundFontError::InvalidRiffChunkType { expected, actual } => write!(
+                f,
+                "the type of the RIFF chunk must be '{}', but was '{}'",
+                expected, actual
+            ),
+            SoundFontError::ListChunkNotFound => write!(f, "the LIST chunk was not found"),
+            SoundFontError::InvalidListChunkType { expected, actual } => write!(
+                f,
+                "the type of the LIST chunk must be '{}', but was '{}'",
+                expected, actual
+            ),
+            SoundFontError::ListContainsUnknownId(id) => {
+                write!(f, "the INFO list contains an unknown ID '{id}'")
+            }
+            SoundFontError::SampleDataNotFound => write!(f, "no valid sample data was found"),
+            SoundFontError::SubChunkNotFound(id) => {
+                write!(f, "the '{}' sub-chunk was not found", id)
+            }
+            SoundFontError::InvalidPresetList => write!(f, "the preset list is invalid"),
+            SoundFontError::InvalidInstrumentId {
+                preset_name,
+                instrument_id,
+            } => write!(
+                f,
+                "the preset '{preset_name}' contains an invalid instrument ID '{instrument_id}'"
+            ),
+            SoundFontError::InvalidPreset(preset_name) => {
+                write!(f, "the preset '{preset_name}' has no zone")
+            }
+            SoundFontError::PresetNotFound => write!(f, "no valid preset was found"),
+            SoundFontError::InvalidInstrumentList => write!(f, "the instrument list is invalid"),
+            SoundFontError::InvalidSampleId {
+                instrument_name,
+                sample_id,
+            } => write!(
+                f,
+                "the instrument '{instrument_name}' contains an invalid sample ID '{sample_id}'"
+            ),
+            SoundFontError::InvalidInstrument(instrument_name) => {
+                write!(f, "the instrument '{instrument_name}' has no zone")
+            }
+            SoundFontError::InstrumentNotFound => write!(f, "no valid instrument was found"),
+            SoundFontError::InvalidSampleHeaderList => {
+                write!(f, "the sample header list is invalid")
+            }
+            SoundFontError::InvalidZoneList => write!(f, "the zone list is invalid"),
+            SoundFontError::ZoneNotFound => write!(f, "no valid zone was found"),
+            SoundFontError::InvalidGeneratorList => write!(f, "the generator list is invalid"),
         }
     }
 }

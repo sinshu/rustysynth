@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
-use std::error::Error;
-
+use crate::error::SoundFontError;
 use crate::instrument::Instrument;
 use crate::preset_info::PresetInfo;
 use crate::preset_region::PresetRegion;
@@ -23,12 +22,12 @@ impl Preset {
         info: &PresetInfo,
         zones: &[Zone],
         instruments: &[Instrument],
-    ) -> Result<Self, Box<dyn Error>> {
+    ) -> Result<Self, SoundFontError> {
         let name = info.name.clone();
 
         let zone_count = info.zone_end_index - info.zone_start_index + 1;
         if zone_count <= 0 {
-            return Err(format!("The preset '{name}' has no zone.").into());
+            return Err(SoundFontError::InvalidPreset(name));
         }
 
         let span_start = info.zone_start_index as usize;
@@ -51,9 +50,9 @@ impl Preset {
         infos: &[PresetInfo],
         zones: &[Zone],
         instruments: &[Instrument],
-    ) -> Result<Vec<Preset>, Box<dyn Error>> {
+    ) -> Result<Vec<Preset>, SoundFontError> {
         if infos.len() <= 1 {
-            return Err("No valid preset was found.".into());
+            return Err(SoundFontError::PresetNotFound);
         }
 
         // The last one is the terminator.

@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
-use std::error::Error;
 use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
+use crate::error::SoundFontError;
 
 #[non_exhaustive]
 pub struct SampleHeader {
@@ -20,7 +20,7 @@ pub struct SampleHeader {
 }
 
 impl SampleHeader {
-    fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
+    fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
         let name = BinaryReader::read_fixed_length_string(reader, 20)?;
         let start = BinaryReader::read_i32(reader)?;
         let end = BinaryReader::read_i32(reader)?;
@@ -48,10 +48,10 @@ impl SampleHeader {
 
     pub(crate) fn read_from_chunk<R: Read>(
         reader: &mut R,
-        size: i32,
-    ) -> Result<Vec<SampleHeader>, Box<dyn Error>> {
+        size: usize,
+    ) -> Result<Vec<SampleHeader>, SoundFontError> {
         if size % 46 != 0 {
-            return Err("The sample header list is invalid.".into());
+            return Err(SoundFontError::InvalidSampleHeaderList);
         }
 
         let count = size / 46 - 1;
