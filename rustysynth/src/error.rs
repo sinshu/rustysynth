@@ -1,3 +1,4 @@
+use std::error;
 use std::fmt;
 use std::io;
 
@@ -7,6 +8,8 @@ pub enum SynthesizerError {
     BlockSizeOutOfRange(usize),
     MaximumPolyphonyOutOfRange(usize),
 }
+
+impl error::Error for SynthesizerError {}
 
 impl fmt::Display for SynthesizerError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -68,9 +71,12 @@ pub enum SoundFontError {
     InvalidGeneratorList,
 }
 
-impl From<io::Error> for SoundFontError {
-    fn from(err: io::Error) -> Self {
-        SoundFontError::IoError(err)
+impl error::Error for SoundFontError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            SoundFontError::IoError(ref err) => Some(err),
+            _ => None,
+        }
     }
 }
 
@@ -131,6 +137,12 @@ impl fmt::Display for SoundFontError {
     }
 }
 
+impl From<io::Error> for SoundFontError {
+    fn from(err: io::Error) -> Self {
+        SoundFontError::IoError(err)
+    }
+}
+
 #[derive(Debug)]
 pub enum MidiFileError {
     IoError(io::Error),
@@ -143,9 +155,12 @@ pub enum MidiFileError {
     InvalidTempoValue,
 }
 
-impl From<io::Error> for MidiFileError {
-    fn from(err: io::Error) -> Self {
-        MidiFileError::IoError(err)
+impl error::Error for MidiFileError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            MidiFileError::IoError(ref err) => Some(err),
+            _ => None,
+        }
     }
 }
 
@@ -164,5 +179,11 @@ impl fmt::Display for MidiFileError {
             }
             MidiFileError::InvalidTempoValue => write!(f, "failed to read the tempo value"),
         }
+    }
+}
+
+impl From<io::Error> for MidiFileError {
+    fn from(err: io::Error) -> Self {
+        MidiFileError::IoError(err)
     }
 }
