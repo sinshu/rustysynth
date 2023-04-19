@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
-use std::error::Error;
 use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
+use crate::error::SoundFontError;
 
 #[non_exhaustive]
 pub(crate) struct InstrumentInfo {
@@ -13,7 +13,7 @@ pub(crate) struct InstrumentInfo {
 }
 
 impl InstrumentInfo {
-    fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
+    fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
         let name = BinaryReader::read_fixed_length_string(reader, 20)?;
         let zone_start_index = BinaryReader::read_u16(reader)? as i32;
 
@@ -26,10 +26,10 @@ impl InstrumentInfo {
 
     pub(crate) fn read_from_chunk<R: Read>(
         reader: &mut R,
-        size: i32,
-    ) -> Result<Vec<InstrumentInfo>, Box<dyn Error>> {
+        size: usize,
+    ) -> Result<Vec<InstrumentInfo>, SoundFontError> {
         if size % 22 != 0 {
-            return Err("The instrument list is invalid.".into());
+            return Err(SoundFontError::InvalidInstrumentList);
         }
 
         let count = size / 22;
@@ -39,7 +39,7 @@ impl InstrumentInfo {
             instruments.push(InstrumentInfo::new(reader)?);
         }
 
-        for i in 0..(count - 1) as usize {
+        for i in 0..(count - 1) {
             instruments[i].zone_end_index = instruments[i + 1].zone_start_index - 1;
         }
 

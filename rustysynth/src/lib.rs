@@ -1,3 +1,5 @@
+mod error;
+
 mod array_math;
 mod binary_reader;
 
@@ -40,6 +42,9 @@ mod midifile_sequencer;
 mod chorus;
 mod reverb;
 
+pub use self::error::MidiFileError;
+pub use self::error::SoundFontError;
+pub use self::error::SynthesizerError;
 pub use self::instrument::Instrument;
 pub use self::instrument_region::InstrumentRegion;
 pub use self::midifile::MidiFile;

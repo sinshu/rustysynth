@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
-use std::error::Error;
-
+use crate::error::SoundFontError;
 use crate::generator::Generator;
 use crate::generator_type::GeneratorType;
 use crate::instrument::Instrument;
@@ -25,11 +24,11 @@ pub struct PresetRegion {
 
 impl PresetRegion {
     fn new(
-        name: &String,
+        name: &str,
         global: &Zone,
         local: &Zone,
         samples: &[Instrument],
-    ) -> Result<Self, Box<dyn Error>> {
+    ) -> Result<Self, SoundFontError> {
         let mut gs: [i16; GeneratorType::COUNT] = [0; GeneratorType::COUNT];
         gs[GeneratorType::KEY_RANGE as usize] = 0x7F00;
         gs[GeneratorType::VELOCITY_RANGE as usize] = 0x7F00;
@@ -44,19 +43,20 @@ impl PresetRegion {
 
         let id = gs[GeneratorType::INSTRUMENT as usize] as usize;
         if id >= samples.len() {
-            return Err(
-                format!("The preset '{name}' contains an invalid instrument ID '{id}'.").into(),
-            );
+            return Err(SoundFontError::InvalidInstrumentId {
+                preset_name: name.to_string(),
+                instrument_id: id,
+            });
         }
 
         Ok(Self { gs, instrument: id })
     }
 
     pub(crate) fn create(
-        name: &String,
+        name: &str,
         zones: &[Zone],
         instruments: &[Instrument],
-    ) -> Result<Vec<PresetRegion>, Box<dyn Error>> {
+    ) -> Result<Vec<PresetRegion>, SoundFontError> {
         // Is the first one the global zone?
         if zones[0].generators.is_empty()
             || zones[0].generators.last().unwrap().generator_type != GeneratorType::INSTRUMENT

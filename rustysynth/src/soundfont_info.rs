@@ -1,10 +1,10 @@
 #![allow(dead_code)]
 
-use std::error::Error;
 use std::io::Read;
 
-use super::binary_reader::BinaryReader;
-use super::soundfont_version::SoundFontVersion;
+use crate::binary_reader::BinaryReader;
+use crate::error::SoundFontError;
+use crate::soundfont_version::SoundFontVersion;
 
 #[non_exhaustive]
 pub struct SoundFontInfo {
@@ -22,22 +22,22 @@ pub struct SoundFontInfo {
 }
 
 impl SoundFontInfo {
-    pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
+    pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "LIST" {
-            return Err("The LIST chunk was not found.".into());
+            return Err(SoundFontError::ListChunkNotFound);
         }
 
-        let end = BinaryReader::read_i32(reader)?;
+        let end = BinaryReader::read_i32(reader)? as usize;
 
-        let mut pos: i32 = 0;
+        let mut pos: usize = 0;
 
         let list_type = BinaryReader::read_four_cc(reader)?;
         if list_type != "INFO" {
-            return Err(format!(
-                "The type of the LIST chunk must be 'INFO', but was '{list_type}'."
-            )
-            .into());
+            return Err(SoundFontError::InvalidListChunkType {
+                expected: "INFO",
+                actual: list_type,
+            });
         }
         pos += 4;
 
@@ -57,7 +57,7 @@ impl SoundFontInfo {
             let id = BinaryReader::read_four_cc(reader)?;
             pos += 4;
 
-            let size = BinaryReader::read_i32(reader)?;
+            let size = BinaryReader::read_i32(reader)? as usize;
             pos += 4;
 
             if id == "ifil" {
@@ -83,7 +83,7 @@ impl SoundFontInfo {
             } else if id == "ISFT" {
                 tools = Some(BinaryReader::read_fixed_length_string(reader, size)?);
             } else {
-                return Err(format!("The INFO list contains an unknown ID '{id}'.").into());
+                return Err(SoundFontError::ListContainsUnknownId(id));
             }
 
             pos += size;

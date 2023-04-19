@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
-use std::error::Error;
 use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
+use crate::error::SoundFontError;
 use crate::generator::Generator;
 use crate::instrument::Instrument;
 use crate::instrument_info::InstrumentInfo;
@@ -21,22 +21,22 @@ pub(crate) struct SoundFontParameters {
 }
 
 impl SoundFontParameters {
-    pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
+    pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != "LIST" {
-            return Err("The LIST chunk was not found.".into());
+            return Err(SoundFontError::ListChunkNotFound);
         }
 
-        let end = BinaryReader::read_i32(reader)?;
+        let end = BinaryReader::read_i32(reader)? as usize;
 
-        let mut pos: i32 = 0;
+        let mut pos: usize = 0;
 
         let list_type = BinaryReader::read_four_cc(reader)?;
         if list_type != "pdta" {
-            return Err(format!(
-                "The type of the LIST chunk must be 'pdta', but was '{list_type}'."
-            )
-            .into());
+            return Err(SoundFontError::InvalidListChunkType {
+                expected: "pdta",
+                actual: list_type,
+            });
         }
         pos += 4;
 
@@ -52,7 +52,7 @@ impl SoundFontParameters {
             let id = BinaryReader::read_four_cc(reader)?;
             pos += 4;
 
-            let size = BinaryReader::read_i32(reader)?;
+            let size = BinaryReader::read_i32(reader)? as usize;
             pos += 4;
 
             if id == "phdr" {
@@ -74,7 +74,7 @@ impl SoundFontParameters {
             } else if id == "shdr" {
                 sample_headers = Some(SampleHeader::read_from_chunk(reader, size)?);
             } else {
-                return Err(format!("The INFO list contains an unknown ID '{id}'.").into());
+                return Err(SoundFontError::ListContainsUnknownId(id));
             }
 
             pos += size;
@@ -82,37 +82,37 @@ impl SoundFontParameters {
 
         let preset_infos = match preset_infos {
             Some(value) => value,
-            None => return Err("The PHDR sub-chunk was not found.".into()),
+            None => return Err(SoundFontError::SubChunkNotFound("PHDR")),
         };
 
         let preset_bag = match preset_bag {
             Some(value) => value,
-            None => return Err("The PBAG sub-chunk was not found.".into()),
+            None => return Err(SoundFontError::SubChunkNotFound("PBAG")),
         };
 
         let preset_generators = match preset_generators {
             Some(value) => value,
-            None => return Err("The PGEN sub-chunk was not found.".into()),
+            None => return Err(SoundFontError::SubChunkNotFound("PGEN")),
         };
 
         let instrument_infos = match instrument_infos {
             Some(value) => value,
-            None => return Err("The INST sub-chunk was not found.".into()),
+            None => return Err(SoundFontError::SubChunkNotFound("INST")),
         };
 
         let instrument_bag = match instrument_bag {
             Some(value) => value,
-            None => return Err("The IBAG sub-chunk was not found.".into()),
+            None => return Err(SoundFontError::SubChunkNotFound("IBAG")),
         };
 
         let instrument_generators = match instrument_generators {
             Some(value) => value,
-            None => return Err("The IGEN sub-chunk was not found.".into()),
+            None => return Err(SoundFontError::SubChunkNotFound("IGEN")),
         };
 
         let sample_headers = match sample_headers {
             Some(value) => value,
-            None => return Err("The SHDR sub-chunk was not found.".into()),
+            None => return Err(SoundFontError::SubChunkNotFound("SHDR")),
         };
 
         let instrument_zones = Zone::create(&instrument_bag, &instrument_generators)?;

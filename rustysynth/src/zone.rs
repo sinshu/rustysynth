@@ -1,5 +1,4 @@
-use std::error::Error;
-
+use crate::error::SoundFontError;
 use crate::generator::Generator;
 use crate::zone_info::ZoneInfo;
 
@@ -30,9 +29,9 @@ impl Zone {
     pub(crate) fn create(
         infos: &[ZoneInfo],
         generators: &[Generator],
-    ) -> Result<Vec<Zone>, Box<dyn Error>> {
+    ) -> Result<Vec<Zone>, SoundFontError> {
         if infos.len() <= 1 {
-            return Err("No valid zone was found.".into());
+            return Err(SoundFontError::ZoneNotFound);
         }
 
         // The last one is the terminator.
