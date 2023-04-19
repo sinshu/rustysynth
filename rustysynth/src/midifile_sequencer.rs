@@ -18,15 +18,10 @@ pub struct MidiFileSequencer {
 
     current_time: f64,
     msg_index: usize,
-
-    block_left: Vec<f32>,
-    block_right: Vec<f32>,
 }
 
 impl MidiFileSequencer {
     pub fn new(synthesizer: Synthesizer) -> Self {
-        let block_size = synthesizer.block_size;
-
         Self {
             synthesizer,
             midi_file: None,
@@ -34,8 +29,6 @@ impl MidiFileSequencer {
             block_wrote: 0,
             current_time: 0.0,
             msg_index: 0,
-            block_left: vec![0_f32; block_size],
-            block_right: vec![0_f32; block_size],
         }
     }
 
