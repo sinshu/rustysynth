@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
-use std::error::Error;
-
+use crate::error::SoundFontError;
 use crate::generator::Generator;
 use crate::generator_type::GeneratorType;
 use crate::instrument::Instrument;
@@ -25,11 +24,11 @@ pub struct PresetRegion {
 
 impl PresetRegion {
     fn new(
-        name: &String,
+        name: &str,
         global: &Zone,
         local: &Zone,
-        samples: &Vec<Instrument>,
-    ) -> Result<Self, Box<dyn Error>> {
+        samples: &[Instrument],
+    ) -> Result<Self, SoundFontError> {
         let mut gs: [i16; GeneratorType::COUNT] = [0; GeneratorType::COUNT];
         gs[GeneratorType::KEY_RANGE as usize] = 0x7F00;
         gs[GeneratorType::VELOCITY_RANGE as usize] = 0x7F00;
@@ -44,24 +43,22 @@ impl PresetRegion {
 
         let id = gs[GeneratorType::INSTRUMENT as usize] as usize;
         if id >= samples.len() {
-            return Err(
-                format!("The preset '{name}' contains an invalid instrument ID '{id}'.").into(),
-            );
+            return Err(SoundFontError::InvalidInstrumentId {
+                preset_name: name.to_string(),
+                instrument_id: id,
+            });
         }
 
-        Ok(Self {
-            gs: gs,
-            instrument: id,
-        })
+        Ok(Self { gs, instrument: id })
     }
 
     pub(crate) fn create(
-        name: &String,
+        name: &str,
         zones: &[Zone],
-        instruments: &Vec<Instrument>,
-    ) -> Result<Vec<PresetRegion>, Box<dyn Error>> {
+        instruments: &[Instrument],
+    ) -> Result<Vec<PresetRegion>, SoundFontError> {
         // Is the first one the global zone?
-        if zones[0].generators.len() == 0
+        if zones[0].generators.is_empty()
             || zones[0].generators.last().unwrap().generator_type != GeneratorType::INSTRUMENT
         {
             // The first one is the global zone.
@@ -71,12 +68,7 @@ impl PresetRegion {
             let count = zones.len() - 1;
             let mut regions: Vec<PresetRegion> = Vec::new();
             for i in 0..count {
-                regions.push(PresetRegion::new(
-                    name,
-                    global,
-                    &zones[i + 1],
-                    &instruments,
-                )?);
+                regions.push(PresetRegion::new(name, global, &zones[i + 1], instruments)?);
             }
 
             Ok(regions)
@@ -84,13 +76,8 @@ impl PresetRegion {
             // No global zone.
             let count = zones.len();
             let mut regions: Vec<PresetRegion> = Vec::new();
-            for i in 0..count {
-                regions.push(PresetRegion::new(
-                    name,
-                    &Zone::empty(),
-                    &zones[i],
-                    &instruments,
-                )?);
+            for zone in zones.iter().take(count) {
+                regions.push(PresetRegion::new(name, &Zone::empty(), zone, instruments)?);
             }
 
             Ok(regions)
@@ -101,7 +88,7 @@ impl PresetRegion {
         let contains_key = self.get_key_range_start() <= key && key <= self.get_key_range_end();
         let contains_velocity = self.get_velocity_range_start() <= velocity
             && velocity <= self.get_velocity_range_end();
-        return contains_key && contains_velocity;
+        contains_key && contains_velocity
     }
 
     pub fn get_modulation_lfo_to_pitch(&self) -> i32 {

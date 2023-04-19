@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
-use std::error::Error;
-
+use crate::error::SoundFontError;
 use crate::instrument::Instrument;
 use crate::preset_info::PresetInfo;
 use crate::preset_region::PresetRegion;
@@ -21,47 +20,47 @@ pub struct Preset {
 impl Preset {
     fn new(
         info: &PresetInfo,
-        zones: &Vec<Zone>,
-        instruments: &Vec<Instrument>,
-    ) -> Result<Self, Box<dyn Error>> {
+        zones: &[Zone],
+        instruments: &[Instrument],
+    ) -> Result<Self, SoundFontError> {
         let name = info.name.clone();
 
         let zone_count = info.zone_end_index - info.zone_start_index + 1;
         if zone_count <= 0 {
-            return Err(format!("The preset '{name}' has no zone.").into());
+            return Err(SoundFontError::InvalidPreset(name));
         }
 
         let span_start = info.zone_start_index as usize;
         let span_end = span_start + zone_count as usize;
         let zone_span = &zones[span_start..span_end];
-        let regions = PresetRegion::create(&name, zone_span, &instruments)?;
+        let regions = PresetRegion::create(&name, zone_span, instruments)?;
 
         Ok(Self {
-            name: name,
+            name,
             patch_number: info.patch_number,
             bank_number: info.bank_number,
             library: info.library,
             genre: info.genre,
             morphology: info.morphology,
-            regions: regions,
+            regions,
         })
     }
 
     pub(crate) fn create(
-        infos: &Vec<PresetInfo>,
-        zones: &Vec<Zone>,
-        instruments: &Vec<Instrument>,
-    ) -> Result<Vec<Preset>, Box<dyn Error>> {
+        infos: &[PresetInfo],
+        zones: &[Zone],
+        instruments: &[Instrument],
+    ) -> Result<Vec<Preset>, SoundFontError> {
         if infos.len() <= 1 {
-            return Err(format!("No valid preset was found.").into());
+            return Err(SoundFontError::PresetNotFound);
         }
 
         // The last one is the terminator.
         let count = infos.len() - 1;
 
         let mut presets: Vec<Preset> = Vec::new();
-        for i in 0..count {
-            presets.push(Preset::new(&infos[i], &zones, &instruments)?);
+        for info in infos.iter().take(count) {
+            presets.push(Preset::new(info, zones, instruments)?);
         }
 
         Ok(presets)

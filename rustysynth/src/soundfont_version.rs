@@ -20,10 +20,7 @@ impl SoundFontVersion {
         let major = BinaryReader::read_i16(reader)?;
         let minor = BinaryReader::read_i16(reader)?;
 
-        Ok(Self {
-            major: major,
-            minor: minor,
-        })
+        Ok(Self { major, minor })
     }
 
     pub fn get_major(&self) -> i32 {

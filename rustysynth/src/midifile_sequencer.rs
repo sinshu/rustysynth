@@ -18,24 +18,17 @@ pub struct MidiFileSequencer {
 
     current_time: f64,
     msg_index: usize,
-
-    block_left: Vec<f32>,
-    block_right: Vec<f32>,
 }
 
 impl MidiFileSequencer {
     pub fn new(synthesizer: Synthesizer) -> Self {
-        let block_size = synthesizer.block_size;
-
         Self {
-            synthesizer: synthesizer,
+            synthesizer,
             midi_file: None,
             play_loop: false,
             block_wrote: 0,
             current_time: 0.0,
             msg_index: 0,
-            block_left: vec![0_f32; block_size as usize],
-            block_right: vec![0_f32; block_size as usize],
         }
     }
 
@@ -43,7 +36,7 @@ impl MidiFileSequencer {
         self.midi_file = Some(Arc::clone(midi_file));
         self.play_loop = play_loop;
 
-        self.block_wrote = self.synthesizer.block_size as usize;
+        self.block_wrote = self.synthesizer.block_size;
 
         self.current_time = 0.0;
         self.msg_index = 0;
@@ -64,14 +57,14 @@ impl MidiFileSequencer {
         let left_length = left.len();
         let mut wrote: usize = 0;
         while wrote < left_length {
-            if self.block_wrote == self.synthesizer.block_size as usize {
+            if self.block_wrote == self.synthesizer.block_size {
                 self.process_events();
                 self.block_wrote = 0;
                 self.current_time +=
                     self.synthesizer.block_size as f64 / self.synthesizer.sample_rate as f64;
             }
 
-            let src_rem = self.synthesizer.block_size as usize - self.block_wrote;
+            let src_rem = self.synthesizer.block_size - self.block_wrote;
             let dst_rem = left_length - wrote;
             let rem = cmp::min(src_rem, dst_rem);
 

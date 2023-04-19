@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
-use std::error::Error;
 use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
+use crate::MidiFileError;
 
 #[derive(Clone, Copy)]
 #[non_exhaustive]
@@ -23,7 +23,7 @@ impl Message {
         Self {
             channel: status & 0x0F,
             command: status & 0xF0,
-            data1: data1,
+            data1,
             data2: 0,
         }
     }
@@ -32,8 +32,8 @@ impl Message {
         Self {
             channel: status & 0x0F,
             command: status & 0xF0,
-            data1: data1,
-            data2: data2,
+            data1,
+            data2,
         }
     }
 
@@ -77,20 +77,23 @@ pub struct MidiFile {
 }
 
 impl MidiFile {
-    pub fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
+    pub fn new<R: Read>(reader: &mut R) -> Result<Self, MidiFileError> {
         let chunk_type = BinaryReader::read_four_cc(reader)?;
         if chunk_type != "MThd" {
-            return Err(format!("The chunk type must be 'MThd', but was '{chunk_type}'.").into());
+            return Err(MidiFileError::InvalidChunkType {
+                expected: "MThd",
+                actual: chunk_type,
+            });
         }
 
         let size = BinaryReader::read_i32_big_endian(reader)?;
         if size != 6 {
-            return Err(format!("The MThd chunk has invalid data.").into());
+            return Err(MidiFileError::InvalidChunkData("MThd"));
         }
 
         let format = BinaryReader::read_i16_big_endian(reader)?;
         if !(format == 0 || format == 1) {
-            return Err(format!("The format {format} is not supported.").into());
+            return Err(MidiFileError::UnsupportedFormat(format));
         }
 
         let track_count = BinaryReader::read_i16_big_endian(reader)? as i32;
@@ -107,22 +110,19 @@ impl MidiFile {
 
         let (messages, times) = MidiFile::merge_tracks(&message_lists, &tick_lists, resolution);
 
-        Ok(Self {
-            messages: messages,
-            times: times,
-        })
+        Ok(Self { messages, times })
     }
 
-    fn discard_data<R: Read>(reader: &mut R) -> Result<(), Box<dyn Error>> {
-        let size = BinaryReader::read_i32_variable_length(reader)?;
+    fn discard_data<R: Read>(reader: &mut R) -> Result<(), MidiFileError> {
+        let size = BinaryReader::read_i32_variable_length(reader)? as usize;
         BinaryReader::discard_data(reader, size)?;
         Ok(())
     }
 
-    fn read_tempo<R: Read>(reader: &mut R) -> Result<i32, Box<dyn Error>> {
+    fn read_tempo<R: Read>(reader: &mut R) -> Result<i32, MidiFileError> {
         let size = BinaryReader::read_i32_variable_length(reader)?;
         if size != 3 {
-            return Err(format!("Failed to read the tempo value.").into());
+            return Err(MidiFileError::InvalidTempoValue);
         }
 
         let b1 = BinaryReader::read_u8(reader)? as i32;
@@ -132,10 +132,13 @@ impl MidiFile {
         Ok((b1 << 16) | (b2 << 8) | b3)
     }
 
-    fn read_track<R: Read>(reader: &mut R) -> Result<(Vec<Message>, Vec<i32>), Box<dyn Error>> {
+    fn read_track<R: Read>(reader: &mut R) -> Result<(Vec<Message>, Vec<i32>), MidiFileError> {
         let chunk_type = BinaryReader::read_four_cc(reader)?;
         if chunk_type != "MTrk" {
-            return Err(format!("The chunk type must be 'MTrk', but was '{chunk_type}'.").into());
+            return Err(MidiFileError::InvalidChunkType {
+                expected: "MTrk",
+                actual: chunk_type,
+            });
         }
 
         BinaryReader::read_i32_big_endian(reader)?;
@@ -202,8 +205,8 @@ impl MidiFile {
     }
 
     fn merge_tracks(
-        message_lists: &Vec<Vec<Message>>,
-        tick_lists: &Vec<Vec<i32>>,
+        message_lists: &[Vec<Message>],
+        tick_lists: &[Vec<i32>],
         resolution: i32,
     ) -> (Vec<Message>, Vec<f64>) {
         let mut merged_messages: Vec<Message> = Vec::new();

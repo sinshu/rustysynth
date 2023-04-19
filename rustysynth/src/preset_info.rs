@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
-use std::error::Error;
 use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
+use crate::error::SoundFontError;
 
 #[non_exhaustive]
 pub(crate) struct PresetInfo {
@@ -18,7 +18,7 @@ pub(crate) struct PresetInfo {
 }
 
 impl PresetInfo {
-    fn new<R: Read>(reader: &mut R) -> Result<Self, Box<dyn Error>> {
+    fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
         let name = BinaryReader::read_fixed_length_string(reader, 20)?;
         let patch_number = BinaryReader::read_u16(reader)? as i32;
         let bank_number = BinaryReader::read_u16(reader)? as i32;
@@ -28,23 +28,23 @@ impl PresetInfo {
         let morphology = BinaryReader::read_i32(reader)?;
 
         Ok(Self {
-            name: name,
-            patch_number: patch_number,
-            bank_number: bank_number,
-            zone_start_index: zone_start_index,
+            name,
+            patch_number,
+            bank_number,
+            zone_start_index,
             zone_end_index: 0,
-            library: library,
-            genre: genre,
-            morphology: morphology,
+            library,
+            genre,
+            morphology,
         })
     }
 
     pub(crate) fn read_from_chunk<R: Read>(
         reader: &mut R,
-        size: i32,
-    ) -> Result<Vec<PresetInfo>, Box<dyn Error>> {
+        size: usize,
+    ) -> Result<Vec<PresetInfo>, SoundFontError> {
         if size % 38 != 0 {
-            return Err(format!("The preset list is invalid.").into());
+            return Err(SoundFontError::InvalidPresetList);
         }
 
         let count = size / 38;
@@ -54,7 +54,7 @@ impl PresetInfo {
             presets.push(PresetInfo::new(reader)?);
         }
 
-        for i in 0..(count - 1) as usize {
+        for i in 0..(count - 1) {
             presets[i].zone_end_index = presets[i + 1].zone_start_index - 1;
         }
 

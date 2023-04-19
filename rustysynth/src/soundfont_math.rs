@@ -9,23 +9,23 @@ pub(crate) struct SoundFontMath {}
 impl SoundFontMath {
     pub(crate) const HALF_PI: f32 = consts::PI / 2_f32;
     pub(crate) const NON_AUDIBLE: f32 = 1.0e-3_f32;
-    pub(crate) const LOG_NON_AUDIBLE: f32 = -6.90775527898_f32;
+    pub(crate) const LOG_NON_AUDIBLE: f32 = -6.907_755_4_f32;
 
     pub(crate) fn max(x: f32, y: f32) -> f32 {
         if x > y {
-            return x;
+            x
         } else {
-            return y;
+            y
         }
     }
 
     pub(crate) fn clamp(value: f32, min: f32, max: f32) -> f32 {
         if value < min {
-            return min;
+            min
         } else if value > max {
-            return max;
+            max
         } else {
-            return value;
+            value
         }
     }
 
@@ -55,9 +55,9 @@ impl SoundFontMath {
 
     pub(crate) fn exp_cutoff(x: f64) -> f64 {
         if x < SoundFontMath::LOG_NON_AUDIBLE as f64 {
-            return 0_f64;
+            0_f64
         } else {
-            return x.exp();
+            x.exp()
         }
     }
 }

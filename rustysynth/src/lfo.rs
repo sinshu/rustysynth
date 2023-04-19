@@ -5,14 +5,14 @@ use crate::synthesizer_settings::SynthesizerSettings;
 #[non_exhaustive]
 pub(crate) struct Lfo {
     sample_rate: i32,
-    block_size: i32,
+    block_size: usize,
 
     active: bool,
 
     delay: f64,
     period: f64,
 
-    processed_sample_count: i32,
+    processed_sample_count: usize,
     value: f32,
 }
 

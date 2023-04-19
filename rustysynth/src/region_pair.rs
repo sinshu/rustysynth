@@ -13,10 +13,7 @@ pub(crate) struct RegionPair<'a> {
 
 impl<'a> RegionPair<'a> {
     pub(crate) fn new(preset: &'a PresetRegion, instrument: &'a InstrumentRegion) -> Self {
-        Self {
-            preset: preset,
-            instrument: instrument,
-        }
+        Self { preset, instrument }
     }
 
     fn gs(&self, i: usize) -> i32 {

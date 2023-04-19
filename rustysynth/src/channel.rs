@@ -27,7 +27,7 @@ pub(crate) struct Channel {
 impl Channel {
     pub(crate) fn new(is_percussion_channel: bool) -> Self {
         let mut channel = Self {
-            is_percussion_channel: is_percussion_channel,
+            is_percussion_channel,
             bank_number: 0,
             patch_number: 0,
             modulation: 0,
