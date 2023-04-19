@@ -105,8 +105,9 @@ impl BinaryReader {
         }
 
         // Replace non-ASCII characters with '?'.
+        // Tabs and returns are preserved.
         for value in &mut data[0..actual_length] {
-            if !(32..=126).contains(value) {
+            if !(9..=126).contains(value) {
                 *value = 63; // '?'
             }
         }
