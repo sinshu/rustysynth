@@ -5,7 +5,7 @@
 
 
 
-# v0.9.1
+# v0.9.2
 
 - Refactored the entire code to be more idiomatic ([thanks to @joseluis](https://github.com/sinshu/rustysynth/pull/6)).
 - Fixed issue where locks occurred during the rendering process.
