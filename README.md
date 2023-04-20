@@ -18,7 +18,7 @@ This is a demo video to show the synthesizer running on [rust-sfml](https://gith
 
 https://www.youtube.com/watch?v=o9rPTJIPmVk
 
-[![Youtube video](https://img.youtube.com/vi/o9rPTJIPmVk/0.jpg)](https://www.youtube.com/watch?v=o9rPTJIPmVk)
+[![Youtube video](rustysynth-yt.png)](https://www.youtube.com/watch?v=o9rPTJIPmVk)
 
 
 

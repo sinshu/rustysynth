@@ -7,7 +7,7 @@ use crate::voice::Voice;
 
 #[non_exhaustive]
 pub(crate) struct VoiceCollection {
-    pub(crate) voices: Vec<Voice>,
+    voices: Vec<Voice>,
     pub(crate) active_voice_count: usize,
 }
 
@@ -84,6 +84,10 @@ impl VoiceCollection {
                 self.voices.swap(i, self.active_voice_count);
             }
         }
+    }
+
+    pub(crate) fn get_active_voices(&mut self) -> &mut [Voice] {
+        &mut self.voices[0..self.active_voice_count]
     }
 
     pub(crate) fn clear(&mut self) {
