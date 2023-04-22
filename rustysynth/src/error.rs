@@ -50,6 +50,7 @@ pub enum SoundFontError {
     },
     ListContainsUnknownId(String),
     SampleDataNotFound,
+    UnsupportedSampleFormat,
     SubChunkNotFound(&'static str),
     InvalidPresetList,
     InvalidInstrumentId {
@@ -100,6 +101,7 @@ impl fmt::Display for SoundFontError {
                 write!(f, "the INFO list contains an unknown ID '{id}'")
             }
             SoundFontError::SampleDataNotFound => write!(f, "no valid sample data was found"),
+            SoundFontError::UnsupportedSampleFormat => write!(f, "SoundFont3 is not yet supported"),
             SoundFontError::SubChunkNotFound(id) => {
                 write!(f, "the '{}' sub-chunk was not found", id)
             }
