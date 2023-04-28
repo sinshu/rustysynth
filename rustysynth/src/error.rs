@@ -3,6 +3,7 @@ use std::fmt;
 use std::io;
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum SynthesizerError {
     SampleRateOutOfRange(i32),
     BlockSizeOutOfRange(usize),
@@ -36,6 +37,7 @@ impl fmt::Display for SynthesizerError {
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum SoundFontError {
     IoError(io::Error),
     RiffChunkNotFound,
@@ -146,6 +148,7 @@ impl From<io::Error> for SoundFontError {
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum MidiFileError {
     IoError(io::Error),
     InvalidChunkType {
