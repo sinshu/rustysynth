@@ -9,7 +9,6 @@ use std::path::PathBuf;
 fn soundfont3_load_test() {
     let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
     path.pop();
-    //path.push("MuseScore_General.sf3");
     path.push("MuseScore_General.sf3");
     let mut file = File::open(&path).unwrap();
     let result = SoundFont::new(&mut file);
