@@ -1,3 +1,10 @@
+# v1.1.0
+
+- Error types are now `non_exhaustive`.
+- Loading SoundFont3 explicitly fails with an error `SoundFontError::UnsupportedSampleFormat`.
+
+
+
 # v1.0.0
 
 - Introduced custom error types for error reporting.
