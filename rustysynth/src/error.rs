@@ -3,6 +3,7 @@ use std::fmt;
 use std::io;
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum SynthesizerError {
     SampleRateOutOfRange(i32),
     BlockSizeOutOfRange(usize),
@@ -36,6 +37,7 @@ impl fmt::Display for SynthesizerError {
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum SoundFontError {
     IoError(io::Error),
     RiffChunkNotFound,
@@ -50,6 +52,7 @@ pub enum SoundFontError {
     },
     ListContainsUnknownId(String),
     SampleDataNotFound,
+    UnsupportedSampleFormat,
     SubChunkNotFound(&'static str),
     InvalidPresetList,
     InvalidInstrumentId {
@@ -100,6 +103,7 @@ impl fmt::Display for SoundFontError {
                 write!(f, "the INFO list contains an unknown ID '{id}'")
             }
             SoundFontError::SampleDataNotFound => write!(f, "no valid sample data was found"),
+            SoundFontError::UnsupportedSampleFormat => write!(f, "SoundFont3 is not yet supported"),
             SoundFontError::SubChunkNotFound(id) => {
                 write!(f, "the '{}' sub-chunk was not found", id)
             }
@@ -144,6 +148,7 @@ impl From<io::Error> for SoundFontError {
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum MidiFileError {
     IoError(io::Error),
     InvalidChunkType {

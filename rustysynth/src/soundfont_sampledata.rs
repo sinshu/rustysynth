@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use std::io::Read;
+use std::slice;
 
 use crate::binary_reader::BinaryReader;
 use crate::error::SoundFontError;
@@ -55,6 +56,12 @@ impl SoundFontSampleData {
             Some(value) => value,
             None => return Err(SoundFontError::SampleDataNotFound),
         };
+
+        let ptr = wave_data.as_ptr() as *const u8;
+        let four_cc = unsafe { slice::from_raw_parts(ptr, 4) };
+        if four_cc == "OggS".as_bytes() {
+            return Err(SoundFontError::UnsupportedSampleFormat);
+        }
 
         Ok(Self {
             bits_per_sample: 16,
