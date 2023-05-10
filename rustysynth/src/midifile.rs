@@ -6,7 +6,7 @@ use crate::binary_reader::BinaryReader;
 use crate::counting_reader::CountingReadWrapper;
 use crate::MidiFileError;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 #[non_exhaustive]
 pub(crate) struct Message {
     pub(crate) channel: u8,
