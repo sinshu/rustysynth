@@ -3,9 +3,10 @@
 use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
+use crate::counting_reader::CountingReadWrapper;
 use crate::MidiFileError;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 #[non_exhaustive]
 pub(crate) struct Message {
     pub(crate) channel: u8,
@@ -141,7 +142,8 @@ impl MidiFile {
             });
         }
 
-        BinaryReader::read_i32_big_endian(reader)?;
+        let expected_len = BinaryReader::read_i32_big_endian(reader)? as usize;
+        let reader = &mut CountingReadWrapper::new(reader);
 
         let mut messages: Vec<Message> = Vec::new();
         let mut ticks: Vec<i32> = Vec::new();
@@ -177,6 +179,11 @@ impl MidiFile {
                         BinaryReader::read_u8(reader)?;
                         messages.push(Message::end_of_track());
                         ticks.push(tick);
+
+                        if reader.bytes_read() < expected_len {
+                            BinaryReader::discard_data(reader, expected_len - reader.bytes_read())?;
+                        }
+
                         return Ok((messages, ticks));
                     }
                     0x51 => {

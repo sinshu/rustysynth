@@ -2,6 +2,7 @@ mod error;
 
 mod array_math;
 mod binary_reader;
+mod counting_reader;
 
 mod generator;
 mod generator_type;
