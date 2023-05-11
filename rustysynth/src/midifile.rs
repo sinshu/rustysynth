@@ -3,7 +3,7 @@
 use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
-use crate::counting_reader::CountingReadWrapper;
+use crate::read_counter::ReadCounter;
 use crate::MidiFileError;
 
 #[derive(Clone, Copy)]
@@ -142,8 +142,8 @@ impl MidiFile {
             });
         }
 
-        let expected_len = BinaryReader::read_i32_big_endian(reader)? as usize;
-        let reader = &mut CountingReadWrapper::new(reader);
+        let size = BinaryReader::read_i32_big_endian(reader)? as usize;
+        let reader = &mut ReadCounter::new(reader);
 
         let mut messages: Vec<Message> = Vec::new();
         let mut ticks: Vec<i32> = Vec::new();
@@ -180,8 +180,10 @@ impl MidiFile {
                         messages.push(Message::end_of_track());
                         ticks.push(tick);
 
-                        if reader.bytes_read() < expected_len {
-                            BinaryReader::discard_data(reader, expected_len - reader.bytes_read())?;
+                        // Some MIDI files may have events inserted after the EOT.
+                        // Such events should be ignored.
+                        if reader.bytes_read() < size {
+                            BinaryReader::discard_data(reader, size - reader.bytes_read())?;
                         }
 
                         return Ok((messages, ticks));
