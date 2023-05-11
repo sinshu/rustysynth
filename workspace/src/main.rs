@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use rustysynth::MidiFile;
 use rustysynth::MidiFileSequencer;
 use rustysynth::SoundFont;
@@ -39,10 +40,8 @@ fn main() {
     let _device = run_output_device(params, {
         move |data| {
             sequencer.render(&mut left[..], &mut right[..]);
-            for i in 0..params.channel_sample_count {
-                let offset = 2 * i;
-                data[offset] = left[i];
-                data[offset + 1] = right[i];
+            for (i, value) in left.iter().interleave(right.iter()).enumerate() {
+                data[i] = *value;
             }
         }
     })
