@@ -4,6 +4,7 @@ use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
 use crate::error::SoundFontError;
+use crate::read_counter::ReadCounter;
 use crate::soundfont_version::SoundFontVersion;
 
 #[non_exhaustive]
@@ -29,8 +30,7 @@ impl SoundFontInfo {
         }
 
         let end = BinaryReader::read_i32(reader)? as usize;
-
-        let mut pos: usize = 0;
+        let reader = &mut ReadCounter::new(reader);
 
         let list_type = BinaryReader::read_four_cc(reader)?;
         if list_type != "INFO" {
@@ -39,7 +39,6 @@ impl SoundFontInfo {
                 actual: list_type,
             });
         }
-        pos += 4;
 
         let mut version: Option<SoundFontVersion> = None;
         let mut target_sound_engine: Option<String> = None;
@@ -53,12 +52,9 @@ impl SoundFontInfo {
         let mut comments: Option<String> = None;
         let mut tools: Option<String> = None;
 
-        while pos < end {
+        while reader.bytes_read() < end {
             let id = BinaryReader::read_four_cc(reader)?;
-            pos += 4;
-
             let size = BinaryReader::read_i32(reader)? as usize;
-            pos += 4;
 
             if id == "ifil" {
                 version = Some(SoundFontVersion::new(reader)?);
@@ -85,8 +81,6 @@ impl SoundFontInfo {
             } else {
                 return Err(SoundFontError::ListContainsUnknownId(id));
             }
-
-            pos += size;
         }
 
         let version = match version {

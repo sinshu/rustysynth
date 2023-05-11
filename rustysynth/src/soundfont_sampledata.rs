@@ -5,6 +5,7 @@ use std::slice;
 
 use crate::binary_reader::BinaryReader;
 use crate::error::SoundFontError;
+use crate::read_counter::ReadCounter;
 
 #[non_exhaustive]
 pub struct SoundFontSampleData {
@@ -20,8 +21,7 @@ impl SoundFontSampleData {
         }
 
         let end = BinaryReader::read_i32(reader)? as usize;
-
-        let mut pos: usize = 0;
+        let reader = &mut ReadCounter::new(reader);
 
         let list_type = BinaryReader::read_four_cc(reader)?;
         if list_type != "sdta" {
@@ -30,16 +30,12 @@ impl SoundFontSampleData {
                 actual: list_type,
             });
         }
-        pos += 4;
 
         let mut wave_data: Option<Vec<i16>> = None;
 
-        while pos < end {
+        while reader.bytes_read() < end {
             let id = BinaryReader::read_four_cc(reader)?;
-            pos += 4;
-
             let size = BinaryReader::read_i32(reader)? as usize;
-            pos += 4;
 
             if id == "smpl" {
                 wave_data = Some(BinaryReader::read_wave_data(reader, size)?);
@@ -48,8 +44,6 @@ impl SoundFontSampleData {
             } else {
                 return Err(SoundFontError::ListContainsUnknownId(id));
             }
-
-            pos += size;
         }
 
         let wave_data = match wave_data {
