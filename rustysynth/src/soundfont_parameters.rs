@@ -9,6 +9,7 @@ use crate::instrument::Instrument;
 use crate::instrument_info::InstrumentInfo;
 use crate::preset::Preset;
 use crate::preset_info::PresetInfo;
+use crate::read_counter::ReadCounter;
 use crate::sample_header::SampleHeader;
 use crate::zone::Zone;
 use crate::zone_info::ZoneInfo;
@@ -28,8 +29,7 @@ impl SoundFontParameters {
         }
 
         let end = BinaryReader::read_i32(reader)? as usize;
-
-        let mut pos: usize = 0;
+        let reader = &mut ReadCounter::new(reader);
 
         let list_type = BinaryReader::read_four_cc(reader)?;
         if list_type != "pdta" {
@@ -38,7 +38,6 @@ impl SoundFontParameters {
                 actual: list_type,
             });
         }
-        pos += 4;
 
         let mut preset_infos: Option<Vec<PresetInfo>> = None;
         let mut preset_bag: Option<Vec<ZoneInfo>> = None;
@@ -48,12 +47,9 @@ impl SoundFontParameters {
         let mut instrument_generators: Option<Vec<Generator>> = None;
         let mut sample_headers: Option<Vec<SampleHeader>> = None;
 
-        while pos < end {
+        while reader.bytes_read() < end {
             let id = BinaryReader::read_four_cc(reader)?;
-            pos += 4;
-
             let size = BinaryReader::read_i32(reader)? as usize;
-            pos += 4;
 
             if id == "phdr" {
                 preset_infos = Some(PresetInfo::read_from_chunk(reader, size)?);
@@ -76,8 +72,6 @@ impl SoundFontParameters {
             } else {
                 return Err(SoundFontError::ListContainsUnknownId(id));
             }
-
-            pos += size;
         }
 
         let preset_infos = match preset_infos {
