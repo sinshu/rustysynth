@@ -1,6 +1,6 @@
 [package]
 name = "rustysynth"
-version = "1.1.0"
+version = "1.1.1"
 authors = ["Nobuaki Tanaka"]
 
 description = "A SoundFont MIDI synthesizer written in pure Rust"
