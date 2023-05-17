@@ -1,3 +1,9 @@
+# v1.1.2
+
+- Optimized chorus for better performance.
+
+
+
 # v1.1.1
 
 - Fixed issue where reading MIDI files with events inserted after EOT would fail ([thanks to @ArthurCose](https://github.com/sinshu/rustysynth/pull/9)).
