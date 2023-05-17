@@ -259,12 +259,10 @@ impl Synthesizer {
         }
 
         let preset = &self.sound_font.presets[preset];
-        for pr in 0..preset.regions.len() {
-            let preset_region = &preset.regions[pr];
+        for preset_region in preset.regions.iter() {
             if preset_region.contains(key, velocity) {
                 let instrument = &self.sound_font.instruments[preset_region.instrument];
-                for ir in 0..instrument.regions.len() {
-                    let instrument_region = &instrument.regions[ir];
+                for instrument_region in instrument.regions.iter() {
                     if instrument_region.contains(key, velocity) {
                         let region_pair = RegionPair::new(preset_region, instrument_region);
 
