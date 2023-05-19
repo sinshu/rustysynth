@@ -18,6 +18,7 @@ pub struct MidiFileSequencer {
 
     current_time: f64,
     msg_index: usize,
+    loop_index: usize,
 }
 
 impl MidiFileSequencer {
@@ -29,6 +30,7 @@ impl MidiFileSequencer {
             block_wrote: 0,
             current_time: 0.0,
             msg_index: 0,
+            loop_index: 0,
         }
     }
 
@@ -40,6 +42,7 @@ impl MidiFileSequencer {
 
         self.current_time = 0.0;
         self.msg_index = 0;
+        self.loop_index = 0;
 
         self.synthesizer.reset()
     }
@@ -96,6 +99,14 @@ impl MidiFileSequencer {
                         msg.data1 as i32,
                         msg.data2 as i32,
                     );
+                } else if self.play_loop {
+                    if msg.get_message_type() == Message::LOOP_START {
+                        self.loop_index = self.msg_index;
+                    } else if msg.get_message_type() == Message::LOOP_END {
+                        self.current_time = midi_file.times[self.loop_index];
+                        self.msg_index = self.loop_index;
+                        self.synthesizer.note_off_all(false);
+                    }
                 }
                 self.msg_index += 1;
             } else {

@@ -177,6 +177,7 @@ impl MidiFile {
                 let loop_point = loop_point as i32;
                 let tick_list = &mut tick_lists[0];
                 let message_list = &mut message_lists[0];
+
                 if loop_point <= *tick_list.last().unwrap() {
                     for i in 0..tick_list.len() {
                         if tick_list[i] >= loop_point {
