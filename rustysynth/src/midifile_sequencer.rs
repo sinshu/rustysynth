@@ -115,8 +115,8 @@ impl MidiFileSequencer {
         }
 
         if self.msg_index == midi_file.messages.len() && self.play_loop {
-            self.current_time = 0.0;
-            self.msg_index = 0;
+            self.current_time = midi_file.times[self.loop_index];
+            self.msg_index = self.loop_index;
             self.synthesizer.note_off_all(false);
         }
     }
