@@ -5,6 +5,7 @@ use std::io::Read;
 use crate::binary_reader::BinaryReader;
 use crate::read_counter::ReadCounter;
 use crate::MidiFileError;
+use crate::MidiFileLoopType;
 
 #[derive(Clone, Copy)]
 #[non_exhaustive]
@@ -18,6 +19,8 @@ pub(crate) struct Message {
 impl Message {
     pub(crate) const NORMAL: u8 = 0;
     pub(crate) const TEMPO_CHANGE: u8 = 252;
+    pub(crate) const LOOP_START: u8 = 253;
+    pub(crate) const LOOP_END: u8 = 254;
     pub(crate) const END_OF_TRACK: u8 = 255;
 
     pub(crate) fn common1(status: u8, data1: u8) -> Self {
@@ -29,10 +32,43 @@ impl Message {
         }
     }
 
-    pub(crate) fn common2(status: u8, data1: u8, data2: u8) -> Self {
+    pub(crate) fn common2(status: u8, data1: u8, data2: u8, loop_type: MidiFileLoopType) -> Self {
+        let channel = status & 0x0F;
+        let command = status & 0xF0;
+
+        if command == 0xB0 {
+            match loop_type {
+                MidiFileLoopType::RpgMaker => {
+                    if data1 == 111 {
+                        return Message::loop_start();
+                    }
+                }
+
+                MidiFileLoopType::IncredibleMachine => {
+                    if data1 == 110 {
+                        return Message::loop_start();
+                    }
+                    if data1 == 111 {
+                        return Message::loop_end();
+                    }
+                }
+
+                MidiFileLoopType::FinalFantasy => {
+                    if data1 == 116 {
+                        return Message::loop_start();
+                    }
+                    if data1 == 117 {
+                        return Message::loop_end();
+                    }
+                }
+
+                _ => (),
+            }
+        }
+
         Self {
-            channel: status & 0x0F,
-            command: status & 0xF0,
+            channel,
+            command,
             data1,
             data2,
         }
@@ -44,6 +80,24 @@ impl Message {
             command: (tempo >> 16) as u8,
             data1: (tempo >> 8) as u8,
             data2: tempo as u8,
+        }
+    }
+
+    pub(crate) fn loop_start() -> Self {
+        Self {
+            channel: Message::LOOP_START,
+            command: 0,
+            data1: 0,
+            data2: 0,
+        }
+    }
+
+    pub(crate) fn loop_end() -> Self {
+        Self {
+            channel: Message::LOOP_END,
+            command: 0,
+            data1: 0,
+            data2: 0,
         }
     }
 
@@ -59,6 +113,8 @@ impl Message {
     pub(crate) fn get_message_type(&self) -> u8 {
         match self.channel {
             Message::TEMPO_CHANGE => Message::TEMPO_CHANGE,
+            Message::LOOP_START => Message::LOOP_START,
+            Message::LOOP_END => Message::LOOP_END,
             Message::END_OF_TRACK => Message::END_OF_TRACK,
             _ => Message::NORMAL,
         }
@@ -79,6 +135,13 @@ pub struct MidiFile {
 
 impl MidiFile {
     pub fn new<R: Read>(reader: &mut R) -> Result<Self, MidiFileError> {
+        MidiFile::new_with_loop_type(reader, MidiFileLoopType::LoopPoint(0))
+    }
+
+    pub fn new_with_loop_type<R: Read>(
+        reader: &mut R,
+        loop_type: MidiFileLoopType,
+    ) -> Result<Self, MidiFileError> {
         let chunk_type = BinaryReader::read_four_cc(reader)?;
         if chunk_type != "MThd" {
             return Err(MidiFileError::InvalidChunkType {
@@ -104,9 +167,31 @@ impl MidiFile {
         let mut tick_lists: Vec<Vec<i32>> = Vec::new();
 
         for _i in 0..track_count {
-            let (message_list, tick_list) = MidiFile::read_track(reader)?;
+            let (message_list, tick_list) = MidiFile::read_track(reader, loop_type)?;
             message_lists.push(message_list);
             tick_lists.push(tick_list);
+        }
+
+        match loop_type {
+            MidiFileLoopType::LoopPoint(loop_point) if loop_point != 0 => {
+                let loop_point = loop_point as i32;
+                let tick_list = &mut tick_lists[0];
+                let message_list = &mut message_lists[0];
+
+                if loop_point <= *tick_list.last().unwrap() {
+                    for i in 0..tick_list.len() {
+                        if tick_list[i] >= loop_point {
+                            tick_list.insert(i, loop_point);
+                            message_list.insert(i, Message::loop_start());
+                            break;
+                        }
+                    }
+                } else {
+                    tick_list.push(loop_point);
+                    message_list.push(Message::loop_start());
+                }
+            }
+            _ => (),
         }
 
         let (messages, times) = MidiFile::merge_tracks(&message_lists, &tick_lists, resolution);
@@ -133,7 +218,10 @@ impl MidiFile {
         Ok((b1 << 16) | (b2 << 8) | b3)
     }
 
-    fn read_track<R: Read>(reader: &mut R) -> Result<(Vec<Message>, Vec<i32>), MidiFileError> {
+    fn read_track<R: Read>(
+        reader: &mut R,
+        loop_type: MidiFileLoopType,
+    ) -> Result<(Vec<Message>, Vec<i32>), MidiFileError> {
         let chunk_type = BinaryReader::read_four_cc(reader)?;
         if chunk_type != "MTrk" {
             return Err(MidiFileError::InvalidChunkType {
@@ -164,7 +252,7 @@ impl MidiFile {
                     ticks.push(tick);
                 } else {
                     let data2 = BinaryReader::read_u8(reader)?;
-                    messages.push(Message::common2(last_status, first, data2));
+                    messages.push(Message::common2(last_status, first, data2, loop_type));
                     ticks.push(tick);
                 }
 
@@ -203,7 +291,7 @@ impl MidiFile {
                     } else {
                         let data1 = BinaryReader::read_u8(reader)?;
                         let data2 = BinaryReader::read_u8(reader)?;
-                        messages.push(Message::common2(first, data1, data2));
+                        messages.push(Message::common2(first, data1, data2, loop_type));
                         ticks.push(tick);
                     }
                 }
