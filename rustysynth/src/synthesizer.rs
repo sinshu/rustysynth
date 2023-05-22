@@ -516,7 +516,7 @@ impl Synthesizer {
         self.master_volume
     }
 
-    pub fn set_master_volume(&mut self, master_volume: f32) {
-        self.master_volume = master_volume;
+    pub fn set_master_volume(&mut self, value: f32) {
+        self.master_volume = value;
     }
 }
