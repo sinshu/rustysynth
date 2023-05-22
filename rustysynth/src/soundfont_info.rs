@@ -7,6 +7,7 @@ use crate::error::SoundFontError;
 use crate::read_counter::ReadCounter;
 use crate::soundfont_version::SoundFontVersion;
 
+/// The information of a SoundFont.
 #[non_exhaustive]
 pub struct SoundFontInfo {
     pub(crate) version: SoundFontVersion,
@@ -153,46 +154,57 @@ impl SoundFontInfo {
         })
     }
 
+    /// Gets the version of the SoundFont.
     pub fn get_version(&self) -> &SoundFontVersion {
         &self.version
     }
 
+    /// Gets the target sound engine of the SoundFont.
     pub fn get_target_sound_engine(&self) -> &str {
         &self.target_sound_engine
     }
 
+    /// Gets the bank name of the SoundFont.
     pub fn get_bank_name(&self) -> &str {
         &self.bank_name
     }
 
+    /// Gets the ROM name of the SoundFont.
     pub fn get_rom_name(&self) -> &str {
         &self.rom_name
     }
 
+    /// Gets the ROM version of the SoundFont.
     pub fn get_rom_version(&self) -> &SoundFontVersion {
         &self.rom_version
     }
 
+    /// Gets the creation date of the SoundFont.
     pub fn get_creation_date(&self) -> &str {
         &self.creation_date
     }
 
+    /// Gets the auther of the SoundFont.
     pub fn get_author(&self) -> &str {
         &self.author
     }
 
+    /// Gets the target product of the SoundFont.
     pub fn get_target_product(&self) -> &str {
         &self.target_product
     }
 
+    /// Gets the copyright message for the SoundFont.
     pub fn get_copyright(&self) -> &str {
         &self.copyright
     }
 
+    /// Gets the comments for the SoundFont.
     pub fn get_comments(&self) -> &str {
         &self.comments
     }
 
+    /// Gets the tools used to create the SoundFont.
     pub fn get_tools(&self) -> &str {
         &self.tools
     }

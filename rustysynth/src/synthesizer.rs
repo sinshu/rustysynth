@@ -15,6 +15,7 @@ use crate::soundfont_math::SoundFontMath;
 use crate::synthesizer_settings::SynthesizerSettings;
 use crate::voice_collection::VoiceCollection;
 
+/// An instance of the SoundFont synthesizer.
 #[non_exhaustive]
 pub struct Synthesizer {
     pub(crate) sound_font: Arc<SoundFont>,
@@ -52,9 +53,17 @@ pub struct Synthesizer {
 }
 
 impl Synthesizer {
+    /// The number of channels.
     pub const CHANNEL_COUNT: usize = 16;
+    /// The percussion channel.
     pub const PERCUSSION_CHANNEL: usize = 9;
 
+    /// Initializes a new synthesizer using a specified SoundFont and settings.
+    ///
+    /// # Arguments
+    ///
+    /// * `sound_font` - The SoundFont instance.
+    /// * `settings` - The settings for synthesis.
     pub fn new(
         sound_font: &Arc<SoundFont>,
         settings: &SynthesizerSettings,
@@ -173,6 +182,14 @@ impl Synthesizer {
         })
     }
 
+    /// Processes a MIDI message.
+    ///
+    /// # Arguments
+    ///
+    /// * `channel` - The channel to which the message will be sent.
+    /// * `command` - The type of the message.
+    /// * `data1` - The first data part of the message.
+    /// * `data2` - The second data part of the message.
     pub fn process_midi_message(&mut self, channel: i32, command: i32, data1: i32, data2: i32) {
         if !(0 <= channel && channel < self.channels.len() as i32) {
             return;
@@ -212,6 +229,12 @@ impl Synthesizer {
         }
     }
 
+    /// Stops a note.
+    ///
+    /// # Arguments
+    ///
+    /// * `channel` - The channel of the note.
+    /// * `key` - The key of the note.
     pub fn note_off(&mut self, channel: i32, key: i32) {
         if !(0 <= channel && channel < self.channels.len() as i32) {
             return;
@@ -224,6 +247,13 @@ impl Synthesizer {
         }
     }
 
+    /// Starts a note.
+    ///
+    /// # Arguments
+    ///
+    /// * `channel` - The channel of the note.
+    /// * `key` - The key of the note.
+    /// * `velocity` - The velocity of the note.
     pub fn note_on(&mut self, channel: i32, key: i32, velocity: i32) {
         if velocity == 0 {
             self.note_off(channel, key);
@@ -275,6 +305,11 @@ impl Synthesizer {
         }
     }
 
+    /// Stops all the notes in the specified channel.
+    ///
+    /// # Arguments
+    ///
+    /// * `immediate` - If `true`, notes will stop immediately without the release sound.
     pub fn note_off_all(&mut self, immediate: bool) {
         if immediate {
             self.voices.clear();
@@ -285,6 +320,12 @@ impl Synthesizer {
         }
     }
 
+    /// Stops all the notes in the specified channel.
+    ///
+    /// # Arguments
+    ///
+    /// * `channel` - The channel in which the notes will be stopped.
+    /// * `immediate` - If `true`, notes will stop immediately without the release sound.
     pub fn note_off_all_channel(&mut self, channel: i32, immediate: bool) {
         if immediate {
             for voice in self.voices.get_active_voices().iter_mut() {
@@ -301,12 +342,18 @@ impl Synthesizer {
         }
     }
 
+    /// Resets all the controllers.
     pub fn reset_all_controllers(&mut self) {
         for channel in &mut self.channels {
             channel.reset_all_controllers();
         }
     }
 
+    /// Resets all the controllers of the specified channel.
+    ///
+    /// # Arguments
+    ///
+    /// * `channel` - The channel to be reset.
     pub fn reset_all_controllers_channel(&mut self, channel: i32) {
         if !(0 <= channel && channel < self.channels.len() as i32) {
             return;
@@ -315,6 +362,7 @@ impl Synthesizer {
         self.channels[channel as usize].reset_all_controllers();
     }
 
+    /// Resets the synthesizer.
     pub fn reset(&mut self) {
         self.voices.clear();
 
@@ -330,6 +378,16 @@ impl Synthesizer {
         self.block_read = self.block_size;
     }
 
+    /// Renders the waveform.
+    ///
+    /// # Arguments
+    ///
+    /// * `left` - The buffer of the left channel to store the rendered waveform.
+    /// * `right` - The buffer of the right channel to store the rendered waveform.
+    ///
+    /// # Remarks
+    ///
+    /// The output buffers for the left and right must be the same length.
     pub fn render(&mut self, left: &mut [f32], right: &mut [f32]) {
         if left.len() != right.len() {
             panic!("The output buffers for the left and right must be the same length.");
@@ -492,31 +550,42 @@ impl Synthesizer {
         }
     }
 
+    /// Gets the SoundFont used as the audio source.
     pub fn get_sound_font(&self) -> &SoundFont {
         &self.sound_font
     }
 
+    /// Gets the sample rate for synthesis.
     pub fn get_sample_rate(&self) -> i32 {
         self.sample_rate
     }
 
+    /// Gets the block size for rendering waveform.
     pub fn get_block_size(&self) -> usize {
         self.block_size
     }
 
+    /// Gets the number of maximum polyphony.
     pub fn get_maximum_polyphony(&self) -> usize {
         self.maximum_polyphony
     }
 
+    /// Gets the value indicating whether reverb and chorus are enabled.
     pub fn get_enable_reverb_and_chorus(&self) -> bool {
         self.enable_reverb_and_chorus
     }
 
+    /// Gets the master volume.
     pub fn get_master_volume(&self) -> f32 {
         self.master_volume
     }
 
-    pub fn set_master_volume(&mut self, master_volume: f32) {
-        self.master_volume = master_volume;
+    /// Sets the master volume.
+    ///
+    /// # Arguments
+    ///
+    /// * `value` - The new value of the master volume.
+    pub fn set_master_volume(&mut self, value: f32) {
+        self.master_volume = value;
     }
 }

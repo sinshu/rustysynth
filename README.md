@@ -7,7 +7,7 @@ RustySynth is a SoundFont MIDI synthesizer written in pure Rust, ported from [Me
 ## Features
 
 * Suitable for both real-time and offline synthesis.
-* Support for standard MIDI files.
+* Supports standard MIDI files with additional features including dynamic tempo changing.
 * No dependencies other than the standard library.
 
 
@@ -159,6 +159,7 @@ std::thread::sleep(std::time::Duration::from_secs(10));
     - [x] Chorus
 * __Other things__
     - [x] Standard MIDI file support
+    - [x] MIDI file loop extension support
     - [x] Performace optimization
 
 
