@@ -2,11 +2,16 @@
 
 use crate::error::SynthesizerError;
 
+/// Specifies a set of parameters for synthesis.
 #[non_exhaustive]
 pub struct SynthesizerSettings {
+    /// The sample rate for synthesis.
     pub sample_rate: i32,
+    /// The block size for rendering waveform.
     pub block_size: usize,
+    /// The number of maximum polyphony.
     pub maximum_polyphony: usize,
+    /// The value indicating whether reverb and chorus are enabled.
     pub enable_reverb_and_chorus: bool,
 }
 

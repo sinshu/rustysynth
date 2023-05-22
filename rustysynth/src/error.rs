@@ -2,6 +2,7 @@ use std::error;
 use std::fmt;
 use std::io;
 
+/// Represents an error when initializing a synthesizer.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum SynthesizerError {
@@ -36,6 +37,7 @@ impl fmt::Display for SynthesizerError {
     }
 }
 
+/// Represents an error when loading a SoundFont.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum SoundFontError {
@@ -147,6 +149,7 @@ impl From<io::Error> for SoundFontError {
     }
 }
 
+/// Represents an error when loading a MIDI file.
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum MidiFileError {

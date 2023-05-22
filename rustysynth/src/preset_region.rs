@@ -16,6 +16,8 @@ fn set_parameter(gs: &mut [i16; GeneratorType::COUNT], generator: &Generator) {
     }
 }
 
+/// Represents a preset region.
+/// A preset region indicates how the parameters of the instrument should be modified in the preset.
 #[non_exhaustive]
 pub struct PresetRegion {
     pub(crate) gs: [i16; GeneratorType::COUNT],
@@ -84,6 +86,13 @@ impl PresetRegion {
         }
     }
 
+    /// Checks if the region covers the given key and velocity.
+    /// Returns `true` if the region covers the given key and velocity.
+    ///
+    /// # Arguments
+    ///
+    /// * `key` - The key of a note.
+    /// * `velocity` - The velocity of a note.
     pub fn contains(&self, key: i32, velocity: i32) -> bool {
         let contains_key = self.get_key_range_start() <= key && key <= self.get_key_range_end();
         let contains_velocity = self.get_velocity_range_start() <= velocity

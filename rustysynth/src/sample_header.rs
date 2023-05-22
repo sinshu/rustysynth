@@ -5,6 +5,7 @@ use std::io::Read;
 use crate::binary_reader::BinaryReader;
 use crate::error::SoundFontError;
 
+/// Represents a sample in the SoundFont.
 #[non_exhaustive]
 pub struct SampleHeader {
     pub(crate) name: String,
@@ -67,42 +68,52 @@ impl SampleHeader {
         Ok(headers)
     }
 
+    /// Gets the name of the sample.
     pub fn get_name(&self) -> &str {
         &self.name
     }
 
+    /// Gets the start point of the sample in the sample data.
     pub fn get_start(&self) -> i32 {
         self.start
     }
 
+    /// Gets the end point of the sample in the sample data.
     pub fn get_end(&self) -> i32 {
         self.end
     }
 
+    /// Gets the loop start point of the sample in the sample data.
     pub fn get_start_loop(&self) -> i32 {
         self.start_loop
     }
 
+    /// Gets the loop end point of the sample in the sample data.
     pub fn get_end_loop(&self) -> i32 {
         self.end_loop
     }
 
+    /// Gets the sample rate of the sample.
     pub fn get_sample_rate(&self) -> i32 {
         self.sample_rate
     }
 
+    /// Gets the key number of the recorded pitch of the sample.
     pub fn get_original_pitch(&self) -> i32 {
         self.original_pitch as i32
     }
 
+    /// Gets the pitch correction in cents that should be applied to the sample on playback.
     pub fn get_pitch_correction(&self) -> i32 {
         self.pitch_correction as i32
     }
 
+    /// Gets the link info.
     pub fn get_link(&self) -> i32 {
         self.link as i32
     }
 
+    /// Gets the sample type.
     pub fn get_sample_type(&self) -> i32 {
         self.sample_type as i32
     }
