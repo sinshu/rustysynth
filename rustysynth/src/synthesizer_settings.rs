@@ -20,6 +20,11 @@ impl SynthesizerSettings {
     const DEFAULT_MAXIMUM_POLYPHONY: usize = 64;
     const DEFAULT_ENABLE_REVERB_AND_CHORUS: bool = true;
 
+    /// Initializes a new instance of synthesizer settings.
+    ///
+    /// # Arguments
+    ///
+    /// * `sample_rate` - The sample rate for synthesis.
     pub fn new(sample_rate: i32) -> Self {
         Self {
             sample_rate,
