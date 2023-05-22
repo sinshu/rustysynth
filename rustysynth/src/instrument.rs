@@ -6,6 +6,7 @@ use crate::instrument_region::InstrumentRegion;
 use crate::sample_header::SampleHeader;
 use crate::zone::Zone;
 
+/// Represents an instrument in the SoundFont.
 #[non_exhaustive]
 pub struct Instrument {
     pub(crate) name: String,
@@ -53,10 +54,12 @@ impl Instrument {
         Ok(instruments)
     }
 
+    /// Gets the name of the instrument.
     pub fn get_name(&self) -> &str {
         &self.name
     }
 
+    /// Gets the regions of the instrument.
     pub fn get_regions(&self) -> &[InstrumentRegion] {
         &self.regions[..]
     }

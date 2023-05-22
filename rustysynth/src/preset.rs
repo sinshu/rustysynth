@@ -6,6 +6,7 @@ use crate::preset_info::PresetInfo;
 use crate::preset_region::PresetRegion;
 use crate::zone::Zone;
 
+/// Represents a preset in the SoundFont.
 #[non_exhaustive]
 pub struct Preset {
     pub(crate) name: String,
@@ -66,30 +67,37 @@ impl Preset {
         Ok(presets)
     }
 
+    /// Gets the name of the preset.
     pub fn get_name(&self) -> &str {
         &self.name
     }
 
+    /// Gets the patch number of the preset.
     pub fn get_patch_number(&self) -> i32 {
         self.patch_number
     }
 
+    /// Gets the bank number of the preset.
     pub fn get_bank_number(&self) -> i32 {
         self.bank_number
     }
 
+    /// Gets the library info.
     pub fn get_library(&self) -> i32 {
         self.library
     }
 
+    /// Gets the genre info.
     pub fn get_genre(&self) -> i32 {
         self.genre
     }
 
+    /// Gets the morphology info.
     pub fn get_morphology(&self) -> i32 {
         self.morphology
     }
 
+    /// Gets the regions of the preset.
     pub fn get_regions(&self) -> &[PresetRegion] {
         &self.regions[..]
     }

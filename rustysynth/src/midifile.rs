@@ -127,6 +127,7 @@ impl Message {
     }
 }
 
+/// Represents a standard MIDI file.
 #[non_exhaustive]
 pub struct MidiFile {
     pub(crate) messages: Vec<Message>,
@@ -134,10 +135,32 @@ pub struct MidiFile {
 }
 
 impl MidiFile {
+    /// Loads a MIDI file from the stream.
+    ///
+    /// # Arguments
+    ///
+    /// * `reader` - The data stream used to load the MIDI file.
     pub fn new<R: Read>(reader: &mut R) -> Result<Self, MidiFileError> {
         MidiFile::new_with_loop_type(reader, MidiFileLoopType::LoopPoint(0))
     }
 
+    /// Loads a MIDI file from the stream with a specified loop type.
+    ///
+    /// # Arguments
+    ///
+    /// * `reader` - The data stream used to load the MIDI file.
+    /// * `loop_type` - The type of the loop extension to be used.
+    ///
+    /// # Remarks
+    ///
+    /// `MidiFileLoopType` has the following variants:
+    /// * `LoopPoint(usize)` - Specifies the loop start point by a tick value.
+    /// * `RpgMaker` - The RPG Maker style loop.
+    /// CC #111 will be the loop start point.
+    /// * `IncredibleMachine` - The Incredible Machine style loop.
+    /// CC #110 and #111 will be the start and end points of the loop.
+    /// * `FinalFantasy` - The Final Fantasy style loop.
+    /// CC #116 and #117 will be the start and end points of the loop.
     pub fn new_with_loop_type<R: Read>(
         reader: &mut R,
         loop_type: MidiFileLoopType,
@@ -355,6 +378,7 @@ impl MidiFile {
         (merged_messages, merged_times)
     }
 
+    /// Get the length of the MIDI file in seconds.
     pub fn get_length(&self) -> f64 {
         *self.times.last().unwrap()
     }

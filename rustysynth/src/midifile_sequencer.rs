@@ -7,6 +7,7 @@ use crate::midifile::Message;
 use crate::midifile::MidiFile;
 use crate::synthesizer::Synthesizer;
 
+/// An instance of the MIDI file sequencer.
 #[non_exhaustive]
 pub struct MidiFileSequencer {
     synthesizer: Synthesizer,
@@ -22,6 +23,11 @@ pub struct MidiFileSequencer {
 }
 
 impl MidiFileSequencer {
+    /// Initializes a new instance of the sequencer.
+    ///
+    /// # Arguments
+    ///
+    /// * `synthesizer` - The synthesizer to be handled by the sequencer.
     pub fn new(synthesizer: Synthesizer) -> Self {
         Self {
             synthesizer,
@@ -34,6 +40,12 @@ impl MidiFileSequencer {
         }
     }
 
+    /// Plays the MIDI file.
+    ///
+    /// # Arguments
+    ///
+    /// * `midi_file` - The MIDI file to be played.
+    /// * `play_loop` - If `true`, the MIDI file loops after reaching the end.
     pub fn play(&mut self, midi_file: &Arc<MidiFile>, play_loop: bool) {
         self.midi_file = Some(Arc::clone(midi_file));
         self.play_loop = play_loop;
@@ -47,11 +59,22 @@ impl MidiFileSequencer {
         self.synthesizer.reset()
     }
 
+    /// Stops playing.
     pub fn stop(&mut self) {
         self.midi_file = None;
         self.synthesizer.reset();
     }
 
+    /// Renders the waveform.
+    ///
+    /// # Arguments
+    ///
+    /// * `left` - The buffer of the left channel to store the rendered waveform.
+    /// * `right` - The buffer of the right channel to store the rendered waveform.
+    ///
+    /// # Remarks
+    ///
+    /// The output buffers for the left and right must be the same length.
     pub fn render(&mut self, left: &mut [f32], right: &mut [f32]) {
         if left.len() != right.len() {
             panic!("The output buffers for the left and right must be the same length.");
