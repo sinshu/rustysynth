@@ -386,6 +386,7 @@ impl Synthesizer {
     /// * `right` - The buffer of the right channel to store the rendered waveform.
     ///
     /// # Remarks
+    ///
     /// The output buffers for the left and right must be the same length.
     pub fn render(&mut self, left: &mut [f32], right: &mut [f32]) {
         if left.len() != right.len() {
