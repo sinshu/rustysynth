@@ -1,4 +1,4 @@
-/// Specifies the type of loop extension to use when playing back a MIDI file.
+/// Specifies the type of the loop extension to use when playing back a MIDI file.
 #[derive(Clone, Copy)]
 #[non_exhaustive]
 pub enum MidiFileLoopType {
