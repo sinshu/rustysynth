@@ -12,6 +12,8 @@ use crate::synthesizer::Synthesizer;
 pub struct MidiFileSequencer {
     synthesizer: Synthesizer,
 
+    speed: f64,
+
     midi_file: Option<Arc<MidiFile>>,
     play_loop: bool,
 
@@ -31,6 +33,7 @@ impl MidiFileSequencer {
     pub fn new(synthesizer: Synthesizer) -> Self {
         Self {
             synthesizer,
+            speed: 1.0,
             midi_file: None,
             play_loop: false,
             block_wrote: 0,
@@ -86,8 +89,8 @@ impl MidiFileSequencer {
             if self.block_wrote == self.synthesizer.block_size {
                 self.process_events();
                 self.block_wrote = 0;
-                self.current_time +=
-                    self.synthesizer.block_size as f64 / self.synthesizer.sample_rate as f64;
+                self.current_time += self.speed * self.synthesizer.block_size as f64
+                    / self.synthesizer.sample_rate as f64;
             }
 
             let src_rem = self.synthesizer.block_size - self.block_wrote;
@@ -142,5 +145,51 @@ impl MidiFileSequencer {
             self.msg_index = self.loop_index;
             self.synthesizer.note_off_all(false);
         }
+    }
+
+    /// Gets the synthesizer handled by the sequencer.
+    pub fn get_synthesizer(&self) -> &Synthesizer {
+        &self.synthesizer
+    }
+
+    /// Gets the current playback position in seconds.
+    pub fn get_position(&self) -> f64 {
+        self.current_time
+    }
+
+    /// Gets a value that indicates whether the current playback position is at the end of the sequence.
+    ///
+    /// # Remarks
+    ///
+    /// If the `play` method has not yet been called, this value will be `true`.
+    /// This value will never be `true` if loop playback is enabled.
+    pub fn end_of_sequence(&self) -> bool {
+        match &self.midi_file {
+            None => true,
+            Some(value) => self.msg_index == value.messages.len(),
+        }
+    }
+
+    /// Gets the current playback speed.
+    ///
+    /// # Remarks
+    ///
+    /// The default value is 1.
+    /// The tempo will be multiplied by this value during playback.
+    pub fn get_speed(&self) -> f64 {
+        self.speed
+    }
+
+    /// Sets the playback speed.
+    ///
+    /// # Remarks
+    ///
+    /// The value must be non-negative.
+    pub fn set_speed(&mut self, value: f64) {
+        if value < 0.0 {
+            panic!("The playback speed must be a non-negative value.");
+        }
+
+        self.speed = value;
     }
 }
