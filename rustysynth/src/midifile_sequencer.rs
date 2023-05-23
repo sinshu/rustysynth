@@ -156,7 +156,7 @@ impl MidiFileSequencer {
     pub fn get_midi_file(&self) -> Option<&MidiFile> {
         match &self.midi_file {
             None => None,
-            Some(value) => Some(&value),
+            Some(value) => Some(value),
         }
     }
 
