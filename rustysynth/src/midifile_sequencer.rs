@@ -7,6 +7,8 @@ use crate::midifile::Message;
 use crate::midifile::MidiFile;
 use crate::synthesizer::Synthesizer;
 
+type MessageHook = Box<dyn Fn(&mut Synthesizer, i32, i32, i32, i32)>;
+
 /// An instance of the MIDI file sequencer.
 #[non_exhaustive]
 pub struct MidiFileSequencer {
@@ -22,6 +24,8 @@ pub struct MidiFileSequencer {
     current_time: f64,
     msg_index: usize,
     loop_index: usize,
+
+    message_hook: Option<MessageHook>,
 }
 
 impl MidiFileSequencer {
@@ -40,6 +44,7 @@ impl MidiFileSequencer {
             current_time: 0.0,
             msg_index: 0,
             loop_index: 0,
+            message_hook: None,
         }
     }
 
@@ -119,12 +124,22 @@ impl MidiFileSequencer {
 
             if time <= self.current_time {
                 if msg.get_message_type() == Message::NORMAL {
-                    self.synthesizer.process_midi_message(
-                        msg.channel as i32,
-                        msg.command as i32,
-                        msg.data1 as i32,
-                        msg.data2 as i32,
-                    );
+                    if let Some(hook) = &mut self.message_hook {
+                        hook(
+                            &mut self.synthesizer,
+                            msg.channel as i32,
+                            msg.command as i32,
+                            msg.data1 as i32,
+                            msg.data2 as i32,
+                        );
+                    } else {
+                        self.synthesizer.process_midi_message(
+                            msg.channel as i32,
+                            msg.command as i32,
+                            msg.data1 as i32,
+                            msg.data2 as i32,
+                        );
+                    }
                 } else if self.play_loop {
                     if msg.get_message_type() == Message::LOOP_START {
                         self.loop_index = self.msg_index;
@@ -199,5 +214,9 @@ impl MidiFileSequencer {
         }
 
         self.speed = value;
+    }
+
+    pub fn set_message_hook(&mut self, hook: MessageHook) {
+        self.message_hook = Some(hook);
     }
 }
