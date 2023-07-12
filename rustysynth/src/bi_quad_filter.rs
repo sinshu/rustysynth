@@ -78,7 +78,7 @@ impl BiQuadFilter {
         let block_length = block.len();
 
         if self.active {
-            for input in block.iter_mut() {
+            for input in block.iter_mut().take(block_length) {
                 let output = self.a0 * *input + self.a1 * self.x1 + self.a2 * self.x2
                     - self.a3 * self.y1
                     - self.a4 * self.y2;
