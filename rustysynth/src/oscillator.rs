@@ -110,14 +110,11 @@ impl Oscillator {
     }
 
     fn fill_block_no_loop(&mut self, data: &[i16], block: &mut [f32], pitch_ratio_fp: i64) -> bool {
-        let block_length = block.len();
-
-        for t in 0..block_length {
+        for t in 0..block.len() {
             let index = (self.position_fp >> Oscillator::FRAC_BITS) as usize;
-
             if index >= self.end as usize {
                 if t > 0 {
-                    for sample in block.iter_mut().take(block_length).skip(t) {
+                    for sample in block.iter_mut().skip(t) {
                         *sample = 0_f32;
                     }
                     return true;
@@ -144,21 +141,17 @@ impl Oscillator {
         block: &mut [f32],
         pitch_ratio_fp: i64,
     ) -> bool {
-        let block_length = block.len();
-
         let end_loop_fp = (self.end_loop as i64) << Oscillator::FRAC_BITS;
-
         let loop_length = (self.end_loop - self.start_loop) as i64;
         let loop_length_fp = loop_length << Oscillator::FRAC_BITS;
 
-        for sample in block.iter_mut().take(block_length) {
+        for sample in block.iter_mut() {
             if self.position_fp >= end_loop_fp {
                 self.position_fp -= loop_length_fp;
             }
 
             let index1 = (self.position_fp >> Oscillator::FRAC_BITS) as usize;
             let mut index2 = index1 + 1;
-
             if index2 >= self.end_loop as usize {
                 index2 -= loop_length as usize;
             }
