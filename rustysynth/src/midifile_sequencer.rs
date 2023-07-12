@@ -152,6 +152,14 @@ impl MidiFileSequencer {
         &self.synthesizer
     }
 
+    /// Gets the currently playing MIDI file.
+    pub fn get_midi_file(&self) -> Option<&MidiFile> {
+        match &self.midi_file {
+            None => None,
+            Some(value) => Some(value),
+        }
+    }
+
     /// Gets the current playback position in seconds.
     pub fn get_position(&self) -> f64 {
         self.current_time

@@ -22,7 +22,6 @@ pub struct Synthesizer {
     pub(crate) sample_rate: i32,
     pub(crate) block_size: usize,
     pub(crate) maximum_polyphony: usize,
-    pub(crate) enable_reverb_and_chorus: bool,
 
     preset_lookup: HashMap<i32, usize>,
     default_preset: usize,
@@ -38,18 +37,9 @@ pub struct Synthesizer {
 
     block_read: usize,
 
-    pub(crate) master_volume: f32,
+    master_volume: f32,
 
-    reverb: Option<Reverb>,
-    reverb_input: Option<Vec<f32>>,
-    reverb_output_left: Option<Vec<f32>>,
-    reverb_output_right: Option<Vec<f32>>,
-
-    chorus: Option<Chorus>,
-    chorus_input_left: Option<Vec<f32>>,
-    chorus_input_right: Option<Vec<f32>>,
-    chorus_output_left: Option<Vec<f32>>,
-    chorus_output_right: Option<Vec<f32>>,
+    effects: Option<Effects>,
 }
 
 impl Synthesizer {
@@ -108,49 +98,8 @@ impl Synthesizer {
 
         let master_volume = 0.5_f32;
 
-        let reverb = if settings.enable_reverb_and_chorus {
-            Some(Reverb::new(settings.sample_rate))
-        } else {
-            None
-        };
-        let reverb_input = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size])
-        } else {
-            None
-        };
-        let reverb_output_left = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size])
-        } else {
-            None
-        };
-        let reverb_output_right = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size])
-        } else {
-            None
-        };
-
-        let chorus = if settings.enable_reverb_and_chorus {
-            Some(Chorus::new(settings.sample_rate, 0.002, 0.0019, 0.4))
-        } else {
-            None
-        };
-        let chorus_input_left = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size])
-        } else {
-            None
-        };
-        let chorus_input_right = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size])
-        } else {
-            None
-        };
-        let chorus_output_left = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size])
-        } else {
-            None
-        };
-        let chorus_output_right = if settings.enable_reverb_and_chorus {
-            Some(vec![0_f32; settings.block_size])
+        let effects = if settings.enable_reverb_and_chorus {
+            Some(Effects::new(settings))
         } else {
             None
         };
@@ -160,7 +109,6 @@ impl Synthesizer {
             sample_rate: settings.sample_rate,
             block_size: settings.block_size,
             maximum_polyphony: settings.maximum_polyphony,
-            enable_reverb_and_chorus: settings.enable_reverb_and_chorus,
             preset_lookup,
             default_preset,
             channels,
@@ -170,15 +118,7 @@ impl Synthesizer {
             inverse_block_size,
             block_read,
             master_volume,
-            reverb,
-            reverb_input,
-            reverb_output_left,
-            reverb_output_right,
-            chorus,
-            chorus_input_left,
-            chorus_input_right,
-            chorus_output_left,
-            chorus_output_right,
+            effects,
         })
     }
 
@@ -370,9 +310,9 @@ impl Synthesizer {
             channel.reset();
         }
 
-        if self.enable_reverb_and_chorus {
-            self.reverb.as_mut().unwrap().mute();
-            self.chorus.as_mut().unwrap().mute();
+        if let Some(effects) = self.effects.as_mut() {
+            effects.reverb.mute();
+            effects.chorus.mute();
         }
 
         self.block_read = self.block_size;
@@ -446,12 +386,12 @@ impl Synthesizer {
             );
         }
 
-        if self.enable_reverb_and_chorus {
-            let chorus = self.chorus.as_mut().unwrap();
-            let chorus_input_left = self.chorus_input_left.as_mut().unwrap();
-            let chorus_input_right = self.chorus_input_right.as_mut().unwrap();
-            let chorus_output_left = self.chorus_output_left.as_mut().unwrap();
-            let chorus_output_right = self.chorus_output_right.as_mut().unwrap();
+        if let Some(effects) = self.effects.as_mut() {
+            let chorus = &mut effects.chorus;
+            let chorus_input_left = &mut effects.chorus_input_left[..];
+            let chorus_input_right = &mut effects.chorus_input_right[..];
+            let chorus_output_left = &mut effects.chorus_output_left[..];
+            let chorus_output_right = &mut effects.chorus_output_right[..];
             for i in 0..self.block_size {
                 chorus_input_left[i] = 0_f32;
                 chorus_input_right[i] = 0_f32;
@@ -463,7 +403,7 @@ impl Synthesizer {
                     previous_gain_left,
                     current_gain_left,
                     &voice.block[..],
-                    &mut chorus_input_left[..],
+                    chorus_input_left,
                     self.inverse_block_size,
                 );
                 let previous_gain_right =
@@ -473,7 +413,7 @@ impl Synthesizer {
                     previous_gain_right,
                     current_gain_right,
                     &voice.block[..],
-                    &mut chorus_input_right[..],
+                    chorus_input_right,
                     self.inverse_block_size,
                 );
             }
@@ -494,10 +434,10 @@ impl Synthesizer {
                 &mut self.block_right[..],
             );
 
-            let reverb = self.reverb.as_mut().unwrap();
-            let reverb_input = self.reverb_input.as_mut().unwrap();
-            let reverb_output_left = self.reverb_output_left.as_mut().unwrap();
-            let reverb_output_right = self.reverb_output_right.as_mut().unwrap();
+            let reverb = &mut effects.reverb;
+            let reverb_input = &mut effects.reverb_input[..];
+            let reverb_output_left = &mut effects.reverb_output_left[..];
+            let reverb_output_right = &mut effects.reverb_output_right[..];
             for input in reverb_input.iter_mut().take(self.block_size) {
                 *input = 0_f32;
             }
@@ -572,7 +512,7 @@ impl Synthesizer {
 
     /// Gets the value indicating whether reverb and chorus are enabled.
     pub fn get_enable_reverb_and_chorus(&self) -> bool {
-        self.enable_reverb_and_chorus
+        self.effects.is_some()
     }
 
     /// Gets the master volume.
@@ -587,5 +527,34 @@ impl Synthesizer {
     /// * `value` - The new value of the master volume.
     pub fn set_master_volume(&mut self, value: f32) {
         self.master_volume = value;
+    }
+}
+
+struct Effects {
+    reverb: Reverb,
+    reverb_input: Vec<f32>,
+    reverb_output_left: Vec<f32>,
+    reverb_output_right: Vec<f32>,
+
+    chorus: Chorus,
+    chorus_input_left: Vec<f32>,
+    chorus_input_right: Vec<f32>,
+    chorus_output_left: Vec<f32>,
+    chorus_output_right: Vec<f32>,
+}
+
+impl Effects {
+    fn new(settings: &SynthesizerSettings) -> Effects {
+        Self {
+            reverb: Reverb::new(settings.sample_rate),
+            reverb_input: vec![0_f32; settings.block_size],
+            reverb_output_left: vec![0_f32; settings.block_size],
+            reverb_output_right: vec![0_f32; settings.block_size],
+            chorus: Chorus::new(settings.sample_rate, 0.002, 0.0019, 0.4),
+            chorus_input_left: vec![0_f32; settings.block_size],
+            chorus_input_right: vec![0_f32; settings.block_size],
+            chorus_output_left: vec![0_f32; settings.block_size],
+            chorus_output_right: vec![0_f32; settings.block_size],
+        }
     }
 }
