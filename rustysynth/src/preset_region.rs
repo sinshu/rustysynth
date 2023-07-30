@@ -285,4 +285,8 @@ impl PresetRegion {
     pub fn get_scale_tuning(&self) -> i32 {
         self.gs[GeneratorType::SCALE_TUNING as usize] as i32
     }
+
+    pub fn get_instrument_id(&self) -> usize {
+        self.instrument
+    }
 }
