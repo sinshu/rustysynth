@@ -374,7 +374,7 @@ impl InstrumentRegion {
         }
     }
 
-    pub fn get_sample_id(&self) -> i32 {
-        self.gs[GeneratorType::SAMPLE_ID as usize] as i32
+    pub fn get_sample_id(&self) -> usize {
+        self.gs[GeneratorType::SAMPLE_ID as usize] as usize
     }
 }
