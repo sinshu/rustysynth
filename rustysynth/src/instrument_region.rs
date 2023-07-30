@@ -373,4 +373,8 @@ impl InstrumentRegion {
             self.sample_original_pitch
         }
     }
+
+    pub fn get_sample_id(&self) -> i32 {
+        self.gs[GeneratorType::SAMPLE_ID as usize] as i32
+    }
 }
