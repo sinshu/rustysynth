@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display, Formatter, Result, Write};
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone, Copy)]
 pub struct FourCC([u8; 4]);
 
 impl FourCC {
@@ -35,6 +35,12 @@ impl Debug for FourCC {
         }
         f.write_char('"')?;
         Ok(())
+    }
+}
+
+impl PartialEq<&[u8; 4]> for FourCC {
+    fn eq(&self, other: &&[u8; 4]) -> bool {
+        &self.0 == *other
     }
 }
 

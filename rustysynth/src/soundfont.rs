@@ -32,14 +32,14 @@ impl SoundFont {
     /// * `reader` - The data stream used to load the SoundFont.
     pub fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
-        if &chunk_id != b"RIFF" {
+        if chunk_id != b"RIFF" {
             return Err(SoundFontError::RiffChunkNotFound);
         }
 
         let _size = BinaryReader::read_i32(reader);
 
         let form_type = BinaryReader::read_four_cc(reader)?;
-        if &form_type != b"sfbk" {
+        if form_type != b"sfbk" {
             return Err(SoundFontError::InvalidRiffChunkType {
                 expected: FourCC::from_bytes(*b"sfbk"),
                 actual: form_type,

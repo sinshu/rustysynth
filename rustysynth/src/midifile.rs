@@ -167,7 +167,7 @@ impl MidiFile {
         loop_type: MidiFileLoopType,
     ) -> Result<Self, MidiFileError> {
         let chunk_type = BinaryReader::read_four_cc(reader)?;
-        if &chunk_type != b"MThd" {
+        if chunk_type != b"MThd" {
             return Err(MidiFileError::InvalidChunkType {
                 expected: FourCC::from_bytes(*b"MThd"),
                 actual: chunk_type,
@@ -249,7 +249,7 @@ impl MidiFile {
         loop_type: MidiFileLoopType,
     ) -> Result<(Vec<Message>, Vec<i32>), MidiFileError> {
         let chunk_type = BinaryReader::read_four_cc(reader)?;
-        if &chunk_type != b"MTrk" {
+        if chunk_type != b"MTrk" {
             return Err(MidiFileError::InvalidChunkType {
                 expected: FourCC::from_bytes(*b"MTrk"),
                 actual: chunk_type,

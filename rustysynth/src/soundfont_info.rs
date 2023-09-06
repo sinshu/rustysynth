@@ -27,7 +27,7 @@ pub struct SoundFontInfo {
 impl SoundFontInfo {
     pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
-        if &chunk_id != b"LIST" {
+        if chunk_id != b"LIST" {
             return Err(SoundFontError::ListChunkNotFound);
         }
 
@@ -35,7 +35,7 @@ impl SoundFontInfo {
         let reader = &mut ReadCounter::new(reader);
 
         let list_type = BinaryReader::read_four_cc(reader)?;
-        if &list_type != b"INFO" {
+        if list_type != b"INFO" {
             return Err(SoundFontError::InvalidListChunkType {
                 expected: FourCC::from_bytes(*b"INFO"),
                 actual: list_type,
