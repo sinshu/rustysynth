@@ -77,13 +77,7 @@ impl Oscillator {
         self.tune = coarse_tune as f32 + 0.01_f32 * fine_tune as f32;
         self.pitch_change_scale = 0.01_f32 * scale_tuning as f32;
         self.sample_rate_ratio = sample_rate as f32 / self.synthesizer_sample_rate as f32;
-
-        if self.loop_mode == LoopMode::NO_LOOP {
-            self.looping = false;
-        } else {
-            self.looping = true;
-        }
-
+        self.looping = self.loop_mode != LoopMode::NO_LOOP;
         self.position_fp = (start as i64) << Oscillator::FRAC_BITS;
     }
 
