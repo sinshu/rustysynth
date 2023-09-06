@@ -4,6 +4,7 @@ use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
 use crate::error::SoundFontError;
+use crate::four_cc::FourCC;
 use crate::read_counter::ReadCounter;
 use crate::soundfont_version::SoundFontVersion;
 
@@ -26,7 +27,7 @@ pub struct SoundFontInfo {
 impl SoundFontInfo {
     pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
-        if chunk_id != "LIST" {
+        if &chunk_id != b"LIST" {
             return Err(SoundFontError::ListChunkNotFound);
         }
 
@@ -34,9 +35,9 @@ impl SoundFontInfo {
         let reader = &mut ReadCounter::new(reader);
 
         let list_type = BinaryReader::read_four_cc(reader)?;
-        if list_type != "INFO" {
+        if &list_type != b"INFO" {
             return Err(SoundFontError::InvalidListChunkType {
-                expected: "INFO",
+                expected: FourCC::from_bytes(*b"INFO"),
                 actual: list_type,
             });
         }
@@ -57,87 +58,40 @@ impl SoundFontInfo {
             let id = BinaryReader::read_four_cc(reader)?;
             let size = BinaryReader::read_i32(reader)? as usize;
 
-            if id == "ifil" {
-                version = Some(SoundFontVersion::new(reader)?);
-            } else if id == "isng" {
-                target_sound_engine = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            } else if id == "INAM" {
-                bank_name = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            } else if id == "irom" {
-                rom_name = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            } else if id == "iver" {
-                rom_version = Some(SoundFontVersion::new(reader)?);
-            } else if id == "ICRD" {
-                creation_date = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            } else if id == "IENG" {
-                author = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            } else if id == "IPRD" {
-                target_product = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            } else if id == "ICOP" {
-                copyright = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            } else if id == "ICMT" {
-                comments = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            } else if id == "ISFT" {
-                tools = Some(BinaryReader::read_fixed_length_string(reader, size)?);
-            } else {
-                return Err(SoundFontError::ListContainsUnknownId(id));
+            match id.as_bytes() {
+                b"ifil" => version = Some(SoundFontVersion::new(reader)?),
+                b"isng" => {
+                    target_sound_engine =
+                        Some(BinaryReader::read_fixed_length_string(reader, size)?)
+                }
+                b"INAM" => bank_name = Some(BinaryReader::read_fixed_length_string(reader, size)?),
+                b"irom" => rom_name = Some(BinaryReader::read_fixed_length_string(reader, size)?),
+                b"iver" => rom_version = Some(SoundFontVersion::new(reader)?),
+                b"ICRD" => {
+                    creation_date = Some(BinaryReader::read_fixed_length_string(reader, size)?)
+                }
+                b"IENG" => author = Some(BinaryReader::read_fixed_length_string(reader, size)?),
+                b"IPRD" => {
+                    target_product = Some(BinaryReader::read_fixed_length_string(reader, size)?)
+                }
+                b"ICOP" => copyright = Some(BinaryReader::read_fixed_length_string(reader, size)?),
+                b"ICMT" => comments = Some(BinaryReader::read_fixed_length_string(reader, size)?),
+                b"ISFT" => tools = Some(BinaryReader::read_fixed_length_string(reader, size)?),
+                _ => return Err(SoundFontError::ListContainsUnknownId(id)),
             }
         }
 
-        let version = match version {
-            Some(value) => value,
-            None => SoundFontVersion::default(),
-        };
-
-        let target_sound_engine = match target_sound_engine {
-            Some(value) => value,
-            None => String::new(),
-        };
-
-        let bank_name = match bank_name {
-            Some(value) => value,
-            None => String::new(),
-        };
-
-        let rom_name = match rom_name {
-            Some(value) => value,
-            None => String::new(),
-        };
-
-        let rom_version = match rom_version {
-            Some(value) => value,
-            None => SoundFontVersion::default(),
-        };
-
-        let creation_date = match creation_date {
-            Some(value) => value,
-            None => String::new(),
-        };
-
-        let author = match author {
-            Some(value) => value,
-            None => String::new(),
-        };
-
-        let target_product = match target_product {
-            Some(value) => value,
-            None => String::new(),
-        };
-
-        let copyright = match copyright {
-            Some(value) => value,
-            None => String::new(),
-        };
-
-        let comments = match comments {
-            Some(value) => value,
-            None => String::new(),
-        };
-
-        let tools = match tools {
-            Some(value) => value,
-            None => String::new(),
-        };
+        let version = version.unwrap_or_else(SoundFontVersion::default);
+        let target_sound_engine = target_sound_engine.unwrap_or_default();
+        let bank_name = bank_name.unwrap_or_default();
+        let rom_name = rom_name.unwrap_or_default();
+        let rom_version = rom_version.unwrap_or_else(SoundFontVersion::default);
+        let creation_date = creation_date.unwrap_or_default();
+        let author = author.unwrap_or_default();
+        let target_product = target_product.unwrap_or_default();
+        let copyright = copyright.unwrap_or_default();
+        let comments = comments.unwrap_or_default();
+        let tools = tools.unwrap_or_default();
 
         Ok(Self {
             version,

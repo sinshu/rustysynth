@@ -3,6 +3,7 @@
 use std::io::Read;
 
 use crate::binary_reader::BinaryReader;
+use crate::four_cc::FourCC;
 use crate::read_counter::ReadCounter;
 use crate::MidiFileError;
 use crate::MidiFileLoopType;
@@ -166,16 +167,18 @@ impl MidiFile {
         loop_type: MidiFileLoopType,
     ) -> Result<Self, MidiFileError> {
         let chunk_type = BinaryReader::read_four_cc(reader)?;
-        if chunk_type != "MThd" {
+        if &chunk_type != b"MThd" {
             return Err(MidiFileError::InvalidChunkType {
-                expected: "MThd",
+                expected: FourCC::from_bytes(*b"MThd"),
                 actual: chunk_type,
             });
         }
 
         let size = BinaryReader::read_i32_big_endian(reader)?;
         if size != 6 {
-            return Err(MidiFileError::InvalidChunkData("MThd"));
+            return Err(MidiFileError::InvalidChunkData(FourCC::from_bytes(
+                *b"MThd",
+            )));
         }
 
         let format = BinaryReader::read_i16_big_endian(reader)?;
@@ -246,9 +249,9 @@ impl MidiFile {
         loop_type: MidiFileLoopType,
     ) -> Result<(Vec<Message>, Vec<i32>), MidiFileError> {
         let chunk_type = BinaryReader::read_four_cc(reader)?;
-        if chunk_type != "MTrk" {
+        if &chunk_type != b"MTrk" {
             return Err(MidiFileError::InvalidChunkType {
-                expected: "MTrk",
+                expected: FourCC::from_bytes(*b"MTrk"),
                 actual: chunk_type,
             });
         }

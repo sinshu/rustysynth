@@ -6,6 +6,8 @@ use std::io::Read;
 use std::slice;
 use std::str;
 
+use crate::four_cc::FourCC;
+
 #[allow(unused)]
 #[non_exhaustive]
 pub(crate) struct BinaryReader {}
@@ -75,18 +77,10 @@ impl BinaryReader {
         Ok(acc)
     }
 
-    pub(crate) fn read_four_cc<R: Read>(reader: &mut R) -> Result<String, io::Error> {
+    pub(crate) fn read_four_cc<R: Read>(reader: &mut R) -> Result<FourCC, io::Error> {
         let mut data: [u8; 4] = [0; 4];
         reader.read_exact(&mut data)?;
-
-        // Replace non-ASCII characters with '?'.
-        for value in &mut data {
-            if !(32..=126).contains(value) {
-                *value = 63; // '?'
-            }
-        }
-
-        Ok(str::from_utf8(&data).unwrap().to_string())
+        Ok(FourCC::from_bytes(data))
     }
 
     pub(crate) fn read_fixed_length_string<R: Read>(

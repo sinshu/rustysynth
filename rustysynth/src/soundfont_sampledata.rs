@@ -5,6 +5,7 @@ use std::slice;
 
 use crate::binary_reader::BinaryReader;
 use crate::error::SoundFontError;
+use crate::four_cc::FourCC;
 use crate::read_counter::ReadCounter;
 
 #[non_exhaustive]
@@ -16,7 +17,7 @@ pub struct SoundFontSampleData {
 impl SoundFontSampleData {
     pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
-        if chunk_id != "LIST" {
+        if &chunk_id != b"LIST" {
             return Err(SoundFontError::ListChunkNotFound);
         }
 
@@ -24,9 +25,9 @@ impl SoundFontSampleData {
         let reader = &mut ReadCounter::new(reader);
 
         let list_type = BinaryReader::read_four_cc(reader)?;
-        if list_type != "sdta" {
+        if &list_type != b"sdta" {
             return Err(SoundFontError::InvalidListChunkType {
-                expected: "sdta",
+                expected: FourCC::from_bytes(*b"sdta"),
                 actual: list_type,
             });
         }
@@ -37,9 +38,9 @@ impl SoundFontSampleData {
             let id = BinaryReader::read_four_cc(reader)?;
             let size = BinaryReader::read_i32(reader)? as usize;
 
-            if id == "smpl" {
+            if &id == b"smpl" {
                 wave_data = Some(BinaryReader::read_wave_data(reader, size)?);
-            } else if id == "sm24" {
+            } else if &id == b"sm24" {
                 BinaryReader::discard_data(reader, size)?;
             } else {
                 return Err(SoundFontError::ListContainsUnknownId(id));

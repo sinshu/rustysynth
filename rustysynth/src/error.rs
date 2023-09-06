@@ -2,6 +2,8 @@ use std::error;
 use std::fmt;
 use std::io;
 
+use crate::four_cc::FourCC;
+
 /// Represents an error when initializing a synthesizer.
 #[derive(Debug)]
 #[non_exhaustive]
@@ -44,18 +46,18 @@ pub enum SoundFontError {
     IoError(io::Error),
     RiffChunkNotFound,
     InvalidRiffChunkType {
-        expected: &'static str,
-        actual: String,
+        expected: FourCC,
+        actual: FourCC,
     },
     ListChunkNotFound,
     InvalidListChunkType {
-        expected: &'static str,
-        actual: String,
+        expected: FourCC,
+        actual: FourCC,
     },
-    ListContainsUnknownId(String),
+    ListContainsUnknownId(FourCC),
     SampleDataNotFound,
     UnsupportedSampleFormat,
-    SubChunkNotFound(&'static str),
+    SubChunkNotFound(FourCC),
     InvalidPresetList,
     InvalidInstrumentId {
         preset_name: String,
@@ -154,11 +156,8 @@ impl From<io::Error> for SoundFontError {
 #[non_exhaustive]
 pub enum MidiFileError {
     IoError(io::Error),
-    InvalidChunkType {
-        expected: &'static str,
-        actual: String,
-    },
-    InvalidChunkData(&'static str),
+    InvalidChunkType { expected: FourCC, actual: FourCC },
+    InvalidChunkData(FourCC),
     UnsupportedFormat(i16),
     InvalidTempoValue,
 }
