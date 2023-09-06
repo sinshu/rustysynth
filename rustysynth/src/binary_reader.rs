@@ -43,6 +43,12 @@ impl BinaryReader {
         Ok(i32::from_le_bytes(data))
     }
 
+    pub(crate) fn read_u32<R: Read>(reader: &mut R) -> Result<u32, io::Error> {
+        let mut data: [u8; 4] = [0; 4];
+        reader.read_exact(&mut data)?;
+        Ok(u32::from_le_bytes(data))
+    }
+
     pub(crate) fn read_i16_big_endian<R: Read>(reader: &mut R) -> Result<i16, io::Error> {
         let mut data: [u8; 2] = [0; 2];
         reader.read_exact(&mut data)?;

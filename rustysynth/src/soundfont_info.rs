@@ -31,7 +31,7 @@ impl SoundFontInfo {
             return Err(SoundFontError::ListChunkNotFound);
         }
 
-        let end = BinaryReader::read_i32(reader)? as usize;
+        let end = BinaryReader::read_u32(reader)? as usize;
         let reader = &mut ReadCounter::new(reader);
 
         let list_type = BinaryReader::read_four_cc(reader)?;
@@ -56,7 +56,7 @@ impl SoundFontInfo {
 
         while reader.bytes_read() < end {
             let id = BinaryReader::read_four_cc(reader)?;
-            let size = BinaryReader::read_i32(reader)? as usize;
+            let size = BinaryReader::read_u32(reader)? as usize;
 
             match id.as_bytes() {
                 b"ifil" => version = Some(SoundFontVersion::new(reader)?),

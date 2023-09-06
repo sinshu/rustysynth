@@ -21,7 +21,7 @@ impl SoundFontSampleData {
             return Err(SoundFontError::ListChunkNotFound);
         }
 
-        let end = BinaryReader::read_i32(reader)? as usize;
+        let end = BinaryReader::read_u32(reader)? as usize;
         let reader = &mut ReadCounter::new(reader);
 
         let list_type = BinaryReader::read_four_cc(reader)?;
@@ -36,7 +36,7 @@ impl SoundFontSampleData {
 
         while reader.bytes_read() < end {
             let id = BinaryReader::read_four_cc(reader)?;
-            let size = BinaryReader::read_i32(reader)? as usize;
+            let size = BinaryReader::read_u32(reader)? as usize;
 
             if &id == b"smpl" {
                 wave_data = Some(BinaryReader::read_wave_data(reader, size)?);
