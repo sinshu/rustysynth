@@ -1,3 +1,7 @@
+# v1.3.1
+
+- Now all the error types don't use heap allocation.
+
 # v1.3.0
 
 - Fixed issue where loading large SoundFont files would fail ([thanks to @paxbun](https://github.com/sinshu/rustysynth/pull/12)).
