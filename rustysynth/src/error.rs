@@ -60,17 +60,17 @@ pub enum SoundFontError {
     SubChunkNotFound(FourCC),
     InvalidPresetList,
     InvalidInstrumentId {
-        preset_name: String,
+        preset_id: usize,
         instrument_id: usize,
     },
-    InvalidPreset(String),
+    InvalidPreset(usize),
     PresetNotFound,
     InvalidInstrumentList,
     InvalidSampleId {
-        instrument_name: String,
+        instrument_id: usize,
         sample_id: usize,
     },
-    InvalidInstrument(String),
+    InvalidInstrument(usize),
     InstrumentNotFound,
     InvalidSampleHeaderList,
     InvalidZoneList,
@@ -113,26 +113,26 @@ impl fmt::Display for SoundFontError {
             }
             SoundFontError::InvalidPresetList => write!(f, "the preset list is invalid"),
             SoundFontError::InvalidInstrumentId {
-                preset_name,
+                preset_id,
                 instrument_id,
             } => write!(
                 f,
-                "the preset '{preset_name}' contains an invalid instrument ID '{instrument_id}'"
+                "the preset with the ID '{preset_id}' contains an invalid instrument ID '{instrument_id}'"
             ),
-            SoundFontError::InvalidPreset(preset_name) => {
-                write!(f, "the preset '{preset_name}' has no zone")
+            SoundFontError::InvalidPreset(preset_id) => {
+                write!(f, "the preset with the ID '{preset_id}' has no zone")
             }
             SoundFontError::PresetNotFound => write!(f, "no valid preset was found"),
             SoundFontError::InvalidInstrumentList => write!(f, "the instrument list is invalid"),
             SoundFontError::InvalidSampleId {
-                instrument_name,
+                instrument_id,
                 sample_id,
             } => write!(
                 f,
-                "the instrument '{instrument_name}' contains an invalid sample ID '{sample_id}'"
+                "the instrument with the ID '{instrument_id}' contains an invalid sample ID '{sample_id}'"
             ),
-            SoundFontError::InvalidInstrument(instrument_name) => {
-                write!(f, "the instrument '{instrument_name}' has no zone")
+            SoundFontError::InvalidInstrument(instrument_id) => {
+                write!(f, "the instrument with the ID '{instrument_id}' has no zone")
             }
             SoundFontError::InstrumentNotFound => write!(f, "no valid instrument was found"),
             SoundFontError::InvalidSampleHeaderList => {

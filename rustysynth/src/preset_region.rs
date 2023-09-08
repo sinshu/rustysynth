@@ -26,7 +26,7 @@ pub struct PresetRegion {
 
 impl PresetRegion {
     fn new(
-        name: &str,
+        preset_id: usize,
         global: &Zone,
         local: &Zone,
         samples: &[Instrument],
@@ -43,19 +43,22 @@ impl PresetRegion {
             set_parameter(&mut gs, generator);
         }
 
-        let id = gs[GeneratorType::INSTRUMENT as usize] as usize;
-        if id >= samples.len() {
+        let instrument_id = gs[GeneratorType::INSTRUMENT as usize] as usize;
+        if instrument_id >= samples.len() {
             return Err(SoundFontError::InvalidInstrumentId {
-                preset_name: name.to_string(),
-                instrument_id: id,
+                preset_id,
+                instrument_id,
             });
         }
 
-        Ok(Self { gs, instrument: id })
+        Ok(Self {
+            gs,
+            instrument: instrument_id,
+        })
     }
 
     pub(crate) fn create(
-        name: &str,
+        preset_id: usize,
         zones: &[Zone],
         instruments: &[Instrument],
     ) -> Result<Vec<PresetRegion>, SoundFontError> {
@@ -70,7 +73,12 @@ impl PresetRegion {
             let count = zones.len() - 1;
             let mut regions: Vec<PresetRegion> = Vec::new();
             for i in 0..count {
-                regions.push(PresetRegion::new(name, global, &zones[i + 1], instruments)?);
+                regions.push(PresetRegion::new(
+                    preset_id,
+                    global,
+                    &zones[i + 1],
+                    instruments,
+                )?);
             }
 
             Ok(regions)
@@ -79,7 +87,12 @@ impl PresetRegion {
             let count = zones.len();
             let mut regions: Vec<PresetRegion> = Vec::new();
             for zone in zones.iter().take(count) {
-                regions.push(PresetRegion::new(name, &Zone::empty(), zone, instruments)?);
+                regions.push(PresetRegion::new(
+                    preset_id,
+                    &Zone::empty(),
+                    zone,
+                    instruments,
+                )?);
             }
 
             Ok(regions)

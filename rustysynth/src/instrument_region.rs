@@ -33,7 +33,7 @@ pub struct InstrumentRegion {
 
 impl InstrumentRegion {
     fn new(
-        name: &str,
+        instrument_id: usize,
         global: &Zone,
         local: &Zone,
         samples: &[SampleHeader],
@@ -67,14 +67,14 @@ impl InstrumentRegion {
             set_parameter(&mut gs, generator);
         }
 
-        let id = gs[GeneratorType::SAMPLE_ID as usize] as usize;
-        if id >= samples.len() {
+        let sample_id = gs[GeneratorType::SAMPLE_ID as usize] as usize;
+        if sample_id >= samples.len() {
             return Err(SoundFontError::InvalidSampleId {
-                instrument_name: name.to_string(),
-                sample_id: id,
+                instrument_id,
+                sample_id,
             });
         }
-        let sample = &samples[id];
+        let sample = &samples[sample_id];
 
         Ok(Self {
             gs,
@@ -89,7 +89,7 @@ impl InstrumentRegion {
     }
 
     pub(crate) fn create(
-        name: &str,
+        instrument_id: usize,
         zones: &[Zone],
         samples: &[SampleHeader],
     ) -> Result<Vec<InstrumentRegion>, SoundFontError> {
@@ -104,7 +104,12 @@ impl InstrumentRegion {
             let count = zones.len() - 1;
             let mut regions: Vec<InstrumentRegion> = Vec::new();
             for i in 0..count {
-                regions.push(InstrumentRegion::new(name, global, &zones[i + 1], samples)?);
+                regions.push(InstrumentRegion::new(
+                    instrument_id,
+                    global,
+                    &zones[i + 1],
+                    samples,
+                )?);
             }
 
             Ok(regions)
@@ -113,7 +118,12 @@ impl InstrumentRegion {
             let count = zones.len();
             let mut regions: Vec<InstrumentRegion> = Vec::new();
             for zone in zones.iter().take(count) {
-                regions.push(InstrumentRegion::new(name, &Zone::empty(), zone, samples)?);
+                regions.push(InstrumentRegion::new(
+                    instrument_id,
+                    &Zone::empty(),
+                    zone,
+                    samples,
+                )?);
             }
 
             Ok(regions)

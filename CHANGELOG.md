@@ -1,3 +1,8 @@
+# v1.3.0
+
+- Fixed issue where loading large SoundFont files would fail ([thanks to @paxbun](https://github.com/sinshu/rustysynth/pull/12)).
+- Error types no longer allocate `String` ([thanks to @paxbun](https://github.com/sinshu/rustysynth/pull/12)).
+
 # v1.2.1
 
 - Minor tweaks to make the code idiomatic.

@@ -16,6 +16,7 @@ pub struct Instrument {
 impl Instrument {
     fn new(
         info: &InstrumentInfo,
+        instrument_id: usize,
         zones: &[Zone],
         samples: &[SampleHeader],
     ) -> Result<Self, SoundFontError> {
@@ -23,13 +24,13 @@ impl Instrument {
 
         let zone_count = info.zone_end_index - info.zone_start_index + 1;
         if zone_count <= 0 {
-            return Err(SoundFontError::InvalidInstrument(name));
+            return Err(SoundFontError::InvalidInstrument(instrument_id));
         }
 
         let span_start = info.zone_start_index as usize;
         let span_end = span_start + zone_count as usize;
         let zone_span = &zones[span_start..span_end];
-        let regions = InstrumentRegion::create(&name, zone_span, samples)?;
+        let regions = InstrumentRegion::create(instrument_id, zone_span, samples)?;
 
         Ok(Self { name, regions })
     }
@@ -47,8 +48,8 @@ impl Instrument {
         let count = infos.len() - 1;
 
         let mut instruments: Vec<Instrument> = Vec::new();
-        for info in infos.iter().take(count) {
-            instruments.push(Instrument::new(info, zones, samples)?);
+        for (instrument_id, info) in infos.iter().take(count).enumerate() {
+            instruments.push(Instrument::new(info, instrument_id, zones, samples)?);
         }
 
         Ok(instruments)
