@@ -21,6 +21,7 @@ pub struct Preset {
 impl Preset {
     fn new(
         info: &PresetInfo,
+        preset_id: usize,
         zones: &[Zone],
         instruments: &[Instrument],
     ) -> Result<Self, SoundFontError> {
@@ -28,13 +29,13 @@ impl Preset {
 
         let zone_count = info.zone_end_index - info.zone_start_index + 1;
         if zone_count <= 0 {
-            return Err(SoundFontError::InvalidPreset(name));
+            return Err(SoundFontError::InvalidPreset(preset_id));
         }
 
         let span_start = info.zone_start_index as usize;
         let span_end = span_start + zone_count as usize;
         let zone_span = &zones[span_start..span_end];
-        let regions = PresetRegion::create(&name, zone_span, instruments)?;
+        let regions = PresetRegion::create(preset_id, zone_span, instruments)?;
 
         Ok(Self {
             name,
@@ -60,8 +61,8 @@ impl Preset {
         let count = infos.len() - 1;
 
         let mut presets: Vec<Preset> = Vec::new();
-        for info in infos.iter().take(count) {
-            presets.push(Preset::new(info, zones, instruments)?);
+        for (preset_id, info) in infos.iter().take(count).enumerate() {
+            presets.push(Preset::new(info, preset_id, zones, instruments)?);
         }
 
         Ok(presets)
