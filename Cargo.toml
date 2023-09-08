@@ -5,3 +5,5 @@ members = [
     "rustysynth",
     "rustysynth_test",
 ]
+
+resolver = "2"

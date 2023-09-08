@@ -1,3 +1,9 @@
+# v1.2.1
+
+- Minor tweaks to make the code idiomatic.
+- Added `get_sample_id` method to `InstrumentRegion` ([thanks to @pomscyth](https://github.com/sinshu/rustysynth/pull/11)).
+- Added `get_instrument_id` method to `PresetRegion`.
+
 # v1.2.0
 
 - Added ability to set the loop point when playing MIDI files.
