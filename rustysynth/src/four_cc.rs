@@ -1,5 +1,7 @@
 use std::fmt::{Debug, Display, Formatter, Result, Write};
 
+/// Reperesents the FourCC.
+/// This is used for error reporting when the binary format is invalid.
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct FourCC([u8; 4]);
 
