@@ -132,7 +132,7 @@ impl Message {
 #[non_exhaustive]
 pub struct MidiFile {
     pub(crate) messages: Vec<Message>,
-    pub(crate) times: Vec<f64>,
+    pub times: Vec<f64>,
 }
 
 impl MidiFile {
@@ -143,6 +143,11 @@ impl MidiFile {
     /// * `reader` - The data stream used to load the MIDI file.
     pub fn new<R: Read>(reader: &mut R) -> Result<Self, MidiFileError> {
         MidiFile::new_with_loop_type(reader, MidiFileLoopType::LoopPoint(0))
+    }
+
+    pub fn update_file<R: Read>(&mut self, reader: &mut R) -> Result<(), MidiFileError> {
+        *self = MidiFile::new(reader)?;
+        Ok(())
     }
 
     /// Loads a MIDI file from the stream with a specified loop type.

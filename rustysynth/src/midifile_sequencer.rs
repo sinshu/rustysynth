@@ -2,6 +2,7 @@
 
 use std::cmp;
 use std::sync::Arc;
+use std::sync::Mutex;
 
 use crate::midifile::Message;
 use crate::midifile::MidiFile;
@@ -14,7 +15,7 @@ pub struct MidiFileSequencer {
 
     speed: f64,
 
-    midi_file: Option<Arc<MidiFile>>,
+    midi_file: Arc<Mutex<Option<MidiFile>>>,
     play_loop: bool,
 
     block_wrote: usize,
@@ -34,7 +35,7 @@ impl MidiFileSequencer {
         Self {
             synthesizer,
             speed: 1.0,
-            midi_file: None,
+            midi_file: Arc::new(Mutex::new(None)),
             play_loop: false,
             block_wrote: 0,
             current_time: 0.0,
@@ -49,8 +50,8 @@ impl MidiFileSequencer {
     ///
     /// * `midi_file` - The MIDI file to be played.
     /// * `play_loop` - If `true`, the MIDI file loops after reaching the end.
-    pub fn play(&mut self, midi_file: &Arc<MidiFile>, play_loop: bool) {
-        self.midi_file = Some(Arc::clone(midi_file));
+    pub fn play(&mut self, midi_file: &Arc<Mutex<Option<MidiFile>>>, play_loop: bool) {
+        self.midi_file = midi_file.clone();
         self.play_loop = play_loop;
 
         self.block_wrote = self.synthesizer.block_size;
@@ -64,8 +65,12 @@ impl MidiFileSequencer {
 
     /// Stops playing.
     pub fn stop(&mut self) {
-        self.midi_file = None;
+        self.midi_file = Arc::new(Mutex::new(None));
         self.synthesizer.reset();
+    }
+
+    pub fn has_midi(&self) -> bool {
+        self.midi_file.lock().unwrap().is_some()
     }
 
     /// Renders the waveform.
@@ -107,8 +112,28 @@ impl MidiFileSequencer {
         }
     }
 
+    pub fn reset_message_index(&mut self) {
+        let midi_file = self.midi_file.clone();
+        let midi_file = midi_file.lock().unwrap();
+        let midi_file = match midi_file.as_ref() {
+            Some(value) => value,
+            None => return,
+        };
+
+        self.msg_index = 0;
+        while self.msg_index < midi_file.messages.len() {
+            let time = midi_file.times[self.msg_index];
+            if time > self.current_time {
+                break;
+            }
+            self.msg_index += 1;
+        }
+    }
+
     fn process_events(&mut self) {
-        let midi_file = match self.midi_file.as_ref() {
+        let midi_file = self.midi_file.clone();
+        let midi_file = midi_file.lock().unwrap();
+        let midi_file = match midi_file.as_ref() {
             Some(value) => value,
             None => return,
         };
@@ -140,7 +165,7 @@ impl MidiFileSequencer {
             }
         }
 
-        if self.msg_index == midi_file.messages.len() && self.play_loop {
+        if self.msg_index >= midi_file.messages.len() && self.play_loop {
             self.current_time = midi_file.times[self.loop_index];
             self.msg_index = self.loop_index;
             self.synthesizer.note_off_all(false);
@@ -152,12 +177,14 @@ impl MidiFileSequencer {
         &self.synthesizer
     }
 
+    /// Gets the synthesizer handled by the sequencer.
+    pub fn get_mut_synthesizer(&mut self) -> &mut Synthesizer {
+        &mut self.synthesizer
+    }
+
     /// Gets the currently playing MIDI file.
-    pub fn get_midi_file(&self) -> Option<&MidiFile> {
-        match &self.midi_file {
-            None => None,
-            Some(value) => Some(value),
-        }
+    pub fn get_midi_file(&self) -> Arc<Mutex<Option<MidiFile>>> {
+        return self.midi_file.clone();
     }
 
     /// Gets the current playback position in seconds.
@@ -172,9 +199,9 @@ impl MidiFileSequencer {
     /// If the `play` method has not yet been called, this value will be `true`.
     /// This value will never be `true` if loop playback is enabled.
     pub fn end_of_sequence(&self) -> bool {
-        match &self.midi_file {
-            None => true,
+        match self.midi_file.clone().lock().unwrap().as_ref() {
             Some(value) => self.msg_index == value.messages.len(),
+            None => true,
         }
     }
 
