@@ -12,4 +12,11 @@ license = "MIT"
 keywords = ["soundfont", "midi", "synthesizer", "audio", "music"]
 categories = ["multimedia::audio"]
 
+[dev-dependencies]
+clap = { version = "4.5.8", features = ["derive"] }
+midir = "0.10.0"
+anyhow = "1.0.86"
+tinyaudio = "0.1.3"
+itertools = "0.13.0"
+
 [dependencies]
