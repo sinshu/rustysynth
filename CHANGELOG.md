@@ -1,3 +1,7 @@
+# v1.3.2
+
+- Added sanity check in loading SoundFonts ([thanks to @sevonj](https://github.com/sinshu/rustysynth/pull/24)).
+
 # v1.3.1
 
 - Now all the error types don't use heap allocation.
