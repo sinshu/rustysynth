@@ -157,11 +157,11 @@ impl MidiFile {
     /// `MidiFileLoopType` has the following variants:
     /// * `LoopPoint(usize)` - Specifies the loop start point by a tick value.
     /// * `RpgMaker` - The RPG Maker style loop.
-    /// CC #111 will be the loop start point.
+    ///   CC #111 will be the loop start point.
     /// * `IncredibleMachine` - The Incredible Machine style loop.
-    /// CC #110 and #111 will be the start and end points of the loop.
+    ///   CC #110 and #111 will be the start and end points of the loop.
     /// * `FinalFantasy` - The Final Fantasy style loop.
-    /// CC #116 and #117 will be the start and end points of the loop.
+    ///   CC #116 and #117 will be the start and end points of the loop.
     pub fn new_with_loop_type<R: Read>(
         reader: &mut R,
         loop_type: MidiFileLoopType,
