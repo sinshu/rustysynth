@@ -50,14 +50,33 @@ impl SoundFont {
         let sample_data = SoundFontSampleData::new(reader)?;
         let parameters = SoundFontParameters::new(reader)?;
 
-        Ok(Self {
+        let result = Self {
             info,
             bits_per_sample: 16,
             wave_data: Arc::new(sample_data.wave_data),
             sample_headers: parameters.sample_headers,
             presets: parameters.presets,
             instruments: parameters.instruments,
-        })
+        };
+
+        if result.sanity_check() {
+            Ok(result)
+        } else {
+            Err(SoundFontError::SanityCheckFailed)
+        }
+    }
+
+    fn sanity_check(&self) -> bool {
+        // https://github.com/sinshu/rustysynth/issues/22
+        for instrument in self.instruments.iter() {
+            for region in instrument.regions.iter() {
+                if region.get_sample_end_loop() < region.get_sample_start_loop() {
+                    return false;
+                }
+            }
+        }
+
+        true
     }
 
     /// Gets the information of the SoundFont.
