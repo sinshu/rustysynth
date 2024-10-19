@@ -360,11 +360,8 @@ impl Synthesizer {
         self.voices
             .process(&self.sound_font.wave_data, &self.channels);
 
-        for t in 0..self.block_size {
-            self.block_left[t] = 0_f32;
-            self.block_right[t] = 0_f32;
-        }
-
+        self.block_left.fill(0_f32);
+        self.block_right.fill(0_f32);
         for voice in self.voices.get_active_voices().iter_mut() {
             let previous_gain_left = self.master_volume * voice.previous_mix_gain_left;
             let current_gain_left = self.master_volume * voice.current_mix_gain_left;
@@ -392,10 +389,8 @@ impl Synthesizer {
             let chorus_input_right = &mut effects.chorus_input_right[..];
             let chorus_output_left = &mut effects.chorus_output_left[..];
             let chorus_output_right = &mut effects.chorus_output_right[..];
-            for i in 0..self.block_size {
-                chorus_input_left[i] = 0_f32;
-                chorus_input_right[i] = 0_f32;
-            }
+            chorus_input_left.fill(0_f32);
+            chorus_input_right.fill(0_f32);
             for voice in self.voices.get_active_voices().iter_mut() {
                 let previous_gain_left = voice.previous_chorus_send * voice.previous_mix_gain_left;
                 let current_gain_left = voice.current_chorus_send * voice.current_mix_gain_left;
@@ -438,9 +433,7 @@ impl Synthesizer {
             let reverb_input = &mut effects.reverb_input[..];
             let reverb_output_left = &mut effects.reverb_output_left[..];
             let reverb_output_right = &mut effects.reverb_output_right[..];
-            for input in reverb_input.iter_mut().take(self.block_size) {
-                *input = 0_f32;
-            }
+            reverb_input.fill(0_f32);
             for voice in self.voices.get_active_voices().iter_mut() {
                 let previous_gain = reverb.get_input_gain()
                     * voice.previous_reverb_send

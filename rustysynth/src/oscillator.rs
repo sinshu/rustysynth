@@ -108,9 +108,8 @@ impl Oscillator {
             let index = (self.position_fp >> Oscillator::FRAC_BITS) as usize;
             if index >= self.end as usize {
                 if t > 0 {
-                    for sample in block.iter_mut().skip(t) {
-                        *sample = 0_f32;
-                    }
+                    let len = block.len();
+                    block[t..len].fill(0_f32);
                     return true;
                 } else {
                     return false;
