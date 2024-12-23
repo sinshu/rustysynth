@@ -1,5 +1,12 @@
 #![allow(dead_code)]
 
+#[derive(PartialEq, Eq)]
+enum DataType {
+    None,
+    Rpn,
+    Nrpn,
+}
+
 #[non_exhaustive]
 pub(crate) struct Channel {
     pub(crate) is_percussion_channel: bool,
@@ -22,6 +29,8 @@ pub(crate) struct Channel {
     fine_tune: i16,
 
     pitch_bend: f32,
+
+    last_data_type: DataType,
 }
 
 impl Channel {
@@ -42,6 +51,7 @@ impl Channel {
             coarse_tune: 0,
             fine_tune: 0,
             pitch_bend: 0_f32,
+            last_data_type: DataType::None,
         };
 
         channel.reset();
@@ -138,13 +148,27 @@ impl Channel {
 
     pub(crate) fn set_rpn_coarse(&mut self, value: i32) {
         self.rpn = (self.rpn & 0x7F) | (value << 7) as i16;
+        self.last_data_type = DataType::Rpn;
     }
 
     pub(crate) fn set_rpn_fine(&mut self, value: i32) {
         self.rpn = (((self.rpn as i32) & 0xFF80) | value) as i16;
+        self.last_data_type = DataType::Rpn;
+    }
+
+    pub(crate) fn set_nrpn_coarse(&mut self, _value: i32) {
+        self.last_data_type = DataType::Nrpn;
+    }
+
+    pub(crate) fn set_nrpn_fine(&mut self, _value: i32) {
+        self.last_data_type = DataType::Nrpn;
     }
 
     pub(crate) fn data_entry_coarse(&mut self, value: i32) {
+        if self.last_data_type != DataType::Rpn {
+            return;
+        }
+
         if self.rpn == 0 {
             self.pitch_bend_range = (self.pitch_bend_range & 0x7F) | (value << 7) as i16;
         } else if self.rpn == 1 {
@@ -155,6 +179,10 @@ impl Channel {
     }
 
     pub(crate) fn data_entry_fine(&mut self, value: i32) {
+        if self.last_data_type != DataType::Rpn {
+            return;
+        }
+
         if self.rpn == 0 {
             self.pitch_bend_range = (((self.pitch_bend_range as i32) & 0xFF80) | value) as i16;
         } else if self.rpn == 1 {
