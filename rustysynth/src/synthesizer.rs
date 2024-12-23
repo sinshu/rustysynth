@@ -156,7 +156,7 @@ impl Synthesizer {
                 0x40 => channel_info.set_hold_pedal(data2), // Hold Pedal
                 0x5B => channel_info.set_reverb_send(data2), // Reverb Send
                 0x5D => channel_info.set_chorus_send(data2), // Chorus Send
-                0x63 => channel_info.set_nrpn_coarse(data2),// NRPN Coarse
+                0x63 => channel_info.set_nrpn_coarse(data2), // NRPN Coarse
                 0x62 => channel_info.set_nrpn_fine(data2), // NRPN Fine
                 0x65 => channel_info.set_rpn_coarse(data2), // RPN Coarse
                 0x64 => channel_info.set_rpn_fine(data2), // RPN Fine
