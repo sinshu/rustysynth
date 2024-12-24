@@ -15,7 +15,7 @@ impl<'a, R: Read> ReadCounter<'a, R> {
     }
 }
 
-impl<'a, R: Read> Read for ReadCounter<'a, R> {
+impl<R: Read> Read for ReadCounter<'_, R> {
     fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
         let len = self.reader.read(buf)?;
         self.count += len;
