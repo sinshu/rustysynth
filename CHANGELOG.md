@@ -1,3 +1,8 @@
+# v1.3.3
+
+- Some minor optimizations.
+- Fixed an issue where the pitch bend range was incorrect in certain MIDI files. ([thanks to @sevonj](https://github.com/sinshu/rustysynth/pull/29)).
+
 # v1.3.2
 
 - Added sanity check in loading SoundFonts ([thanks to @sevonj](https://github.com/sinshu/rustysynth/pull/24)).
