@@ -141,7 +141,7 @@ impl MidiFile {
     /// # Arguments
     ///
     /// * `reader` - The data stream used to load the MIDI file.
-    pub fn new<R: Read>(reader: &mut R) -> Result<Self, MidiFileError> {
+    pub fn new<R: Read + ?Sized>(reader: &mut R) -> Result<Self, MidiFileError> {
         MidiFile::new_with_loop_type(reader, MidiFileLoopType::LoopPoint(0))
     }
 
@@ -162,7 +162,7 @@ impl MidiFile {
     ///   CC #110 and #111 will be the start and end points of the loop.
     /// * `FinalFantasy` - The Final Fantasy style loop.
     ///   CC #116 and #117 will be the start and end points of the loop.
-    pub fn new_with_loop_type<R: Read>(
+    pub fn new_with_loop_type<R: Read + ?Sized>(
         reader: &mut R,
         loop_type: MidiFileLoopType,
     ) -> Result<Self, MidiFileError> {
@@ -225,13 +225,13 @@ impl MidiFile {
         Ok(Self { messages, times })
     }
 
-    fn discard_data<R: Read>(reader: &mut R) -> Result<(), MidiFileError> {
+    fn discard_data<R: Read + ?Sized>(reader: &mut R) -> Result<(), MidiFileError> {
         let size = BinaryReader::read_i32_variable_length(reader)? as usize;
         BinaryReader::discard_data(reader, size)?;
         Ok(())
     }
 
-    fn read_tempo<R: Read>(reader: &mut R) -> Result<i32, MidiFileError> {
+    fn read_tempo<R: Read + ?Sized>(reader: &mut R) -> Result<i32, MidiFileError> {
         let size = BinaryReader::read_i32_variable_length(reader)?;
         if size != 3 {
             return Err(MidiFileError::InvalidTempoValue);
@@ -244,7 +244,7 @@ impl MidiFile {
         Ok((b1 << 16) | (b2 << 8) | b3)
     }
 
-    fn read_track<R: Read>(
+    fn read_track<R: Read + ?Sized>(
         reader: &mut R,
         loop_type: MidiFileLoopType,
     ) -> Result<(Vec<Message>, Vec<i32>), MidiFileError> {

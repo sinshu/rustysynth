@@ -12,7 +12,7 @@ pub(crate) struct Generator {
 }
 
 impl Generator {
-    fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
+    fn new<R: Read + ?Sized>(reader: &mut R) -> Result<Self, SoundFontError> {
         let generator_type = BinaryReader::read_u16(reader)?;
         let value = BinaryReader::read_u16(reader)?;
 
@@ -22,7 +22,7 @@ impl Generator {
         })
     }
 
-    pub(crate) fn read_from_chunk<R: Read>(
+    pub(crate) fn read_from_chunk<R: Read + ?Sized>(
         reader: &mut R,
         size: usize,
     ) -> Result<Vec<Generator>, SoundFontError> {

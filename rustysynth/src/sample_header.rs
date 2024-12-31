@@ -21,7 +21,7 @@ pub struct SampleHeader {
 }
 
 impl SampleHeader {
-    fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
+    fn new<R: Read + ?Sized>(reader: &mut R) -> Result<Self, SoundFontError> {
         let name = BinaryReader::read_fixed_length_string(reader, 20)?;
         let start = BinaryReader::read_i32(reader)?;
         let end = BinaryReader::read_i32(reader)?;
@@ -47,7 +47,7 @@ impl SampleHeader {
         })
     }
 
-    pub(crate) fn read_from_chunk<R: Read>(
+    pub(crate) fn read_from_chunk<R: Read + ?Sized>(
         reader: &mut R,
         size: usize,
     ) -> Result<Vec<SampleHeader>, SoundFontError> {

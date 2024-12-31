@@ -13,7 +13,7 @@ pub(crate) struct InstrumentInfo {
 }
 
 impl InstrumentInfo {
-    fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
+    fn new<R: Read + ?Sized>(reader: &mut R) -> Result<Self, SoundFontError> {
         let name = BinaryReader::read_fixed_length_string(reader, 20)?;
         let zone_start_index = BinaryReader::read_u16(reader)? as i32;
 
@@ -24,7 +24,7 @@ impl InstrumentInfo {
         })
     }
 
-    pub(crate) fn read_from_chunk<R: Read>(
+    pub(crate) fn read_from_chunk<R: Read + ?Sized>(
         reader: &mut R,
         size: usize,
     ) -> Result<Vec<InstrumentInfo>, SoundFontError> {

@@ -15,7 +15,7 @@ pub struct SoundFontSampleData {
 }
 
 impl SoundFontSampleData {
-    pub(crate) fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
+    pub(crate) fn new<R: Read + ?Sized>(reader: &mut R) -> Result<Self, SoundFontError> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != b"LIST" {
             return Err(SoundFontError::ListChunkNotFound);

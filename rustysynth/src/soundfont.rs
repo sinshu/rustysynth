@@ -30,7 +30,7 @@ impl SoundFont {
     /// # Arguments
     ///
     /// * `reader` - The data stream used to load the SoundFont.
-    pub fn new<R: Read>(reader: &mut R) -> Result<Self, SoundFontError> {
+    pub fn new<R: Read + ?Sized>(reader: &mut R) -> Result<Self, SoundFontError> {
         let chunk_id = BinaryReader::read_four_cc(reader)?;
         if chunk_id != b"RIFF" {
             return Err(SoundFontError::RiffChunkNotFound);
