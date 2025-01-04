@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
 use std::io::Read;
-use std::sync::Arc;
 
 use crate::binary_reader::BinaryReader;
 use crate::error::SoundFontError;
@@ -18,7 +17,7 @@ use crate::soundfont_sampledata::SoundFontSampleData;
 pub struct SoundFont {
     pub(crate) info: SoundFontInfo,
     pub(crate) bits_per_sample: i32,
-    pub(crate) wave_data: Arc<Vec<i16>>,
+    pub(crate) wave_data: Vec<i16>,
     pub(crate) sample_headers: Vec<SampleHeader>,
     pub(crate) presets: Vec<Preset>,
     pub(crate) instruments: Vec<Instrument>,
@@ -53,7 +52,7 @@ impl SoundFont {
         let sound_font = Self {
             info,
             bits_per_sample: 16,
-            wave_data: Arc::new(sample_data.wave_data),
+            wave_data: sample_data.wave_data,
             sample_headers: parameters.sample_headers,
             presets: parameters.presets,
             instruments: parameters.instruments,
