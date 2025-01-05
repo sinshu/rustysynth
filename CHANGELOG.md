@@ -1,7 +1,12 @@
+# v1.3.4
+
+- Some minor optimization.
+- Fixed an issue where reading certain invalid SoundFonts results in a panic instead of an error ([thanks to @sevonj](https://github.com/sinshu/rustysynth/pull/31)).
+
 # v1.3.3
 
 - Some minor optimizations.
-- Fixed an issue where the pitch bend range was incorrect in certain MIDI files. ([thanks to @sevonj](https://github.com/sinshu/rustysynth/pull/29)).
+- Fixed an issue where the pitch bend range was incorrect in certain MIDI files ([thanks to @sevonj](https://github.com/sinshu/rustysynth/pull/29)).
 
 # v1.3.2
 
