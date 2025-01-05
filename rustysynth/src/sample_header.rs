@@ -51,7 +51,7 @@ impl SampleHeader {
         reader: &mut R,
         size: usize,
     ) -> Result<Vec<SampleHeader>, SoundFontError> {
-        if size % 46 != 0 {
+        if size == 0 || size % 46 != 0 {
             return Err(SoundFontError::InvalidSampleHeaderList);
         }
 
