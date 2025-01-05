@@ -43,7 +43,7 @@ impl PresetInfo {
         reader: &mut R,
         size: usize,
     ) -> Result<Vec<PresetInfo>, SoundFontError> {
-        if size % 38 != 0 {
+        if size == 0 || size % 38 != 0 {
             return Err(SoundFontError::InvalidPresetList);
         }
 
