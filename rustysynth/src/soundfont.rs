@@ -66,9 +66,24 @@ impl SoundFont {
 
     fn sanity_check(&self) -> Result<(), SoundFontError> {
         // https://github.com/sinshu/rustysynth/issues/22
+        // https://github.com/sinshu/rustysynth/issues/33
         for instrument in self.instruments.iter() {
             for region in instrument.regions.iter() {
-                if region.get_sample_end_loop() < region.get_sample_start_loop() {
+                let start = region.get_sample_start() as usize;
+                let end = region.get_sample_end() as usize;
+                let start_loop = region.get_sample_start_loop() as usize;
+                let end_loop = region.get_sample_end_loop() as usize;
+
+                if end >= self.wave_data.len() {
+                    return Err(SoundFontError::SanityCheckFailed);
+                }
+                if start_loop < start {
+                    return Err(SoundFontError::SanityCheckFailed);
+                }
+                if end_loop <= start_loop {
+                    return Err(SoundFontError::SanityCheckFailed);
+                }
+                if end < end_loop {
                     return Err(SoundFontError::SanityCheckFailed);
                 }
             }
