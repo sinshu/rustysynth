@@ -77,13 +77,7 @@ impl SoundFont {
                 if end >= self.wave_data.len() {
                     return Err(SoundFontError::SanityCheckFailed);
                 }
-                if start_loop < start {
-                    return Err(SoundFontError::SanityCheckFailed);
-                }
-                if end_loop <= start_loop {
-                    return Err(SoundFontError::SanityCheckFailed);
-                }
-                if end < end_loop {
+                if start_loop < start || end_loop <= start_loop || end < end_loop {
                     return Err(SoundFontError::SanityCheckFailed);
                 }
             }
