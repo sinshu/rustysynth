@@ -90,7 +90,7 @@ impl SoundFont {
                     return Err(SoundFontError::RegionCheckFailed {
                         inst_name,
                         region_idx,
-                        msg: "end < start".into(),
+                        msg: "end <= start".into(),
                     });
                 }
                 if end_loop < start_loop {
