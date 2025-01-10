@@ -360,12 +360,13 @@ impl InstrumentRegion {
         self.gs[GeneratorType::FINE_TUNE as usize] as i32 + self.sample_pitch_correction
     }
 
-    pub fn get_sample_modes(&self) -> i32 {
-        if self.gs[GeneratorType::SAMPLE_MODES as usize] != 2 {
-            self.gs[GeneratorType::SAMPLE_MODES as usize] as i32
-        } else {
-            LoopMode::NO_LOOP
-        }
+    pub fn get_sample_modes(&self) -> LoopMode {
+        let value = self.gs[GeneratorType::SAMPLE_MODES as usize];
+        let mode = LoopMode::from(value);
+        return match mode {
+            LoopMode::Invalid(_) => LoopMode::NoLoop,
+            _ => mode,
+        };
     }
 
     pub fn get_scale_tuning(&self) -> i32 {

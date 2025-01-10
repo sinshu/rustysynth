@@ -1,12 +1,29 @@
-#![allow(dead_code)]
+#[derive(Debug, PartialEq, Eq)]
+pub enum LoopMode {
+    NoLoop,
+    Continuous,
+    LoopUntilNoteOff,
+    Invalid(i16),
+}
 
-#[allow(unused)]
-#[non_exhaustive]
-pub(crate) struct LoopMode {}
+impl From<i16> for LoopMode {
+    fn from(value: i16) -> Self {
+        match value {
+            0 => LoopMode::NoLoop,
+            1 => LoopMode::Continuous,
+            3 => LoopMode::LoopUntilNoteOff,
+            _ => LoopMode::Invalid(value),
+        }
+    }
+}
 
-#[allow(unused)]
-impl LoopMode {
-    pub(crate) const NO_LOOP: i32 = 0;
-    pub(crate) const CONTINUOUS: i32 = 0;
-    pub(crate) const LOOP_UNTIL_NOTE_OFF: i32 = 0;
+impl From<LoopMode> for i16 {
+    fn from(mode: LoopMode) -> Self {
+        match mode {
+            LoopMode::NoLoop => 0,
+            LoopMode::Continuous => 1,
+            LoopMode::LoopUntilNoteOff => 3,
+            LoopMode::Invalid(value) => value,
+        }
+    }
 }
