@@ -76,7 +76,15 @@ pub enum SoundFontError {
     InvalidZoneList,
     ZoneNotFound,
     InvalidGeneratorList,
-    SanityCheckFailed,
+    RegionCheckFailed {
+        inst_name: String,
+        region_idx: usize,
+        msg: String,
+    },
+    RegionSampleOutOfBounds {
+        inst_name: String,
+        region_idx: usize,
+    },
 }
 
 impl error::Error for SoundFontError {
@@ -142,7 +150,12 @@ impl fmt::Display for SoundFontError {
             SoundFontError::InvalidZoneList => write!(f, "the zone list is invalid"),
             SoundFontError::ZoneNotFound => write!(f, "no valid zone was found"),
             SoundFontError::InvalidGeneratorList => write!(f, "the generator list is invalid"),
-            SoundFontError::SanityCheckFailed => write!(f, "sanity check failed"),
+            SoundFontError::RegionCheckFailed{ inst_name, region_idx, msg } => {
+                write!(f, "Error at inst {inst_name}, zone {region_idx}: {msg}")
+            }
+            SoundFontError::RegionSampleOutOfBounds { inst_name, region_idx } => {
+                write!(f, "Error at inst {inst_name}, zone {region_idx}: Sample out of bounds")
+            }
         }
     }
 }
