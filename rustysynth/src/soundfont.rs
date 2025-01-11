@@ -67,10 +67,8 @@ impl SoundFont {
     fn sanity_check(&self) -> Result<(), SoundFontError> {
         // https://github.com/sinshu/rustysynth/issues/22
         // https://github.com/sinshu/rustysynth/issues/33
-        for (inst_idx, instrument) in self.instruments.iter().enumerate() {
-            for (region_idx, region) in instrument.regions.iter().enumerate() {
-                let inst_name = format!("{inst_idx} {:?}", instrument.get_name());
-
+        for instrument in &self.instruments {
+            for region in &instrument.regions {
                 let start = region.get_sample_start();
                 let end = region.get_sample_end();
                 let start_loop = region.get_sample_start_loop();
@@ -80,25 +78,10 @@ impl SoundFont {
                     || start_loop < 0
                     || end as usize >= self.wave_data.len()
                     || end_loop as usize >= self.wave_data.len()
+                    || end <= start
+                    || end_loop < start_loop
                 {
-                    return Err(SoundFontError::RegionSampleOutOfBounds {
-                        inst_name,
-                        region_idx,
-                    });
-                }
-                if end <= start {
-                    return Err(SoundFontError::RegionCheckFailed {
-                        inst_name,
-                        region_idx,
-                        msg: "end <= start".into(),
-                    });
-                }
-                if end_loop < start_loop {
-                    return Err(SoundFontError::RegionCheckFailed {
-                        inst_name,
-                        region_idx,
-                        msg: "end_loop < start_loop".into(),
-                    });
+                    return Err(SoundFontError::SanityCheckFailed);
                 }
             }
         }
