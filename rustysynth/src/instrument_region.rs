@@ -361,12 +361,7 @@ impl InstrumentRegion {
     }
 
     pub fn get_sample_modes(&self) -> LoopMode {
-        let value = self.gs[GeneratorType::SAMPLE_MODES as usize];
-        let mode = LoopMode::from(value);
-        if let LoopMode::Invalid(_) = mode {
-            return LoopMode::NoLoop;
-        }
-        mode
+        LoopMode::from(self.gs[GeneratorType::SAMPLE_MODES as usize])
     }
 
     pub fn get_scale_tuning(&self) -> i32 {
