@@ -2,6 +2,7 @@
 #![allow(unused_imports)]
 
 use rustysynth::InstrumentRegion;
+use rustysynth::LoopMode;
 
 fn are_equal(x: f64, y: f64) -> bool {
     if x.floor() == x.ceil() && y.floor() == y.ceil() {
@@ -13,6 +14,14 @@ fn are_equal(x: f64, y: f64) -> bool {
     let delta = (x - y).abs();
 
     delta < limit
+}
+
+fn loop_mode_to_int(loop_mode: LoopMode) -> i16 {
+    match loop_mode {
+        LoopMode::NoLoop => 0,
+        LoopMode::Continuous => 1,
+        LoopMode::LoopUntilNoteOff => 3,
+    }
 }
 
 #[rustfmt::skip]
@@ -63,7 +72,7 @@ pub fn check(region: &InstrumentRegion, values: &[f64; 50]) {
     assert!(are_equal(region.get_initial_attenuation() as f64, values[43]));
     assert!(are_equal(region.get_coarse_tune() as f64, values[44]));
     assert!(are_equal(region.get_fine_tune() as f64, values[45]));
-    assert!(are_equal(region.get_sample_modes() as f64, values[46]));
+    assert!(are_equal(loop_mode_to_int(region.get_sample_modes()) as f64, values[46]));
     assert!(are_equal(region.get_scale_tuning() as f64, values[47]));
     assert!(are_equal(region.get_exclusive_class() as f64, values[48]));
     assert!(are_equal(region.get_root_key() as f64, values[49]));
