@@ -35,8 +35,10 @@ cargo add rustysynth
 ## Examples
 
 Here are some example codes.
-Each example omits the `use` statements.
-For full code, see the respective links.
+
+> [!NOTE]
+> Each example omits the `use` statements.
+> For full code, see the respective links.
 
 [An example code to synthesize a simple chord:](https://github.com/sinshu/rustysynth/blob/4eb2e4143130cf255b10595484c8960c4028f31f/workspace/src/main.rs#L15)
 
