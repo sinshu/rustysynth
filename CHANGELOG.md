@@ -1,3 +1,9 @@
+# v1.3.5
+
+- Improved error reporting for invalid SoundFonts ([thanks to @sevonj](https://github.com/sinshu/rustysynth/pull/32)).
+- Fixed issue where the loop mode was not handled correctly ([thanks to @sevonj](https://github.com/sinshu/rustysynth/pull/36)).
+- All public types now implement the `Debug` trait.
+
 # v1.3.4
 
 - Some minor optimization.
