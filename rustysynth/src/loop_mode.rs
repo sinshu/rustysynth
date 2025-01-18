@@ -1,5 +1,5 @@
 /// Specifies how the sample loops during playback.
-#[derive(PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum LoopMode {
     /// The sample will be played without loop.
     NoLoop,

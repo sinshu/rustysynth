@@ -3,6 +3,7 @@
 use crate::error::SynthesizerError;
 
 /// Specifies a set of parameters for synthesis.
+#[derive(Debug)]
 #[non_exhaustive]
 pub struct SynthesizerSettings {
     /// The sample rate for synthesis.

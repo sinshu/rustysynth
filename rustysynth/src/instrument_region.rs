@@ -19,6 +19,7 @@ fn set_parameter(gs: &mut [i16; GeneratorType::COUNT], generator: &Generator) {
 
 /// Represents an instrument region.
 /// An instrument region contains all the parameters necessary to synthesize a note.
+#[derive(Debug)]
 #[non_exhaustive]
 pub struct InstrumentRegion {
     pub(crate) gs: [i16; GeneratorType::COUNT],

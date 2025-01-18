@@ -2,6 +2,7 @@
 
 use std::cmp;
 
+#[derive(Debug)]
 #[non_exhaustive]
 pub(crate) struct Reverb {
     cfs_l: Vec<CombFilter>,
@@ -236,6 +237,7 @@ impl Reverb {
     }
 }
 
+#[derive(Debug)]
 #[non_exhaustive]
 struct CombFilter {
     buffer: Vec<f32>,
@@ -323,6 +325,7 @@ impl CombFilter {
     }
 }
 
+#[derive(Debug)]
 #[non_exhaustive]
 struct AllPassFilter {
     buffer: Vec<f32>,

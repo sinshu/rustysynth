@@ -8,6 +8,7 @@ use crate::synthesizer_settings::SynthesizerSettings;
 // and the rest represent the integer part.
 // For clarity, fixed-point number variables have a suffix "_fp".
 
+#[derive(Debug)]
 #[non_exhaustive]
 pub(crate) struct Oscillator {
     synthesizer_sample_rate: i32,

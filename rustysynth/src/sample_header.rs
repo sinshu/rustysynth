@@ -6,6 +6,7 @@ use crate::binary_reader::BinaryReader;
 use crate::error::SoundFontError;
 
 /// Represents a sample in the SoundFont.
+#[derive(Debug)]
 #[non_exhaustive]
 pub struct SampleHeader {
     pub(crate) name: String,

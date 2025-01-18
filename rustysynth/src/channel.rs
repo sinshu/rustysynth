@@ -1,12 +1,13 @@
 #![allow(dead_code)]
 
-#[derive(PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq)]
 enum DataType {
     None,
     Rpn,
     Nrpn,
 }
 
+#[derive(Debug)]
 #[non_exhaustive]
 pub(crate) struct Channel {
     pub(crate) is_percussion_channel: bool,

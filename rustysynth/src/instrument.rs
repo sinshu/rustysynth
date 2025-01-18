@@ -7,6 +7,7 @@ use crate::sample_header::SampleHeader;
 use crate::zone::Zone;
 
 /// Represents an instrument in the SoundFont.
+#[derive(Debug)]
 #[non_exhaustive]
 pub struct Instrument {
     pub(crate) name: String,

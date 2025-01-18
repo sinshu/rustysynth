@@ -1,5 +1,5 @@
 /// Specifies the type of the loop extension to use when playing back a MIDI file.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 pub enum MidiFileLoopType {
     /// Specifies the loop start point by a tick value.
