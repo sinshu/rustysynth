@@ -8,11 +8,12 @@ use crate::synthesizer_settings::SynthesizerSettings;
 // and the rest represent the integer part.
 // For clarity, fixed-point number variables have a suffix "_fp".
 
+#[derive(Debug)]
 #[non_exhaustive]
 pub(crate) struct Oscillator {
     synthesizer_sample_rate: i32,
 
-    loop_mode: i32,
+    loop_mode: LoopMode,
     sample_sample_rate: i32,
     start: i32,
     end: i32,
@@ -37,7 +38,7 @@ impl Oscillator {
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self {
         Self {
             synthesizer_sample_rate: settings.sample_rate,
-            loop_mode: 0,
+            loop_mode: LoopMode::NoLoop,
             sample_sample_rate: 0,
             start: 0,
             end: 0,
@@ -55,7 +56,7 @@ impl Oscillator {
     #[allow(clippy::too_many_arguments)]
     pub(crate) fn start(
         &mut self,
-        loop_mode: i32,
+        loop_mode: LoopMode,
         sample_rate: i32,
         start: i32,
         end: i32,
@@ -77,12 +78,12 @@ impl Oscillator {
         self.tune = coarse_tune as f32 + 0.01_f32 * fine_tune as f32;
         self.pitch_change_scale = 0.01_f32 * scale_tuning as f32;
         self.sample_rate_ratio = sample_rate as f32 / self.synthesizer_sample_rate as f32;
-        self.looping = self.loop_mode != LoopMode::NO_LOOP;
+        self.looping = self.loop_mode != LoopMode::NoLoop;
         self.position_fp = (start as i64) << Oscillator::FRAC_BITS;
     }
 
     pub(crate) fn release(&mut self) {
-        if self.loop_mode == LoopMode::LOOP_UNTIL_NOTE_OFF {
+        if self.loop_mode == LoopMode::LoopUntilNoteOff {
             self.looping = false;
         }
     }

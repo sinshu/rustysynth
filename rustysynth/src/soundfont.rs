@@ -13,6 +13,7 @@ use crate::soundfont_parameters::SoundFontParameters;
 use crate::soundfont_sampledata::SoundFontSampleData;
 
 /// Reperesents a SoundFont.
+#[derive(Debug)]
 #[non_exhaustive]
 pub struct SoundFont {
     pub(crate) info: SoundFontInfo,

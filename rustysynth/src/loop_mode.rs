@@ -1,12 +1,20 @@
-#![allow(dead_code)]
+/// Specifies how the sample loops during playback.
+#[derive(Debug, PartialEq, Eq)]
+pub enum LoopMode {
+    /// The sample will be played without loop.
+    NoLoop,
+    /// The sample will loop continuously.
+    Continuous,
+    /// The sample will loop until the note stops.
+    LoopUntilNoteOff,
+}
 
-#[allow(unused)]
-#[non_exhaustive]
-pub(crate) struct LoopMode {}
-
-#[allow(unused)]
 impl LoopMode {
-    pub(crate) const NO_LOOP: i32 = 0;
-    pub(crate) const CONTINUOUS: i32 = 0;
-    pub(crate) const LOOP_UNTIL_NOTE_OFF: i32 = 0;
+    pub(crate) fn from_i16(value: i16) -> Self {
+        match value {
+            1 => LoopMode::Continuous,
+            3 => LoopMode::LoopUntilNoteOff,
+            _ => LoopMode::NoLoop,
+        }
+    }
 }

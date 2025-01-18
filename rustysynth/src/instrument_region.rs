@@ -19,6 +19,7 @@ fn set_parameter(gs: &mut [i16; GeneratorType::COUNT], generator: &Generator) {
 
 /// Represents an instrument region.
 /// An instrument region contains all the parameters necessary to synthesize a note.
+#[derive(Debug)]
 #[non_exhaustive]
 pub struct InstrumentRegion {
     pub(crate) gs: [i16; GeneratorType::COUNT],
@@ -360,12 +361,8 @@ impl InstrumentRegion {
         self.gs[GeneratorType::FINE_TUNE as usize] as i32 + self.sample_pitch_correction
     }
 
-    pub fn get_sample_modes(&self) -> i32 {
-        if self.gs[GeneratorType::SAMPLE_MODES as usize] != 2 {
-            self.gs[GeneratorType::SAMPLE_MODES as usize] as i32
-        } else {
-            LoopMode::NO_LOOP
-        }
+    pub fn get_sample_modes(&self) -> LoopMode {
+        LoopMode::from_i16(self.gs[GeneratorType::SAMPLE_MODES as usize])
     }
 
     pub fn get_scale_tuning(&self) -> i32 {

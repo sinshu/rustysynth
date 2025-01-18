@@ -13,6 +13,7 @@ use crate::soundfont_math::SoundFontMath;
 use crate::synthesizer_settings::SynthesizerSettings;
 use crate::volume_envelope::VolumeEnvelope;
 
+#[derive(Debug)]
 #[non_exhaustive]
 pub(crate) struct Voice {
     sample_rate: i32,

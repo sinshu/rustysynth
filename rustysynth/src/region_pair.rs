@@ -2,6 +2,7 @@
 
 use crate::generator_type::GeneratorType;
 use crate::instrument_region::InstrumentRegion;
+use crate::loop_mode::LoopMode;
 use crate::preset_region::PresetRegion;
 use crate::soundfont_math::SoundFontMath;
 
@@ -216,7 +217,7 @@ impl<'a> RegionPair<'a> {
         self.gs(GeneratorType::FINE_TUNE as usize) + self.instrument.sample_pitch_correction
     }
 
-    pub(crate) fn get_sample_modes(&self) -> i32 {
+    pub(crate) fn get_sample_modes(&self) -> LoopMode {
         self.instrument.get_sample_modes()
     }
 

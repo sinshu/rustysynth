@@ -18,6 +18,7 @@ fn set_parameter(gs: &mut [i16; GeneratorType::COUNT], generator: &Generator) {
 
 /// Represents a preset region.
 /// A preset region indicates how the parameters of the instrument should be modified in the preset.
+#[derive(Debug)]
 #[non_exhaustive]
 pub struct PresetRegion {
     pub(crate) gs: [i16; GeneratorType::COUNT],

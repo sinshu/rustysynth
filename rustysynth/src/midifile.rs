@@ -8,7 +8,7 @@ use crate::read_counter::ReadCounter;
 use crate::MidiFileError;
 use crate::MidiFileLoopType;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
 pub(crate) struct Message {
     pub(crate) channel: u8,
@@ -129,6 +129,7 @@ impl Message {
 }
 
 /// Represents a standard MIDI file.
+#[derive(Debug)]
 #[non_exhaustive]
 pub struct MidiFile {
     pub(crate) messages: Vec<Message>,
