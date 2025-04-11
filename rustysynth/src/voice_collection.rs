@@ -28,7 +28,7 @@ impl VoiceCollection {
     pub(crate) fn request_new(
         &mut self,
         region: &InstrumentRegion,
-        channel: i32,
+        channel: u8,
     ) -> Option<&mut Voice> {
         // If an exclusive class is assigned to the region, find a voice with the same class.
         // If found, reuse it to avoid playing multiple voices with the same class at a time.

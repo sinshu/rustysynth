@@ -138,7 +138,7 @@ impl InstrumentRegion {
     ///
     /// * `key` - The key of a note.
     /// * `velocity` - The velocity of a note.
-    pub fn contains(&self, key: i32, velocity: i32) -> bool {
+    pub fn contains(&self, key: u8, velocity: u8) -> bool {
         let contains_key = self.get_key_range_start() <= key && key <= self.get_key_range_end();
         let contains_velocity = self.get_velocity_range_start() <= velocity
             && velocity <= self.get_velocity_range_end();
@@ -333,20 +333,20 @@ impl InstrumentRegion {
         self.gs[GeneratorType::KEY_NUMBER_TO_VOLUME_ENVELOPE_DECAY as usize] as i32
     }
 
-    pub fn get_key_range_start(&self) -> i32 {
-        self.gs[GeneratorType::KEY_RANGE as usize] as i32 & 0xFF
+    pub fn get_key_range_start(&self) -> u8 {
+        (self.gs[GeneratorType::KEY_RANGE as usize] & 0xFF) as u8
     }
 
-    pub fn get_key_range_end(&self) -> i32 {
-        (self.gs[GeneratorType::KEY_RANGE as usize] as i32 >> 8) & 0xFF
+    pub fn get_key_range_end(&self) -> u8 {
+        ((self.gs[GeneratorType::KEY_RANGE as usize] >> 8) & 0xFF) as u8
     }
 
-    pub fn get_velocity_range_start(&self) -> i32 {
-        self.gs[GeneratorType::VELOCITY_RANGE as usize] as i32 & 0xFF
+    pub fn get_velocity_range_start(&self) -> u8 {
+        (self.gs[GeneratorType::VELOCITY_RANGE as usize] & 0xFF) as u8
     }
 
-    pub fn get_velocity_range_end(&self) -> i32 {
-        (self.gs[GeneratorType::VELOCITY_RANGE as usize] as i32 >> 8) & 0xFF
+    pub fn get_velocity_range_end(&self) -> u8 {
+        ((self.gs[GeneratorType::VELOCITY_RANGE as usize] >> 8) & 0xFF) as u8
     }
 
     pub fn get_initial_attenuation(&self) -> f32 {

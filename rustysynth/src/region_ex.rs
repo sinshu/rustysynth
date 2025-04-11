@@ -41,8 +41,8 @@ impl RegionEx {
     pub(crate) fn start_volume_envelope(
         envelope: &mut VolumeEnvelope,
         region: &RegionPair,
-        key: i32,
-        _velocity: i32,
+        key: u8,
+        _velocity: u8,
     ) {
         // If the release time is shorter than 10 ms, it will be clamped to 10 ms to avoid pop noise.
 
@@ -67,8 +67,8 @@ impl RegionEx {
     pub(crate) fn start_modulation_envelope(
         envelope: &mut ModulationEnvelope,
         region: &RegionPair,
-        key: i32,
-        velocity: i32,
+        key: u8,
+        velocity: u8,
     ) {
         // According to the implementation of TinySoundFont, the attack time should be adjusted by the velocity.
 
@@ -90,14 +90,14 @@ impl RegionEx {
         envelope.start(delay, attack, hold, decay, sustain, release);
     }
 
-    pub(crate) fn start_vibrato(lfo: &mut Lfo, region: &RegionPair, _key: i32, _velocity: i32) {
+    pub(crate) fn start_vibrato(lfo: &mut Lfo, region: &RegionPair, _key: u8, _velocity: u8) {
         lfo.start(
             region.get_delay_vibrato_lfo(),
             region.get_frequency_vibrato_lfo(),
         );
     }
 
-    pub(crate) fn start_modulation(lfo: &mut Lfo, region: &RegionPair, _key: i32, _velocity: i32) {
+    pub(crate) fn start_modulation(lfo: &mut Lfo, region: &RegionPair, _key: u8, _velocity: u8) {
         lfo.start(
             region.get_delay_modulation_lfo(),
             region.get_frequency_modulation_lfo(),

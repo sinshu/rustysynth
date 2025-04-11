@@ -13,10 +13,10 @@ fn soundfont3_load_test() {
     let mut file = File::open(&path).unwrap();
     let result = SoundFont::new(&mut file);
     match result {
-        Ok(_) => assert!(false),
+        Ok(_) => panic!(),
         Err(err) => match err {
-            SoundFontError::UnsupportedSampleFormat => return,
-            _ => assert!(false),
+            SoundFontError::UnsupportedSampleFormat => {}
+            _ => panic!(),
         },
     }
 }

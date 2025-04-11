@@ -127,12 +127,13 @@ impl Synthesizer {
     ///
     /// # Arguments
     ///
-    /// * `channel` - The channel to which the message will be sent.
-    /// * `command` - The type of the message.
-    /// * `data1` - The first data part of the message.
-    /// * `data2` - The second data part of the message.
-    pub fn process_midi_message(&mut self, channel: i32, command: i32, data1: i32, data2: i32) {
-        if !(0 <= channel && channel < self.channels.len() as i32) {
+    /// * `status` - the MIDI status byte (contains a channel and command)
+    /// * `data1`  - The first data part of the message.
+    /// * `data2`  - The second data part of the message.
+    pub fn process_midi_message(&mut self, status: u8, data1: u8, data2: u8) {
+        let channel = status & 0x0F;
+        let command = status & 0xF0;
+        if (channel as i32) >= (self.channels.len() as i32) {
             return;
         }
 
@@ -178,8 +179,8 @@ impl Synthesizer {
     ///
     /// * `channel` - The channel of the note.
     /// * `key` - The key of the note.
-    pub fn note_off(&mut self, channel: i32, key: i32) {
-        if !(0 <= channel && channel < self.channels.len() as i32) {
+    pub fn note_off(&mut self, channel: u8, key: u8) {
+        if (channel as i32) >= self.channels.len() as i32 {
             return;
         }
 
@@ -197,19 +198,20 @@ impl Synthesizer {
     /// * `channel` - The channel of the note.
     /// * `key` - The key of the note.
     /// * `velocity` - The velocity of the note.
-    pub fn note_on(&mut self, channel: i32, key: i32, velocity: i32) {
+    pub fn note_on(&mut self, channel: u8, key: u8, velocity: u8) {
         if velocity == 0 {
             self.note_off(channel, key);
             return;
         }
 
-        if !(0 <= channel && channel < self.channels.len() as i32) {
+        if (channel as i32) >= self.channels.len() as i32 {
             return;
         }
 
         let channel_info = &self.channels[channel as usize];
 
-        let preset_id = (channel_info.get_bank_number() << 16) | channel_info.get_patch_number();
+        let preset_id = ((channel_info.get_bank_number() as i32) << 16)
+            | channel_info.get_patch_number() as i32;
 
         let mut preset = self.default_preset;
         match self.preset_lookup.get(&preset_id) {
@@ -219,7 +221,7 @@ impl Synthesizer {
                 // Normally, the given patch number + the bank number 0 will work.
                 // For drums (bank number >= 128), it seems to be better to select the standard set (128:0).
                 let gm_preset_id = if channel_info.get_bank_number() < 128 {
-                    channel_info.get_patch_number()
+                    channel_info.get_patch_number() as i32
                 } else {
                     128 << 16
                 };
@@ -269,7 +271,7 @@ impl Synthesizer {
     ///
     /// * `channel` - The channel in which the notes will be stopped.
     /// * `immediate` - If `true`, notes will stop immediately without the release sound.
-    pub fn note_off_all_channel(&mut self, channel: i32, immediate: bool) {
+    pub fn note_off_all_channel(&mut self, channel: u8, immediate: bool) {
         if immediate {
             for voice in self.voices.get_active_voices().iter_mut() {
                 if voice.channel == channel {
@@ -297,8 +299,8 @@ impl Synthesizer {
     /// # Arguments
     ///
     /// * `channel` - The channel to be reset.
-    pub fn reset_all_controllers_channel(&mut self, channel: i32) {
-        if !(0 <= channel && channel < self.channels.len() as i32) {
+    pub fn reset_all_controllers_channel(&mut self, channel: u8) {
+        if (channel as i32) >= self.channels.len() as i32 {
             return;
         }
 

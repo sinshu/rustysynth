@@ -49,8 +49,8 @@ impl SoundFontMath {
         20_f32 * x.log10()
     }
 
-    pub(crate) fn key_number_to_multiplying_factor(cents: i32, key: i32) -> f32 {
-        SoundFontMath::timecents_to_seconds((cents * (60 - key)) as f32)
+    pub(crate) fn key_number_to_multiplying_factor(cents: i32, key: u8) -> f32 {
+        SoundFontMath::timecents_to_seconds((cents * (60 - key as i32)) as f32)
     }
 
     pub(crate) fn exp_cutoff(x: f64) -> f64 {
