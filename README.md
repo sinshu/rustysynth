@@ -40,7 +40,7 @@ Here are some example codes.
 > Each example omits the `use` statements.
 > For full code, see the respective links.
 
-[An example code to synthesize a simple chord:](https://github.com/sinshu/rustysynth/blob/4eb2e4143130cf255b10595484c8960c4028f31f/workspace/src/main.rs#L15)
+[An example code to synthesize a simple chord:](example/src/main.rs#L15)
 
 ```rust
 // Load the SoundFont.
@@ -65,7 +65,7 @@ let mut right: Vec<f32> = vec![0_f32; sample_count];
 synthesizer.render(&mut left[..], &mut right[..]);
 ```
 
-[Another example code to synthesize a MIDI file:](https://github.com/sinshu/rustysynth/blob/4eb2e4143130cf255b10595484c8960c4028f31f/workspace/src/main.rs#L41)
+[Another example code to synthesize a MIDI file:](example/src/main.rs#L41)
 
 ```rust
 // Load the SoundFont.
