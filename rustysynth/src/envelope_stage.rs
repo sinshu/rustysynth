@@ -1,14 +1,20 @@
-#![allow(dead_code)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub(crate) enum EnvelopeStage {
+    Delay = 0,
+    Attack = 1,
+    Hold = 2,
+    Decay = 3,
+    Release = 4,
+}
 
-#[allow(unused)]
-#[non_exhaustive]
-pub(crate) struct EnvelopeStage {}
-
-#[allow(unused)]
 impl EnvelopeStage {
-    pub(crate) const DELAY: i32 = 0;
-    pub(crate) const ATTACK: i32 = 1;
-    pub(crate) const HOLD: i32 = 2;
-    pub(crate) const DECAY: i32 = 3;
-    pub(crate) const RELEASE: i32 = 4;
+    pub const fn next_stage(&self) -> Option<Self> {
+        match self {
+            Self::Delay => Some(Self::Attack),
+            Self::Attack => Some(Self::Hold),
+            Self::Hold => Some(Self::Decay),
+            Self::Decay => Some(Self::Release),
+            Self::Release => None,
+        }
+    }
 }
