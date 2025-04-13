@@ -121,10 +121,10 @@ impl MidiFileSequencer {
             if time <= self.current_time {
                 if msg.get_message_type() == Message::NORMAL {
                     self.synthesizer.process_midi_message(
-                        msg.channel as i32,
-                        msg.command as i32,
-                        msg.data1 as i32,
-                        msg.data2 as i32,
+                        msg.channel,
+                        msg.command,
+                        msg.data1,
+                        msg.data2,
                     );
                 } else if self.play_loop {
                     if msg.get_message_type() == Message::LOOP_START {
