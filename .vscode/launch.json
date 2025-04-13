@@ -7,7 +7,7 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'example'",
+            "name": "Debug example code",
             "cargo": {
                 "args": [
                     "build",
@@ -25,35 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'example'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=example",
-                    "--package=example"
-                ],
-                "filter": {
-                    "name": "example",
-                    "kind": "bin"
-                }
-            },
-            "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in library 'rustysynth'",
+            "name": "Debug unit tests",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
                     "--lib",
-                    "--package=rustysynth"
+                    "--package=rustysynth_test"
                 ],
                 "filter": {
-                    "name": "rustysynth",
+                    "name": "rustysynth_test",
                     "kind": "lib"
                 }
             },
