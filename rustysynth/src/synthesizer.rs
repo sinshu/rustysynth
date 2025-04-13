@@ -131,7 +131,7 @@ impl Synthesizer {
     /// * `data1`  - The first data part of the message.
     /// * `data2`  - The second data part of the message.
     pub fn process_midi_message(&mut self, channel: u8, command: u8, data1: u8, data2: u8) {
-        if (channel as i32) >= (self.channels.len() as i32) {
+        if channel as usize >= self.channels.len() {
             return;
         }
 
@@ -178,7 +178,7 @@ impl Synthesizer {
     /// * `channel` - The channel of the note.
     /// * `key` - The key of the note.
     pub fn note_off(&mut self, channel: u8, key: u8) {
-        if (channel as i32) >= self.channels.len() as i32 {
+        if channel as usize >= self.channels.len() {
             return;
         }
 
@@ -202,7 +202,7 @@ impl Synthesizer {
             return;
         }
 
-        if (channel as i32) >= self.channels.len() as i32 {
+        if channel as usize >= self.channels.len() {
             return;
         }
 
@@ -298,7 +298,7 @@ impl Synthesizer {
     ///
     /// * `channel` - The channel to be reset.
     pub fn reset_all_controllers_channel(&mut self, channel: u8) {
-        if (channel as i32) >= self.channels.len() as i32 {
+        if channel as usize >= self.channels.len() {
             return;
         }
 
