@@ -12,11 +12,8 @@ fn soundfont3_load_test() {
     path.push("MuseScore_General.sf3");
     let mut file = File::open(&path).unwrap();
     let result = SoundFont::new(&mut file);
-    match result {
-        Ok(_) => panic!(),
-        Err(err) => match err {
-            SoundFontError::UnsupportedSampleFormat => {}
-            _ => panic!(),
-        },
-    }
+    assert!(matches!(
+        result,
+        Err(SoundFontError::UnsupportedSampleFormat)
+    ));
 }
