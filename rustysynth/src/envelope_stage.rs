@@ -8,13 +8,13 @@ pub(crate) enum EnvelopeStage {
 }
 
 impl EnvelopeStage {
-    pub const fn next_stage(&self) -> Option<Self> {
+    pub const fn next(&self) -> Self {
         match self {
-            Self::Delay => Some(Self::Attack),
-            Self::Attack => Some(Self::Hold),
-            Self::Hold => Some(Self::Decay),
-            Self::Decay => Some(Self::Release),
-            Self::Release => None,
+            Self::Delay => Self::Attack,
+            Self::Attack => Self::Hold,
+            Self::Hold => Self::Decay,
+            Self::Decay => Self::Release,
+            Self::Release => unreachable!(),
         }
     }
 }

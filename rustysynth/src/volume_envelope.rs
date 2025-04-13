@@ -98,7 +98,7 @@ impl VolumeEnvelope {
             if current_time < end_time {
                 break;
             }
-            self.stage = self.stage.next_stage().unwrap();
+            self.stage = self.stage.next();
         }
 
         match self.stage {
