@@ -34,45 +34,18 @@ impl Message {
     }
 
     pub(crate) fn common2(status: u8, data1: u8, data2: u8, loop_type: MidiFileLoopType) -> Self {
-        let channel = status & 0x0F;
-        let command = status & 0xF0;
-
-        if command == 0xB0 {
-            match loop_type {
-                MidiFileLoopType::RpgMaker => {
-                    if data1 == 111 {
-                        return Message::loop_start();
-                    }
-                }
-
-                MidiFileLoopType::IncredibleMachine => {
-                    if data1 == 110 {
-                        return Message::loop_start();
-                    }
-                    if data1 == 111 {
-                        return Message::loop_end();
-                    }
-                }
-
-                MidiFileLoopType::FinalFantasy => {
-                    if data1 == 116 {
-                        return Message::loop_start();
-                    }
-                    if data1 == 117 {
-                        return Message::loop_end();
-                    }
-                }
-
-                _ => (),
-            }
-        }
-
-        Self {
-            channel,
-            command,
+        let message = Self {
+            channel: status & 0x0F,
+            command: status & 0xF0,
             data1,
             data2,
+        };
+
+        if let Some(mapped) = loop_type.map_message(message) {
+            return mapped;
         }
+
+        message
     }
 
     pub(crate) fn tempo_change(tempo: i32) -> Self {
@@ -84,7 +57,7 @@ impl Message {
         }
     }
 
-    pub(crate) fn loop_start() -> Self {
+    pub(crate) const fn loop_start() -> Self {
         Self {
             channel: Message::LOOP_START,
             command: 0,
@@ -93,7 +66,7 @@ impl Message {
         }
     }
 
-    pub(crate) fn loop_end() -> Self {
+    pub(crate) const fn loop_end() -> Self {
         Self {
             channel: Message::LOOP_END,
             command: 0,
