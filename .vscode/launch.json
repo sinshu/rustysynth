@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'workspace'",
+            "name": "Debug executable 'example'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=workspace",
-                    "--package=workspace"
+                    "--bin=example",
+                    "--package=example"
                 ],
                 "filter": {
-                    "name": "workspace",
+                    "name": "example",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'workspace'",
+            "name": "Debug unit tests in executable 'example'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=workspace",
-                    "--package=workspace"
+                    "--bin=example",
+                    "--package=example"
                 ],
                 "filter": {
-                    "name": "workspace",
+                    "name": "example",
                     "kind": "bin"
                 }
             },
