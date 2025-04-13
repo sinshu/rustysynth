@@ -130,9 +130,7 @@ impl Synthesizer {
     /// * `status` - the MIDI status byte (contains a channel and command)
     /// * `data1`  - The first data part of the message.
     /// * `data2`  - The second data part of the message.
-    pub fn process_midi_message(&mut self, status: u8, data1: u8, data2: u8) {
-        let channel = status & 0x0F;
-        let command = status & 0xF0;
+    pub fn process_midi_message(&mut self, channel: u8, command: u8, data1: u8, data2: u8) {
         if (channel as i32) >= (self.channels.len() as i32) {
             return;
         }

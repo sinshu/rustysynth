@@ -120,9 +120,12 @@ impl MidiFileSequencer {
 
             if time <= self.current_time {
                 if msg.get_message_type() == Message::NORMAL {
-                    let status = msg.channel | msg.command;
-                    self.synthesizer
-                        .process_midi_message(status, msg.data1, msg.data2);
+                    self.synthesizer.process_midi_message(
+                        msg.channel,
+                        msg.command,
+                        msg.data1,
+                        msg.data2,
+                    );
                 } else if self.play_loop {
                     if msg.get_message_type() == Message::LOOP_START {
                         self.loop_index = self.msg_index;
