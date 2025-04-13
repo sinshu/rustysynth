@@ -173,7 +173,7 @@ impl Channel {
         if self.rpn == 0 {
             self.pitch_bend_range = (self.pitch_bend_range & 0x7F) | ((value as u16) << 7);
         } else if self.rpn == 1 {
-            self.fine_tune = (self.fine_tune & 0x7F) | (value << 7) as u16;
+            self.fine_tune = (self.fine_tune & 0x7F) | ((value as u16) << 7);
         } else if self.rpn == 2 {
             self.coarse_tune = (value - 64) as i16;
         }
