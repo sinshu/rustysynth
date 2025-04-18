@@ -25,7 +25,6 @@ enum VoiceState {
 #[non_exhaustive]
 pub(crate) struct Voice {
     sample_rate: i32,
-    block_size: usize,
 
     vol_env: VolumeEnvelope,
     mod_env: ModulationEnvelope,
@@ -90,7 +89,6 @@ impl Voice {
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self {
         Self {
             sample_rate: settings.sample_rate,
-            block_size: settings.block_size,
             vol_env: VolumeEnvelope::new(settings),
             mod_env: ModulationEnvelope::new(settings),
             vib_lfo: Lfo::new(settings),
@@ -201,11 +199,11 @@ impl Voice {
 
         self.release_if_necessary(channel_info);
 
-        if !self.vol_env.process(self.block_size) {
+        if !self.vol_env.process(self.block.len()) {
             return false;
         }
 
-        self.mod_env.process(self.block_size);
+        self.mod_env.process(self.block.len());
         self.vib_lfo.process();
         self.mod_lfo.process();
 
@@ -281,7 +279,7 @@ impl Voice {
             self.previous_chorus_send = self.current_chorus_send;
         }
 
-        self.voice_length += self.block_size;
+        self.voice_length += self.block.len();
 
         true
     }
