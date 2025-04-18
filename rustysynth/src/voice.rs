@@ -13,6 +13,14 @@ use crate::soundfont_math::SoundFontMath;
 use crate::synthesizer_settings::SynthesizerSettings;
 use crate::volume_envelope::VolumeEnvelope;
 
+#[derive(Debug, PartialEq, Eq)]
+#[non_exhaustive]
+enum VoiceState {
+    Playing = 0,
+    ReleaseRequested = 1,
+    Released = 2,
+}
+
 #[derive(Debug)]
 #[non_exhaustive]
 pub(crate) struct Voice {
@@ -73,7 +81,7 @@ pub(crate) struct Voice {
     // This is used to smooth out the cutoff frequency.
     smoothed_cutoff: f32,
 
-    voice_state: i32,
+    voice_state: VoiceState,
     pub(crate) voice_length: usize,
     min_voice_length: usize,
 }
@@ -117,7 +125,7 @@ impl Voice {
             instrument_reverb: 0_f32,
             instrument_chorus: 0_f32,
             smoothed_cutoff: 0_f32,
-            voice_state: 0,
+            voice_state: VoiceState::Playing,
             voice_length: 0,
             min_voice_length: (settings.sample_rate / 500) as usize,
         }
@@ -170,13 +178,13 @@ impl Voice {
 
         self.smoothed_cutoff = self.cutoff;
 
-        self.voice_state = VoiceState::PLAYING;
+        self.voice_state = VoiceState::Playing;
         self.voice_length = 0;
     }
 
     pub(crate) fn end(&mut self) {
-        if self.voice_state == VoiceState::PLAYING {
-            self.voice_state = VoiceState::RELEASE_REQUESTED;
+        if self.voice_state == VoiceState::Playing {
+            self.voice_state = VoiceState::ReleaseRequested;
         }
     }
 
@@ -283,12 +291,12 @@ impl Voice {
             return;
         }
 
-        if self.voice_state == VoiceState::RELEASE_REQUESTED && !channel_info.get_hold_pedal() {
+        if self.voice_state == VoiceState::ReleaseRequested && !channel_info.get_hold_pedal() {
             self.vol_env.release();
             self.mod_env.release();
             self.oscillator.release();
 
-            self.voice_state = VoiceState::RELEASED;
+            self.voice_state = VoiceState::Released;
         }
     }
 
@@ -299,14 +307,4 @@ impl Voice {
             self.vol_env.get_priority()
         }
     }
-}
-
-#[allow(unused)]
-#[non_exhaustive]
-struct VoiceState {}
-
-impl VoiceState {
-    const PLAYING: i32 = 0;
-    const RELEASE_REQUESTED: i32 = 1;
-    const RELEASED: i32 = 2;
 }
