@@ -33,7 +33,7 @@ pub(crate) struct Voice {
     oscillator: Oscillator,
     filter: BiQuadFilter,
 
-    pub(crate) block: Vec<f32>,
+    block: Vec<f32>,
 
     // A sudden change in the mix gain will cause pop noise.
     // To avoid this, we save the mix gain of the previous block,
@@ -49,10 +49,10 @@ pub(crate) struct Voice {
     pub(crate) current_reverb_send: f32,
     pub(crate) current_chorus_send: f32,
 
-    pub(crate) exclusive_class: i32,
-    pub(crate) channel: i32,
-    pub(crate) key: i32,
-    pub(crate) velocity: i32,
+    exclusive_class: i32,
+    channel: i32,
+    key: i32,
+    velocity: i32,
 
     note_gain: f32,
 
@@ -79,7 +79,7 @@ pub(crate) struct Voice {
     smoothed_cutoff: f32,
 
     voice_state: VoiceState,
-    pub(crate) voice_length: usize,
+    samples_elapsed: usize,
     min_voice_length: usize,
 }
 
@@ -121,7 +121,7 @@ impl Voice {
             instrument_chorus: 0_f32,
             smoothed_cutoff: 0_f32,
             voice_state: VoiceState::Playing,
-            voice_length: 0,
+            samples_elapsed: 0,
             min_voice_length: (settings.sample_rate / 500) as usize,
         }
     }
@@ -174,7 +174,7 @@ impl Voice {
         self.smoothed_cutoff = self.cutoff;
 
         self.voice_state = VoiceState::Playing;
-        self.voice_length = 0;
+        self.samples_elapsed = 0;
     }
 
     pub(crate) fn end(&mut self) {
@@ -269,20 +269,20 @@ impl Voice {
             1_f32,
         );
 
-        if self.voice_length == 0 {
+        if self.samples_elapsed == 0 {
             self.previous_mix_gain_left = self.current_mix_gain_left;
             self.previous_mix_gain_right = self.current_mix_gain_right;
             self.previous_reverb_send = self.current_reverb_send;
             self.previous_chorus_send = self.current_chorus_send;
         }
 
-        self.voice_length += self.block.len();
+        self.samples_elapsed += self.block.len();
 
         true
     }
 
     fn release_if_necessary(&mut self, channel_info: &Channel) {
-        if self.voice_length < self.min_voice_length {
+        if self.samples_elapsed < self.min_voice_length {
             return;
         }
 
@@ -293,6 +293,26 @@ impl Voice {
 
             self.voice_state = VoiceState::Released;
         }
+    }
+
+    pub(crate) fn get_block(&self) -> &Vec<f32> {
+        &self.block
+    }
+
+    pub(crate) fn get_samples_elapsed(&self) -> usize {
+        self.samples_elapsed
+    }
+
+    pub(crate) fn get_exclusive_class(&self) -> i32 {
+        self.exclusive_class
+    }
+
+    pub(crate) fn get_channel(&self) -> i32 {
+        self.channel
+    }
+
+    pub(crate) fn get_key(&self) -> i32 {
+        self.key
     }
 
     pub(crate) fn get_priority(&self) -> f32 {
