@@ -24,8 +24,6 @@ enum VoiceState {
 #[derive(Debug)]
 #[non_exhaustive]
 pub(crate) struct Voice {
-    sample_rate: i32,
-
     vol_env: VolumeEnvelope,
     mod_env: ModulationEnvelope,
 
@@ -88,7 +86,6 @@ pub(crate) struct Voice {
 impl Voice {
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self {
         Self {
-            sample_rate: settings.sample_rate,
             vol_env: VolumeEnvelope::new(settings),
             mod_env: ModulationEnvelope::new(settings),
             vib_lfo: Lfo::new(settings),
