@@ -18,3 +18,6 @@ Cargo.lock
 *.sf3
 *.pcm
 *.mid
+
+# Used for tests
+!samples/*

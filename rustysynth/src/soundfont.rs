@@ -119,3 +119,24 @@ impl SoundFont {
         &self.instruments[..]
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use std::{fs::File, path::PathBuf};
+
+    #[test]
+    fn test_load_reject_sf3() {
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.pop();
+        path.push("samples");
+        path.push("dummy.sf3");
+        let mut file = File::open(&path).unwrap();
+
+        assert!(matches!(
+            SoundFont::new(&mut file),
+            Err(SoundFontError::UnsupportedSampleFormat)
+        ));
+    }
+}
