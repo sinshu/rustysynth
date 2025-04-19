@@ -63,7 +63,7 @@ impl VoiceCollection {
             } else if priority == lowest_priority {
                 // Same priority...
                 // The older one should be more suitable for reuse.
-                if voice.get_samples_elapsed() > self.voices[candidate].get_samples_elapsed() {
+                if voice.get_voice_length() > self.voices[candidate].get_voice_length() {
                     candidate = i;
                 }
             }

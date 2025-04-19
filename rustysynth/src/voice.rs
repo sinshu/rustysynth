@@ -79,7 +79,8 @@ pub(crate) struct Voice {
     smoothed_cutoff: f32,
 
     voice_state: VoiceState,
-    samples_elapsed: usize,
+    /// Time elapsed in samples
+    voice_length: usize,
     min_voice_length: usize,
 }
 
@@ -121,7 +122,7 @@ impl Voice {
             instrument_chorus: 0_f32,
             smoothed_cutoff: 0_f32,
             voice_state: VoiceState::Playing,
-            samples_elapsed: 0,
+            voice_length: 0,
             min_voice_length: (settings.sample_rate / 500) as usize,
         }
     }
@@ -174,7 +175,7 @@ impl Voice {
         self.smoothed_cutoff = self.cutoff;
 
         self.voice_state = VoiceState::Playing;
-        self.samples_elapsed = 0;
+        self.voice_length = 0;
     }
 
     pub(crate) fn end(&mut self) {
@@ -269,20 +270,20 @@ impl Voice {
             1_f32,
         );
 
-        if self.samples_elapsed == 0 {
+        if self.voice_length == 0 {
             self.previous_mix_gain_left = self.current_mix_gain_left;
             self.previous_mix_gain_right = self.current_mix_gain_right;
             self.previous_reverb_send = self.current_reverb_send;
             self.previous_chorus_send = self.current_chorus_send;
         }
 
-        self.samples_elapsed += self.block.len();
+        self.voice_length += self.block.len();
 
         true
     }
 
     fn release_if_necessary(&mut self, channel_info: &Channel) {
-        if self.samples_elapsed < self.min_voice_length {
+        if self.voice_length < self.min_voice_length {
             return;
         }
 
@@ -299,8 +300,8 @@ impl Voice {
         &self.block
     }
 
-    pub(crate) fn get_samples_elapsed(&self) -> usize {
-        self.samples_elapsed
+    pub(crate) fn get_voice_length(&self) -> usize {
+        self.voice_length
     }
 
     pub(crate) fn get_exclusive_class(&self) -> i32 {
