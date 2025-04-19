@@ -50,6 +50,10 @@ impl SoundFontSampleData {
             None => return Err(SoundFontError::SampleDataNotFound),
         };
 
+        if wave_data.len() < 4 {
+            return Err(SoundFontError::SampleDataNotFound);
+        }
+
         let ptr = wave_data.as_ptr() as *const u8;
         let four_cc = unsafe { slice::from_raw_parts(ptr, 4) };
         if four_cc == b"OggS" {
