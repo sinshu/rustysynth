@@ -126,17 +126,31 @@ mod tests {
 
     use std::{fs::File, path::PathBuf};
 
+    fn samples_dir_path() -> PathBuf {
+        PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .parent()
+            .unwrap()
+            .join("samples")
+    }
+
     #[test]
     fn test_load_reject_sf3() {
-        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-        path.pop();
-        path.push("samples");
-        path.push("dummy.sf3");
+        let path = samples_dir_path().join("dummy.sf3");
         let mut file = File::open(&path).unwrap();
-
         assert!(matches!(
             SoundFont::new(&mut file),
             Err(SoundFontError::UnsupportedSampleFormat)
+        ));
+    }
+
+    // smpl sub-chunk exists, but is zero-length.
+    #[test]
+    fn test_load_empty_samples() {
+        let path = samples_dir_path().join("test_empty_samples.sf2");
+        let mut file = File::open(&path).unwrap();
+        assert!(matches!(
+            SoundFont::new(&mut file),
+            Err(SoundFontError::SampleDataNotFound)
         ));
     }
 }
