@@ -31,6 +31,25 @@
                     "test",
                     "--no-run",
                     "--lib",
+                    "--package=rustysynth"
+                ],
+                "filter": {
+                    "name": "rustysynth",
+                    "kind": "lib"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug SoundFont parser tests",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--lib",
                     "--package=rustysynth_test"
                 ],
                 "filter": {
