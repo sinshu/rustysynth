@@ -296,27 +296,27 @@ impl Voice {
         }
     }
 
-    pub(crate) fn get_block(&self) -> &Vec<f32> {
+    pub(crate) fn block(&self) -> &Vec<f32> {
         &self.block
     }
 
-    pub(crate) fn get_voice_length(&self) -> usize {
+    pub(crate) fn voice_length(&self) -> usize {
         self.voice_length
     }
 
-    pub(crate) fn get_exclusive_class(&self) -> i32 {
+    pub(crate) fn exclusive_class(&self) -> i32 {
         self.exclusive_class
     }
 
-    pub(crate) fn get_channel(&self) -> i32 {
+    pub(crate) fn channel(&self) -> i32 {
         self.channel
     }
 
-    pub(crate) fn get_key(&self) -> i32 {
+    pub(crate) fn key(&self) -> i32 {
         self.key
     }
 
-    pub(crate) fn get_priority(&self) -> f32 {
+    pub(crate) fn priority(&self) -> f32 {
         if self.note_gain < SoundFontMath::NON_AUDIBLE {
             0_f32
         } else {
