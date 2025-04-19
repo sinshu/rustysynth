@@ -184,7 +184,7 @@ impl Synthesizer {
         }
 
         for voice in self.voices.get_active_voices().iter_mut() {
-            if voice.channel == channel && voice.key == key {
+            if voice.channel() == channel && voice.key() == key {
                 voice.end();
             }
         }
@@ -272,13 +272,13 @@ impl Synthesizer {
     pub fn note_off_all_channel(&mut self, channel: i32, immediate: bool) {
         if immediate {
             for voice in self.voices.get_active_voices().iter_mut() {
-                if voice.channel == channel {
+                if voice.channel() == channel {
                     voice.kill();
                 }
             }
         } else {
             for voice in self.voices.get_active_voices().iter_mut() {
-                if voice.channel == channel {
+                if voice.channel() == channel {
                     voice.end();
                 }
             }
@@ -371,7 +371,7 @@ impl Synthesizer {
             Synthesizer::write_block(
                 previous_gain_left,
                 current_gain_left,
-                &voice.block[..],
+                voice.block(),
                 &mut self.block_left[..],
                 self.inverse_block_size,
             );
@@ -380,7 +380,7 @@ impl Synthesizer {
             Synthesizer::write_block(
                 previous_gain_right,
                 current_gain_right,
-                &voice.block[..],
+                voice.block(),
                 &mut self.block_right[..],
                 self.inverse_block_size,
             );
@@ -400,7 +400,7 @@ impl Synthesizer {
                 Synthesizer::write_block(
                     previous_gain_left,
                     current_gain_left,
-                    &voice.block[..],
+                    voice.block(),
                     chorus_input_left,
                     self.inverse_block_size,
                 );
@@ -410,7 +410,7 @@ impl Synthesizer {
                 Synthesizer::write_block(
                     previous_gain_right,
                     current_gain_right,
-                    &voice.block[..],
+                    voice.block(),
                     chorus_input_right,
                     self.inverse_block_size,
                 );
@@ -447,7 +447,7 @@ impl Synthesizer {
                 Synthesizer::write_block(
                     previous_gain,
                     current_gain,
-                    &voice.block[..],
+                    voice.block(),
                     &mut reverb_input[..],
                     self.inverse_block_size,
                 );

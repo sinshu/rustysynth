@@ -36,7 +36,8 @@ impl VoiceCollection {
         if exclusive_class != 0 {
             for i in 0..self.active_voice_count {
                 let voice = &self.voices[i];
-                if voice.exclusive_class == exclusive_class && voice.channel == channel {
+                if voice.exclusive_class() == exclusive_class && voice.channel() == channel
+                {
                     return Some(&mut self.voices[i]);
                 }
             }
@@ -55,14 +56,14 @@ impl VoiceCollection {
         let mut lowest_priority = f32::MAX;
         for i in 0..self.active_voice_count {
             let voice = &self.voices[i];
-            let priority = voice.get_priority();
+            let priority = voice.priority();
             if priority < lowest_priority {
                 lowest_priority = priority;
                 candidate = i;
             } else if priority == lowest_priority {
                 // Same priority...
                 // The older one should be more suitable for reuse.
-                if voice.voice_length > self.voices[candidate].voice_length {
+                if voice.voice_length() > self.voices[candidate].voice_length() {
                     candidate = i;
                 }
             }

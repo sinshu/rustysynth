@@ -13,12 +13,17 @@ use crate::soundfont_math::SoundFontMath;
 use crate::synthesizer_settings::SynthesizerSettings;
 use crate::volume_envelope::VolumeEnvelope;
 
+#[derive(Debug, PartialEq, Eq)]
+#[non_exhaustive]
+enum VoiceState {
+    Playing = 0,
+    ReleaseRequested = 1,
+    Released = 2,
+}
+
 #[derive(Debug)]
 #[non_exhaustive]
 pub(crate) struct Voice {
-    sample_rate: i32,
-    block_size: usize,
-
     vol_env: VolumeEnvelope,
     mod_env: ModulationEnvelope,
 
@@ -28,7 +33,7 @@ pub(crate) struct Voice {
     oscillator: Oscillator,
     filter: BiQuadFilter,
 
-    pub(crate) block: Vec<f32>,
+    block: Vec<f32>,
 
     // A sudden change in the mix gain will cause pop noise.
     // To avoid this, we save the mix gain of the previous block,
@@ -44,10 +49,10 @@ pub(crate) struct Voice {
     pub(crate) current_reverb_send: f32,
     pub(crate) current_chorus_send: f32,
 
-    pub(crate) exclusive_class: i32,
-    pub(crate) channel: i32,
-    pub(crate) key: i32,
-    pub(crate) velocity: i32,
+    exclusive_class: i32,
+    channel: i32,
+    key: i32,
+    velocity: i32,
 
     note_gain: f32,
 
@@ -73,16 +78,15 @@ pub(crate) struct Voice {
     // This is used to smooth out the cutoff frequency.
     smoothed_cutoff: f32,
 
-    voice_state: i32,
-    pub(crate) voice_length: usize,
+    voice_state: VoiceState,
+    /// Time elapsed in samples
+    voice_length: usize,
     min_voice_length: usize,
 }
 
 impl Voice {
     pub(crate) fn new(settings: &SynthesizerSettings) -> Self {
         Self {
-            sample_rate: settings.sample_rate,
-            block_size: settings.block_size,
             vol_env: VolumeEnvelope::new(settings),
             mod_env: ModulationEnvelope::new(settings),
             vib_lfo: Lfo::new(settings),
@@ -117,7 +121,7 @@ impl Voice {
             instrument_reverb: 0_f32,
             instrument_chorus: 0_f32,
             smoothed_cutoff: 0_f32,
-            voice_state: 0,
+            voice_state: VoiceState::Playing,
             voice_length: 0,
             min_voice_length: (settings.sample_rate / 500) as usize,
         }
@@ -170,13 +174,13 @@ impl Voice {
 
         self.smoothed_cutoff = self.cutoff;
 
-        self.voice_state = VoiceState::PLAYING;
+        self.voice_state = VoiceState::Playing;
         self.voice_length = 0;
     }
 
     pub(crate) fn end(&mut self) {
-        if self.voice_state == VoiceState::PLAYING {
-            self.voice_state = VoiceState::RELEASE_REQUESTED;
+        if self.voice_state == VoiceState::Playing {
+            self.voice_state = VoiceState::ReleaseRequested;
         }
     }
 
@@ -193,11 +197,11 @@ impl Voice {
 
         self.release_if_necessary(channel_info);
 
-        if !self.vol_env.process(self.block_size) {
+        if !self.vol_env.process(self.block.len()) {
             return false;
         }
 
-        self.mod_env.process(self.block_size);
+        self.mod_env.process(self.block.len());
         self.vib_lfo.process();
         self.mod_lfo.process();
 
@@ -273,7 +277,7 @@ impl Voice {
             self.previous_chorus_send = self.current_chorus_send;
         }
 
-        self.voice_length += self.block_size;
+        self.voice_length += self.block.len();
 
         true
     }
@@ -283,30 +287,40 @@ impl Voice {
             return;
         }
 
-        if self.voice_state == VoiceState::RELEASE_REQUESTED && !channel_info.get_hold_pedal() {
+        if self.voice_state == VoiceState::ReleaseRequested && !channel_info.get_hold_pedal() {
             self.vol_env.release();
             self.mod_env.release();
             self.oscillator.release();
 
-            self.voice_state = VoiceState::RELEASED;
+            self.voice_state = VoiceState::Released;
         }
     }
 
-    pub(crate) fn get_priority(&self) -> f32 {
+    pub(crate) fn block(&self) -> &Vec<f32> {
+        &self.block
+    }
+
+    pub(crate) fn voice_length(&self) -> usize {
+        self.voice_length
+    }
+
+    pub(crate) fn exclusive_class(&self) -> i32 {
+        self.exclusive_class
+    }
+
+    pub(crate) fn channel(&self) -> i32 {
+        self.channel
+    }
+
+    pub(crate) fn key(&self) -> i32 {
+        self.key
+    }
+
+    pub(crate) fn priority(&self) -> f32 {
         if self.note_gain < SoundFontMath::NON_AUDIBLE {
             0_f32
         } else {
             self.vol_env.get_priority()
         }
     }
-}
-
-#[allow(unused)]
-#[non_exhaustive]
-struct VoiceState {}
-
-impl VoiceState {
-    const PLAYING: i32 = 0;
-    const RELEASE_REQUESTED: i32 = 1;
-    const RELEASED: i32 = 2;
 }
