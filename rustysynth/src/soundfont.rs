@@ -52,7 +52,7 @@ impl SoundFont {
 
         let sound_font = Self {
             info,
-            bits_per_sample: 16,
+            bits_per_sample: sample_data.bits_per_sample,
             wave_data: sample_data.wave_data,
             sample_headers: parameters.sample_headers,
             presets: parameters.presets,
