@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 
 use std::io::Read;
-use std::slice;
 
 use crate::binary_reader::BinaryReader;
 use crate::error::SoundFontError;
@@ -9,7 +8,7 @@ use crate::four_cc::FourCC;
 use crate::read_counter::ReadCounter;
 
 #[non_exhaustive]
-pub struct SoundFontSampleData {
+pub(crate) struct SoundFontSampleData {
     pub bits_per_sample: i32,
     pub wave_data: Vec<i16>,
 }
@@ -45,17 +44,16 @@ impl SoundFontSampleData {
             }
         }
 
-        let wave_data = match wave_data {
-            Some(value) => value,
-            None => return Err(SoundFontError::SampleDataNotFound),
+        let Some(wave_data) = wave_data else {
+            return Err(SoundFontError::SampleDataNotFound);
         };
 
-        if wave_data.len() < 4 {
+        if wave_data.len() < 2 {
             return Err(SoundFontError::SampleDataNotFound);
         }
 
-        let ptr = wave_data.as_ptr() as *const u8;
-        let four_cc = unsafe { slice::from_raw_parts(ptr, 4) };
+        // SoundFont3 compressed sample format
+        let four_cc = unsafe { std::slice::from_raw_parts(wave_data.as_ptr() as *const u8, 4) };
         if four_cc == b"OggS" {
             return Err(SoundFontError::UnsupportedSampleFormat);
         }
