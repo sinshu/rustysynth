@@ -119,21 +119,28 @@ impl MidiFileSequencer {
             let msg = midi_file.messages[self.msg_index];
 
             if time <= self.current_time {
-                if msg.get_message_type() == Message::NORMAL {
-                    self.synthesizer.process_midi_message(
-                        msg.channel as i32,
-                        msg.command as i32,
-                        msg.data1 as i32,
-                        msg.data2 as i32,
-                    );
-                } else if self.play_loop {
-                    if msg.get_message_type() == Message::LOOP_START {
-                        self.loop_index = self.msg_index;
-                    } else if msg.get_message_type() == Message::LOOP_END {
+                match msg {
+                    Message::Normal {
+                        status,
+                        data1,
+                        data2,
+                    } => {
+                        let channel = status & 0x0F;
+                        let command = status & 0xF0;
+                        self.synthesizer.process_midi_message(
+                            channel as i32,
+                            command as i32,
+                            data1 as i32,
+                            data2 as i32,
+                        );
+                    }
+                    Message::LoopStart if self.play_loop => self.loop_index = self.msg_index,
+                    Message::LoopEnd if self.play_loop => {
                         self.current_time = midi_file.times[self.loop_index];
                         self.msg_index = self.loop_index;
                         self.synthesizer.note_off_all(false);
                     }
+                    _ => (),
                 }
                 self.msg_index += 1;
             } else {

@@ -10,56 +10,49 @@ use crate::MidiFileLoopType;
 
 #[derive(Clone, Copy, Debug)]
 #[non_exhaustive]
-pub(crate) struct Message {
-    pub(crate) channel: u8,
-    pub(crate) command: u8,
-    pub(crate) data1: u8,
-    pub(crate) data2: u8,
+pub(crate) enum Message {
+    Normal { status: u8, data1: u8, data2: u8 },
+    TempoChange { bytes: [u8; 3] },
+    LoopStart,
+    LoopEnd,
+    EndOfTrack,
 }
 
 impl Message {
-    pub(crate) const NORMAL: u8 = 0;
-    pub(crate) const TEMPO_CHANGE: u8 = 252;
-    pub(crate) const LOOP_START: u8 = 253;
-    pub(crate) const LOOP_END: u8 = 254;
-    pub(crate) const END_OF_TRACK: u8 = 255;
-
     pub(crate) fn common1(status: u8, data1: u8) -> Self {
-        Self {
-            channel: status & 0x0F,
-            command: status & 0xF0,
+        Self::Normal {
+            status,
             data1,
             data2: 0,
         }
     }
 
     pub(crate) fn common2(status: u8, data1: u8, data2: u8, loop_type: MidiFileLoopType) -> Self {
-        let channel = status & 0x0F;
         let command = status & 0xF0;
 
         if command == 0xB0 {
             match loop_type {
                 MidiFileLoopType::RpgMaker => {
                     if data1 == 111 {
-                        return Message::loop_start();
+                        return Message::LoopStart;
                     }
                 }
 
                 MidiFileLoopType::IncredibleMachine => {
                     if data1 == 110 {
-                        return Message::loop_start();
+                        return Message::LoopStart;
                     }
                     if data1 == 111 {
-                        return Message::loop_end();
+                        return Message::LoopEnd;
                     }
                 }
 
                 MidiFileLoopType::FinalFantasy => {
                     if data1 == 116 {
-                        return Message::loop_start();
+                        return Message::LoopStart;
                     }
                     if data1 == 117 {
-                        return Message::loop_end();
+                        return Message::LoopEnd;
                     }
                 }
 
@@ -67,64 +60,17 @@ impl Message {
             }
         }
 
-        Self {
-            channel,
-            command,
+        Self::Normal {
+            status,
             data1,
             data2,
         }
     }
 
     pub(crate) fn tempo_change(tempo: i32) -> Self {
-        Self {
-            channel: Message::TEMPO_CHANGE,
-            command: (tempo >> 16) as u8,
-            data1: (tempo >> 8) as u8,
-            data2: tempo as u8,
-        }
-    }
-
-    pub(crate) fn loop_start() -> Self {
-        Self {
-            channel: Message::LOOP_START,
-            command: 0,
-            data1: 0,
-            data2: 0,
-        }
-    }
-
-    pub(crate) fn loop_end() -> Self {
-        Self {
-            channel: Message::LOOP_END,
-            command: 0,
-            data1: 0,
-            data2: 0,
-        }
-    }
-
-    pub(crate) fn end_of_track() -> Self {
-        Self {
-            channel: Message::END_OF_TRACK,
-            command: 0,
-            data1: 0,
-            data2: 0,
-        }
-    }
-
-    pub(crate) fn get_message_type(&self) -> u8 {
-        match self.channel {
-            Message::TEMPO_CHANGE => Message::TEMPO_CHANGE,
-            Message::LOOP_START => Message::LOOP_START,
-            Message::LOOP_END => Message::LOOP_END,
-            Message::END_OF_TRACK => Message::END_OF_TRACK,
-            _ => Message::NORMAL,
-        }
-    }
-
-    pub(crate) fn get_tempo(&self) -> f64 {
-        60000000.0
-            / (((self.command as i32) << 16) | ((self.data1 as i32) << 8) | (self.data2 as i32))
-                as f64
+        // Truncate to u24
+        let bytes = tempo.to_be_bytes()[1..].try_into().unwrap();
+        Self::TempoChange { bytes }
     }
 }
 
@@ -209,13 +155,13 @@ impl MidiFile {
                     for i in 0..tick_list.len() {
                         if tick_list[i] >= loop_point {
                             tick_list.insert(i, loop_point);
-                            message_list.insert(i, Message::loop_start());
+                            message_list.insert(i, Message::LoopStart);
                             break;
                         }
                     }
                 } else {
                     tick_list.push(loop_point);
-                    message_list.push(Message::loop_start());
+                    message_list.push(Message::LoopStart);
                 }
             }
             _ => (),
@@ -292,7 +238,7 @@ impl MidiFile {
                 0xFF => match BinaryReader::read_u8(reader)? {
                     0x2F => {
                         BinaryReader::read_u8(reader)?;
-                        messages.push(Message::end_of_track());
+                        messages.push(Message::EndOfTrack);
                         ticks.push(tick);
 
                         // Some MIDI files may have events inserted after the EOT.
@@ -369,8 +315,9 @@ impl MidiFile {
             current_time += delta_time;
 
             let message = message_lists[min_index as usize][indices[min_index as usize]];
-            if message.get_message_type() == Message::TEMPO_CHANGE {
-                tempo = message.get_tempo();
+            if let Message::TempoChange { bytes } = message {
+                let tempo_i32 = i32::from_be_bytes([0, bytes[0], bytes[1], bytes[2]]);
+                tempo = 60000000.0 / tempo_i32 as f64;
             } else {
                 merged_messages.push(message);
                 merged_times.push(current_time);
@@ -385,5 +332,16 @@ impl MidiFile {
     /// Get the length of the MIDI file in seconds.
     pub fn get_length(&self) -> f64 {
         *self.times.last().unwrap()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_message_size() {
+        // Avoid increasing the size of the Message type
+        assert_eq!(size_of::<Message>(), 4);
     }
 }
