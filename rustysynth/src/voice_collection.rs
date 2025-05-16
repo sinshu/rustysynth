@@ -36,8 +36,7 @@ impl VoiceCollection {
         if exclusive_class != 0 {
             for i in 0..self.active_voice_count {
                 let voice = &self.voices[i];
-                if voice.exclusive_class() == exclusive_class && voice.channel() == channel
-                {
+                if voice.exclusive_class() == exclusive_class && voice.channel() == channel {
                     return Some(&mut self.voices[i]);
                 }
             }
