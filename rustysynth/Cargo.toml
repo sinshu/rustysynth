@@ -1,6 +1,6 @@
 [package]
 name = "rustysynth"
-version = "1.3.5"
+version = "1.3.6"
 authors = ["Nobuaki Tanaka"]
 edition = "2021"
 
