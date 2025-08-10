@@ -68,6 +68,7 @@ impl SoundFont {
     fn sanity_check(&self) -> Result<(), SoundFontError> {
         // https://github.com/sinshu/rustysynth/issues/22
         // https://github.com/sinshu/rustysynth/issues/33
+        // https://github.com/sinshu/rustysynth/pull/51
         for instrument in &self.instruments {
             for region in &instrument.regions {
                 let start = region.get_sample_start();
