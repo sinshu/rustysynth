@@ -1,6 +1,7 @@
 # v1.3.6
 
 - Various code clean-ups ([thanks to @sevonj](https://github.com/sinshu/rustysynth/issues/42)).
+- Fixed segfault caused by empty `smpl` sub-chunks ([thanks to @sevonj](https://github.com/sinshu/rustysynth/pull/48)).
 - Added sanity check for zero-length loops ([thanks to @eswartz](https://github.com/sinshu/rustysynth/pull/51)).
 
 # v1.3.5
