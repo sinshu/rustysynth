@@ -94,8 +94,8 @@ impl SoundFont {
     fn disarm_unplayable_regions(&mut self) -> Vec<DisarmedRegion> {
         let wave_len = self.wave_data.len() as i64;
         let mut disarmed = Vec::new();
-        for instrument in self.instruments.iter_mut() {
-            for region in instrument.regions.iter_mut() {
+        for (instrument_index, instrument) in self.instruments.iter_mut().enumerate() {
+            for (region_index, region) in instrument.regions.iter_mut().enumerate() {
                 // In i64: a header value plus a coarse address offset can pass
                 // i32::MAX, which panics in a debug build.
                 let start = region.sample_start as i64 + region.get_start_address_offset() as i64;
@@ -156,6 +156,8 @@ impl SoundFont {
 
                 let sample_id = region.get_sample_id();
                 disarmed.push(DisarmedRegion {
+                    instrument_index,
+                    region_index,
                     instrument: instrument.name.clone(),
                     sample: self
                         .sample_headers

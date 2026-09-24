@@ -143,12 +143,18 @@ fn only_the_broken_region_changes() {
     // the loop it inherits from the global zone.
     font.instruments[0].1[2].insert(0, (G::END_LOOP_ADDRESS_OFFSET, -2000));
     let font = load(&font);
-    let names: Vec<_> = font
+    let found: Vec<_> = font
         .get_disarmed_regions()
         .iter()
-        .map(|d| d.get_sample_name())
+        .map(|d| {
+            (
+                d.get_instrument_index(),
+                d.get_region_index(),
+                d.get_sample_name(),
+            )
+        })
         .collect();
-    assert_eq!(names, ["high"]);
+    assert_eq!(found, [(0, 1, "high")]);
     let regions = font.get_instruments()[0].get_regions();
     assert_eq!(regions[0].get_sample_modes(), LoopMode::Continuous);
     assert_eq!(regions[1].get_sample_modes(), LoopMode::NoLoop);
