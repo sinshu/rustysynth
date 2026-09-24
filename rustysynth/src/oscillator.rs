@@ -141,7 +141,12 @@ impl Oscillator {
 
         for sample in block.iter_mut() {
             if self.position_fp >= end_loop_fp {
-                self.position_fp -= loop_length_fp;
+                // A step longer than the loop overshoots the loop end by more
+                // than one loop length, so wrap by the remainder. For a
+                // position less than one loop length past the end this is the
+                // same as subtracting the loop length once.
+                self.position_fp = end_loop_fp - loop_length_fp
+                    + (self.position_fp - end_loop_fp) % loop_length_fp;
             }
 
             let index1 = (self.position_fp >> Oscillator::FRAC_BITS) as usize;

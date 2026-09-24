@@ -68,4 +68,6 @@ pub use self::synthesizer_settings::SynthesizerSettings;
 #[cfg(test)]
 mod disarm_tests;
 #[cfg(test)]
+mod oscillator_tests;
+#[cfg(test)]
 mod test_support;
