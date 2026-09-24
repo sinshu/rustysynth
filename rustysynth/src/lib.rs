@@ -5,6 +5,7 @@ mod binary_reader;
 mod four_cc;
 mod read_counter;
 
+mod disarmed_region;
 mod generator;
 mod generator_type;
 mod instrument;
@@ -45,6 +46,7 @@ mod midifile_sequencer;
 mod chorus;
 mod reverb;
 
+pub use self::disarmed_region::DisarmedRegion;
 pub use self::error::MidiFileError;
 pub use self::error::SoundFontError;
 pub use self::error::SynthesizerError;
@@ -62,3 +64,8 @@ pub use self::soundfont_info::SoundFontInfo;
 pub use self::soundfont_version::SoundFontVersion;
 pub use self::synthesizer::Synthesizer;
 pub use self::synthesizer_settings::SynthesizerSettings;
+
+#[cfg(test)]
+mod disarm_tests;
+#[cfg(test)]
+mod test_support;

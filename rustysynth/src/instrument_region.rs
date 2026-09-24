@@ -145,20 +145,28 @@ impl InstrumentRegion {
         contains_key && contains_velocity
     }
 
+    // Header value plus offset, wrapping as a release build always did. While
+    // loading, a sum that leaves i32 makes the region unusable (the check in
+    // `SoundFont::disarm_unplayable_regions` works in i64) -- except the loop
+    // points of a region that does not loop, which are never read. Here it
+    // only must not panic in a debug build.
     pub fn get_sample_start(&self) -> i32 {
-        self.sample_start + self.get_start_address_offset()
+        self.sample_start
+            .wrapping_add(self.get_start_address_offset())
     }
 
     pub fn get_sample_end(&self) -> i32 {
-        self.sample_end + self.get_end_address_offset()
+        self.sample_end.wrapping_add(self.get_end_address_offset())
     }
 
     pub fn get_sample_start_loop(&self) -> i32 {
-        self.sample_start_loop + self.get_start_loop_address_offset()
+        self.sample_start_loop
+            .wrapping_add(self.get_start_loop_address_offset())
     }
 
     pub fn get_sample_end_loop(&self) -> i32 {
-        self.sample_end_loop + self.get_end_loop_address_offset()
+        self.sample_end_loop
+            .wrapping_add(self.get_end_loop_address_offset())
     }
 
     pub fn get_start_address_offset(&self) -> i32 {
