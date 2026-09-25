@@ -82,7 +82,6 @@ impl SoundFont {
                     || end as usize >= self.wave_data.len()
                     || end_loop as usize >= self.wave_data.len()
                     || end <= start
-                    || end_loop < start_loop
                     || (loop_mode != LoopMode::NoLoop && start_loop >= end_loop)
                 {
                     return Err(SoundFontError::SanityCheckFailed);
