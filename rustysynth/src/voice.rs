@@ -141,7 +141,7 @@ impl Voice {
             let decibels = 2_f32 * SoundFontMath::linear_to_decibels(velocity as f32 / 127_f32)
                 - sample_attenuation
                 - filter_attenuation;
-            self.note_gain = SoundFontMath::decibels_to_linear(decibels);
+            self.note_gain = SoundFontMath::decibels_to_linear(decibels.min(0_f32));
         } else {
             self.note_gain = 0_f32;
         }
