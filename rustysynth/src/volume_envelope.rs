@@ -66,7 +66,7 @@ impl VolumeEnvelope {
         self.decay_start_time = self.hold_start_time + hold as f64;
         self.release_start_time = 0_f64;
 
-        self.sustain_level = SoundFontMath::clamp(sustain, 0_f32, 1_f32);
+        self.sustain_level = sustain.clamp(0_f32, 1_f32);
         self.release_level = 0_f32;
 
         self.processed_sample_count = 0;

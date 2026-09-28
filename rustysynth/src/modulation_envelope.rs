@@ -68,7 +68,7 @@ impl ModulationEnvelope {
         self.decay_end_time = self.decay_start_time + decay as f64;
         self.release_end_time = release as f64;
 
-        self.sustain_level = SoundFontMath::clamp(sustain, 0_f32, 1_f32);
+        self.sustain_level = sustain.clamp(0_f32, 1_f32);
         self.release_level = 0_f32;
 
         self.processed_sample_count = 0;

@@ -141,7 +141,7 @@ impl Voice {
             let decibels = 2_f32 * SoundFontMath::linear_to_decibels(velocity as f32 / 127_f32)
                 - sample_attenuation
                 - filter_attenuation;
-            self.note_gain = SoundFontMath::decibels_to_linear(decibels);
+            self.note_gain = SoundFontMath::decibels_to_linear(decibels.min(0_f32));
         } else {
             self.note_gain = 0_f32;
         }
@@ -160,7 +160,7 @@ impl Voice {
         self.mod_lfo_to_volume = region.get_modulation_lfo_to_volume();
         self.dynamic_volume = self.mod_lfo_to_volume > 0.05_f32;
 
-        self.instrument_pan = SoundFontMath::clamp(region.get_pan(), -50_f32, 50_f32);
+        self.instrument_pan = region.get_pan().clamp(-50_f32, 50_f32);
         self.instrument_reverb = 0.01_f32 * region.get_reverb_effects_send();
         self.instrument_chorus = 0.01_f32 * region.get_chorus_effects_send();
 
@@ -224,7 +224,7 @@ impl Voice {
             // The cutoff change is limited within x0.5 and x2 to reduce pop noise.
             let lower_limit = 0.5_f32 * self.smoothed_cutoff;
             let upper_limit = 2_f32 * self.smoothed_cutoff;
-            self.smoothed_cutoff = SoundFontMath::clamp(new_cutoff, lower_limit, upper_limit);
+            self.smoothed_cutoff = new_cutoff.clamp(lower_limit, upper_limit);
 
             self.filter
                 .set_low_pass_filter(self.smoothed_cutoff, self.resonance);
@@ -259,16 +259,10 @@ impl Voice {
             self.current_mix_gain_right = mix_gain * angle.sin();
         }
 
-        self.current_reverb_send = SoundFontMath::clamp(
-            channel_info.get_reverb_send() + self.instrument_reverb,
-            0_f32,
-            1_f32,
-        );
-        self.current_chorus_send = SoundFontMath::clamp(
-            channel_info.get_chorus_send() + self.instrument_chorus,
-            0_f32,
-            1_f32,
-        );
+        self.current_reverb_send =
+            (channel_info.get_reverb_send() + self.instrument_reverb).clamp(0_f32, 1_f32);
+        self.current_chorus_send =
+            (channel_info.get_chorus_send() + self.instrument_chorus).clamp(0_f32, 1_f32);
 
         if self.voice_length == 0 {
             self.previous_mix_gain_left = self.current_mix_gain_left;
