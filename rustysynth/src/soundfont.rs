@@ -11,7 +11,6 @@ use crate::sample_header::SampleHeader;
 use crate::soundfont_info::SoundFontInfo;
 use crate::soundfont_parameters::SoundFontParameters;
 use crate::soundfont_sampledata::SoundFontSampleData;
-use crate::LoopMode;
 
 /// Reperesents a SoundFont.
 #[derive(Debug)]
@@ -75,14 +74,17 @@ impl SoundFont {
                 let end = region.get_sample_end();
                 let start_loop = region.get_sample_start_loop();
                 let end_loop = region.get_sample_end_loop();
-                let loop_mode = region.get_sample_modes();
+                // let loop_mode = region.get_sample_modes();
 
                 if start < 0
                     || start_loop < 0
                     || end as usize >= self.wave_data.len()
                     || end_loop as usize >= self.wave_data.len()
                     || end <= start
-                    || (loop_mode != LoopMode::NoLoop && start_loop >= end_loop)
+                // An invalid loop range no longer rejects the whole file.
+                // The oscillator plays such a region once without looping.
+                // https://github.com/sinshu/rustysynth/issues/55
+                // || (loop_mode != LoopMode::NoLoop && start_loop >= end_loop)
                 {
                     return Err(SoundFontError::SanityCheckFailed);
                 }
