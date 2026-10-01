@@ -1,3 +1,10 @@
+# v1.3.7
+
+- Fixed potential IO issue.
+- Fixed an issue where some SoundFonts could produce excessively loud output ([thanks to @wehrwolfmann](https://github.com/sinshu/rustysynth/pull/59)).
+- Revised sanity checks related to loop points ([thanks to @wehrwolfmann](https://github.com/sinshu/rustysynth/pull/60)).
+- Added runtime handling for invalid loop ranges by disabling looping ([thanks to @wehrwolfmann](https://github.com/sinshu/rustysynth/pull/61)).
+
 # v1.3.6
 
 - Various code clean-ups ([thanks to @sevonj](https://github.com/sinshu/rustysynth/issues/42)).
