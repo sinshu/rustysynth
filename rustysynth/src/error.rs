@@ -3,6 +3,7 @@ use std::fmt;
 use std::io;
 
 use crate::four_cc::FourCC;
+use crate::synthesizer_settings::SynthesizerSettings;
 
 /// Represents an error when initializing a synthesizer.
 #[derive(Debug)]
@@ -31,7 +32,9 @@ impl fmt::Display for SynthesizerError {
             SynthesizerError::MaximumPolyphonyOutOfRange(value) => {
                 write!(
                     f,
-                    "the maximum number of polyphony must be between 8 and 256, but was {}",
+                    "the maximum number of polyphony must be between {} and {}, but was {}",
+                    SynthesizerSettings::MINIMUM_POLYPHONY,
+                    SynthesizerSettings::MAXIMUM_POLYPHONY,
                     value
                 )
             }

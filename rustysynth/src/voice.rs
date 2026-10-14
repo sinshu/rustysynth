@@ -3,6 +3,7 @@
 use std::f32::consts;
 
 use crate::bi_quad_filter::BiQuadFilter;
+use crate::bi_quad_filter::FilterAndBlock;
 use crate::channel::Channel;
 use crate::lfo::Lfo;
 use crate::modulation_envelope::ModulationEnvelope;
@@ -71,6 +72,10 @@ pub(crate) struct Voice {
     dynamic_volume: bool,
 
     instrument_pan: f32,
+    // Cache: the last pan angle and its cosine and sine, since the pan rarely changes.
+    last_pan_angle: f32,
+    last_pan_cos: f32,
+    last_pan_sin: f32,
     instrument_reverb: f32,
     instrument_chorus: f32,
 
@@ -118,6 +123,9 @@ impl Voice {
             mod_lfo_to_volume: 0_f32,
             dynamic_volume: false,
             instrument_pan: 0_f32,
+            last_pan_angle: f32::NAN,
+            last_pan_cos: 0_f32,
+            last_pan_sin: 0_f32,
             instrument_reverb: 0_f32,
             instrument_chorus: 0_f32,
             smoothed_cutoff: 0_f32,
@@ -190,7 +198,13 @@ impl Voice {
         self.note_gain = 0_f32;
     }
 
-    pub(crate) fn process(&mut self, data: &[i16], channels: &[Channel]) -> bool {
+    /// The filter and the block it works on, so that several voices can be filtered together.
+    pub(crate) fn filter_and_block(&mut self) -> FilterAndBlock<'_> {
+        (&mut self.filter, &mut self.block[..])
+    }
+
+    /// Everything up to the filter (the envelopes, the pitch, the oscillator, the filter's cutoff); `false` if the voice has finished.
+    pub(crate) fn process_before_filter(&mut self, data: &[i16], channels: &[Channel]) -> bool {
         if self.note_gain < SoundFontMath::NON_AUDIBLE {
             return false;
         }
@@ -231,7 +245,13 @@ impl Voice {
             self.filter
                 .set_low_pass_filter(self.smoothed_cutoff, self.resonance);
         }
-        self.filter.process(&mut self.block[..]);
+
+        true
+    }
+
+    /// Everything after the filter (the gains, the pan and the sends).
+    pub(crate) fn process_after_filter(&mut self, channels: &[Channel]) {
+        let channel_info = &channels[self.channel as usize];
 
         self.previous_mix_gain_left = self.current_mix_gain_left;
         self.previous_mix_gain_right = self.current_mix_gain_right;
@@ -257,8 +277,12 @@ impl Voice {
             self.current_mix_gain_left = 0_f32;
             self.current_mix_gain_right = mix_gain;
         } else {
-            self.current_mix_gain_left = mix_gain * angle.cos();
-            self.current_mix_gain_right = mix_gain * angle.sin();
+            if angle != self.last_pan_angle {
+                (self.last_pan_angle, self.last_pan_cos, self.last_pan_sin) =
+                    (angle, angle.cos(), angle.sin());
+            }
+            self.current_mix_gain_left = mix_gain * self.last_pan_cos;
+            self.current_mix_gain_right = mix_gain * self.last_pan_sin;
         }
 
         self.current_reverb_send =
@@ -274,8 +298,6 @@ impl Voice {
         }
 
         self.voice_length += self.block.len();
-
-        true
     }
 
     fn release_if_necessary(&mut self, channel_info: &Channel) {
