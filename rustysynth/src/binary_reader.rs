@@ -120,6 +120,8 @@ impl BinaryReader {
         reader.read_exact(&mut data)
     }
 
+    // The size must be even. SoundFontSampleData::new rejects odd sizes before
+    // calling this function.
     pub(crate) fn read_wave_data<R: Read>(
         reader: &mut R,
         size: usize,
