@@ -1,3 +1,7 @@
+# v1.3.8
+
+- Reject sample data with an odd size (thanks to @Defkil).
+
 # v1.3.7
 
 - Fixed potential IO issue.
